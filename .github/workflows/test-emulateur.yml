@@ -1,0 +1,51 @@
+name: Tester sur un téléphone virtuel
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Compiler AgroDiag CI"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Activer KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Télécharger l'APK de test publié
+        run: curl -sSL -o app.apk https://github.com/${{ github.repository }}/releases/download/test/AgroDiag-CI-test.apk
+
+      - name: Installer, ouvrir et capturer l'écran (Android 14)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: |
+            adb install -r app.apk
+            adb logcat -c
+            adb shell am start -W -n com.agrodiag.ci/.MainActivity
+            sleep 25
+            adb exec-out screencap -p > ecran.png
+            adb shell dumpsys activity activities | grep -iE "mResumedActivity|topResumedActivity" > activite.txt || true
+            adb logcat -d -v brief > logcat.txt || true
+            grep -iE "agrodiag|AndroidRuntime|chromium|WebView|FATAL" logcat.txt | tail -300 > logcat_filtre.txt || true
+
+      - name: Publier le rapport
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete test-rapport -R ${{ github.repository }} -y --cleanup-tag || true
+          touch ecran.png activite.txt logcat_filtre.txt
+          gh release create test-rapport ecran.png activite.txt logcat_filtre.txt -R ${{ github.repository }} --prerelease --title "Rapport de test sur téléphone virtuel" --notes "Capture d'écran et journal de l'application sur Android 14."
