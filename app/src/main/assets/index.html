@@ -1,0 +1,1015 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>AgroDiag CI</title>
+<style>
+/* Layout : barre d'onglets fixe en haut, une colonne sur téléphone, liste + fiche côte à côte sur grand écran */
+:root{
+  --bg:#F3F5F1; --surface:#FFFFFF; --sunk:#E8ECE5; --line:#D3DACF; --fg:#18231C; --muted:#5B6A60;
+  --accent:#1D6A4A; --accent-ink:#FFFFFF; --accent-soft:#DCEDE3;
+  --good:#1E7B4C; --good-bg:#DDF1E5; --warn:#9A6400; --warn-bg:#FBEBC9; --risk:#B4501A; --risk-bg:#FADFCF; --bad:#B42335; --bad-bg:#F8DADE;
+  --font-display:"Familjen Grotesk", "Segoe UI", system-ui, sans-serif;
+  --font-body:"Public Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111813; --surface:#18211B; --sunk:#0D130F; --line:#2C3830; --fg:#E4EBE5; --muted:#9AAA9F;
+  --accent:#5CC492; --accent-ink:#08140D; --accent-soft:#1D3328;
+  --good:#6FD39E; --good-bg:#183326; --warn:#E8B45A; --warn-bg:#3A2D12; --risk:#F0925C; --risk-bg:#3D2215; --bad:#F27D8C; --bad-bg:#3E1B21; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111813; --surface:#18211B; --sunk:#0D130F; --line:#2C3830; --fg:#E4EBE5; --muted:#9AAA9F;
+  --accent:#5CC492; --accent-ink:#08140D; --accent-soft:#1D3328;
+  --good:#6FD39E; --good-bg:#183326; --warn:#E8B45A; --warn-bg:#3A2D12; --risk:#F0925C; --risk-bg:#3D2215; --bad:#F27D8C; --bad-bg:#3E1B21; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--font-body)}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;line-height:1.2}
+button,input,select,textarea{font:inherit;color:inherit}
+.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.lab{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.top-in{max-width:1180px;margin:0 auto;padding:12px 16px 0;display:flex;flex-direction:column;gap:10px}
+.brand{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.brand h1{font-size:21px;letter-spacing:-.01em}
+.brand h1 span{color:var(--accent)}
+.brand p{margin:0;color:var(--muted);font-size:13px}
+nav.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;margin:0 -4px}
+nav.tabs button{background:none;border:0;padding:9px 12px 11px;cursor:pointer;color:var(--muted);font-weight:600;font-size:14px;border-bottom:2.5px solid transparent;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent)}
+nav.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+nav.tabs .badge{display:inline-block;min-width:18px;padding:0 5px;margin-left:4px;border-radius:9px;background:var(--sunk);font-size:11px;color:var(--muted)}
+
+main{max-width:1180px;margin:0 auto;padding-block:18px 60px;padding-inline:16px}
+section.view{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1 1 160px}
+.field label{font-size:12.5px;font-weight:600;color:var(--muted)}
+input[type=text],input[type=number],input[type=search],select,textarea{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:9px 10px;width:100%;min-width:0}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 13px;cursor:pointer;font-weight:600;font-size:14px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:none;border-color:transparent;color:var(--accent);padding-inline:6px}
+.btn.danger{color:var(--bad)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+
+.pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:2px 9px;font-size:12px;font-weight:600;white-space:nowrap}
+.p-fav{background:var(--good-bg);color:var(--good)}
+.p-cond{background:var(--warn-bg);color:var(--warn)}
+.p-risk{background:var(--risk-bg);color:var(--risk)}
+.p-bad{background:var(--bad-bg);color:var(--bad)}
+.p-neutral{background:var(--sunk);color:var(--muted)}
+.p-acc{background:var(--accent-soft);color:var(--accent)}
+
+/* Diagnostic */
+.diag-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+@media (min-width:920px){.diag-grid{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);align-items:start}
+  .detail-wrap{position:sticky;top:120px;max-height:calc(100vh - 140px);overflow:auto}}
+.soil{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px 18px;margin-top:12px}
+.soil .v{font-family:var(--font-mono);font-size:17px}
+.soil .v.edited{color:var(--accent)}
+.constr{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.notice{border-radius:8px;padding:9px 12px;font-size:13.5px;background:var(--sunk)}
+.notice.warn{background:var(--warn-bg);color:var(--fg)}
+.notice.ok{background:var(--good-bg)}
+.override{margin-top:12px;border-top:1px dashed var(--line);padding-top:12px}
+
+.list-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chk{display:inline-flex;gap:6px;align-items:center;font-size:13.5px}
+ul.crops{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column}
+ul.crops li button{all:unset;box-sizing:border-box;width:100%;display:grid;grid-template-columns:minmax(0,1fr) 92px auto;gap:12px;align-items:center;padding:10px 8px;border-bottom:1px solid var(--line);cursor:pointer;border-radius:6px}
+ul.crops li button:hover{background:var(--sunk)}
+ul.crops li button[aria-current="true"]{background:var(--accent-soft)}
+ul.crops li button:focus-visible{outline:2px solid var(--accent)}
+.cn{font-weight:600;min-width:0}
+.cn small{display:block;font-weight:400;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar{height:8px;background:var(--sunk);border-radius:4px;position:relative;overflow:hidden}
+.bar i{position:absolute;inset:0 auto 0 0;border-radius:4px}
+.sc{font-family:var(--font-mono);font-size:13px;text-align:right;min-width:26px}
+@media (max-width:480px){ul.crops li button{grid-template-columns:minmax(0,1fr) 60px auto}}
+
+.detail h2{font-size:22px}
+.big{display:flex;align-items:center;gap:14px;margin:12px 0 4px}
+.big .n{font-family:var(--font-display);font-size:44px;font-weight:700;line-height:1}
+.facts{width:100%;border-collapse:collapse;margin-top:8px;font-size:14px}
+.facts td{padding:7px 4px;border-bottom:1px solid var(--line);vertical-align:top}
+.facts td.pts{text-align:right;white-space:nowrap;font-family:var(--font-mono)}
+.facts td:first-child{font-weight:600;white-space:nowrap}
+.phscale{margin:14px 0 4px}
+.phscale svg{width:100%;height:auto;display:block}
+ul.reco{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:5px}
+.kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;font-size:14px;margin-top:6px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0}
+.sub{display:flex;flex-direction:column;gap:6px;margin-top:18px}
+.sub h3{font-size:15px}
+
+/* Tables */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table.t{border-collapse:collapse;width:100%;font-size:13.5px;min-width:640px}
+table.t th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:9px 10px;border-bottom:1px solid var(--line);background:var(--sunk);position:sticky;top:0}
+table.t td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+table.t tr:last-child td{border-bottom:0}
+tr.st-interdit td:first-child{box-shadow:inset 3px 0 var(--bad)}
+tr.st-verifier td:first-child{box-shadow:inset 3px 0 var(--warn)}
+
+/* Rentabilité */
+.calc-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+@media (min-width:900px){.calc-grid{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);align-items:start}}
+.costs{display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:8px 12px;align-items:center;margin-top:10px}
+.costs label{font-size:14px}
+.costs input{text-align:right;font-family:var(--font-mono)}
+.res{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.res .k{font-size:12px;color:var(--muted)}
+.res .v{font-family:var(--font-mono);font-size:19px;font-weight:500}
+.res .v.neg{color:var(--bad)}
+.res .v.pos{color:var(--good)}
+.progress{height:6px;background:var(--sunk);border-radius:3px;overflow:hidden;margin-top:6px}
+.progress i{display:block;height:100%;background:var(--accent)}
+
+/* Qualité */
+.q-sum{display:flex;gap:8px;flex-wrap:wrap}
+.q-cat{display:flex;flex-direction:column;gap:8px}
+.q-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.q-item:last-child{border-bottom:0}
+.q-item b{font-weight:600}
+.q-item p{margin:2px 0 0;font-size:13.5px;color:var(--muted);grid-column:1/-1}
+.empty{padding:28px 12px;text-align:center;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:9px 16px;border-radius:8px;font-size:14px;z-index:20;max-width:calc(100% - 32px)}
+.inline-confirm{display:inline-flex;gap:6px;align-items:center;font-size:13px}
+@media (prefers-reduced-motion:no-preference){.bar i{transition:width .3s ease}}
+
+fieldset.chips{border:0;padding:0;margin:0;min-width:0}
+label.btn{cursor:pointer}
+.brand .pill{margin-left:auto}
+</style>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <h1>Agro<span>Diag</span> CI</h1>
+      <p>Outil de décision agro-pédologique · Côte d'Ivoire</p>
+      <span class="pill p-neutral" id="modeBadge">Hors connexion · données sur cet appareil</span>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button role="tab" id="tab-diag" aria-selected="true" data-v="diag">Que planter ici ?</button>
+      <button role="tab" id="tab-cult" aria-selected="false" data-v="cult">Où planter ?</button>
+      <button role="tab" id="tab-calc" aria-selected="false" data-v="calc">Rentabilité</button>
+      <button role="tab" id="tab-fich" aria-selected="false" data-v="fich">Fiches terrain<span class="badge" id="nbFiches">0</span></button>
+      <button role="tab" id="tab-qual" aria-selected="false" data-v="qual">Données et sauvegarde<span class="badge" id="nbAno">0</span></button>
+    </nav>
+  </div>
+</header>
+
+<main>
+<!-- QUE PLANTER ICI -->
+<section class="view" id="v-diag">
+  <div class="card">
+    <div class="row">
+      <div class="field"><label for="selReg">Région</label><select id="selReg"></select></div>
+      <div class="field" style="flex-basis:260px"><label for="selLoc">Localité</label><select id="selLoc"></select></div>
+    </div>
+    <div id="locInfo"></div>
+    <details class="override" id="addLocBox">
+      <summary style="cursor:pointer;font-weight:600">Ajouter mon village ou ma parcelle</summary>
+      <p class="small muted" style="margin:6px 0 10px">Le village s'ajoute à la liste avec vos données de sol. La pluie mensuelle est reprise de la station de référence de la zone ; vous pourrez ensuite importer ses données NASA POWER.</p>
+      <div class="row">
+        <div class="field"><label for="nlNom">Nom du village</label><input type="text" id="nlNom" maxlength="80"></div>
+        <div class="field"><label for="nlReg">Région</label><input type="text" id="nlReg" list="regList" maxlength="60"><datalist id="regList"></datalist></div>
+        <div class="field"><label for="nlZone">Zone agro-climatique</label><select id="nlZone"></select></div>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <div class="field"><label for="nlPh">pH eau</label><input type="number" id="nlPh" step="0.1" min="3" max="10"></div>
+        <div class="field"><label for="nlMo">MO (%)</label><input type="number" id="nlMo" step="0.1" min="0" max="20"></div>
+        <div class="field"><label for="nlDr">Drainage</label><select id="nlDr"><option>Bon</option><option>Moyen</option><option>Rapide</option><option>Variable</option></select></div>
+        <div class="field"><label for="nlSol">Type de sol</label><input type="text" id="nlSol" maxlength="60" placeholder="ex. Ferralsol"></div>
+      </div>
+      <fieldset class="chips" style="margin-top:10px"><legend class="small muted">Contraintes observées</legend><div id="nlContr" class="constr"></div></fieldset>
+      <div class="row" style="margin-top:10px;align-items:center"><button class="btn primary" id="nlSave">Ajouter le village</button><span class="small" id="nlMsg"></span></div>
+    </details>
+  </div>
+  <div class="diag-grid">
+    <div class="card">
+      <div class="list-head">
+        <h2 style="font-size:17px">Cultures classées pour cette localité</h2>
+        <div class="filters">
+          <label class="chk"><input type="checkbox" id="onlyRef" checked> Pratiquées dans la zone</label>
+          <select id="selFam" aria-label="Famille de culture" style="width:auto"></select>
+        </div>
+      </div>
+      <ul class="crops" id="cropList"></ul>
+    </div>
+    <div class="detail-wrap"><div class="card detail" id="detail"></div></div>
+  </div>
+</section>
+
+<!-- OÙ PLANTER -->
+<section class="view" id="v-cult" hidden>
+  <div class="card">
+    <div class="row">
+      <div class="field"><label for="selCult">Culture</label><select id="selCult"></select></div>
+      <div class="field"><label for="selWhere">Afficher</label>
+        <select id="selWhere"><option value="20">Les 20 meilleures localités</option><option value="all">Toutes les localités</option></select></div>
+    </div>
+  </div>
+  <div id="cultCard" class="card"></div>
+  <div class="card"><h3 style="font-size:16px">Meilleures localités pour cette culture</h3><p class="small muted" style="margin:4px 0 10px">Classement avec le sol de zone ou celui que vous avez saisi pour vos villages, et le climat de référence ou importé.</p><div id="whereList"></div></div>
+  <div class="card"><h3 style="font-size:16px">Risques phytosanitaires</h3>
+    <div class="row" style="margin:8px 0 10px"><div class="field" style="max-width:320px"><label for="selPhyFilter">Afficher</label>
+      <select id="selPhyFilter"><option value="all">Toutes les recommandations</option><option value="pb">Seulement les produits à problème</option></select></div></div>
+    <div id="phyto"></div></div>
+</section>
+
+<!-- RENTABILITÉ -->
+<section class="view" id="v-calc" hidden>
+  <div class="card">
+    <div class="list-head"><h2 style="font-size:17px">Coûts de référence saisis</h2><span class="small muted" id="costCount"></span></div>
+    <div class="progress"><i id="costBar" style="width:0"></i></div>
+    <p class="small muted" style="margin:8px 0 0">Chaque culture enregistrée devient la référence de coûts et peut être exportée.</p>
+  </div>
+  <div class="calc-grid">
+    <div class="card">
+      <div class="row">
+        <div class="field" style="flex-basis:220px"><label for="cCult">Culture</label><select id="cCult"></select></div>
+        <div class="field"><label for="cSurf">Surface (ha)</label><input type="number" id="cSurf" min="0" step="0.1" value="1"></div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <div class="field"><label for="cRend">Rendement attendu (t/ha)</label><input type="number" id="cRend" min="0" step="0.1"></div>
+        <div class="field"><label for="cPrix">Prix bord champ (FCFA/kg)</label><input type="number" id="cPrix" min="0" step="5" placeholder="à saisir"></div>
+      </div>
+      <p class="small muted" id="cRendHint" style="margin:6px 0 0"></p>
+      <div class="notice" id="engBox" style="margin-top:14px"></div>
+      <h3 style="font-size:15px;margin-top:18px">Charges par hectare (FCFA/ha)</h3>
+      <div class="costs" id="costLines"></div>
+      <div class="row" style="margin-top:16px;align-items:center">
+        <button class="btn primary" id="saveCost">Enregistrer comme référence</button>
+        <span class="small muted" id="costMeta"></span>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="font-size:15px">Résultat</h3>
+      <div class="res" id="calcRes" style="margin-top:12px"></div>
+      <p class="small muted" id="calcNote" style="margin:14px 0 0"></p>
+    </div>
+  </div>
+</section>
+
+<!-- FICHES -->
+<section class="view" id="v-fich" hidden>
+  <div class="card">
+    <h2 style="font-size:17px">Fiches de diagnostic enregistrées</h2>
+    <p class="small muted" style="margin:4px 0 0" id="fichHint"></p>
+  </div>
+  <div id="fichList"></div>
+</section>
+
+<!-- DONNÉES -->
+<section class="view" id="v-qual" hidden>
+  <div class="card">
+    <h2 style="font-size:17px">Sauvegarde et transfert</h2>
+    <p class="small" style="margin:6px 0 0;max-width:72ch" id="saveHint"></p>
+    <div class="row" style="margin-top:12px">
+      <button class="btn primary" id="bkExport">Exporter mes données (.json)</button>
+      <label class="btn" for="bkFile" style="display:inline-flex;align-items:center">Importer une sauvegarde</label>
+      <input type="file" id="bkFile" accept=".json,application/json" hidden>
+    </div>
+    <p class="small" id="bkMsg" style="margin:8px 0 0"></p>
+  </div>
+  <div class="card">
+    <h2 style="font-size:17px">État du référentiel</h2>
+    <div class="q-sum" id="qSum" style="margin-top:10px"></div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn" data-exp="loc">Exporter les localités (CSV)</button>
+      <button class="btn" data-exp="score">Exporter les scores (CSV)</button>
+      <button class="btn" data-exp="cout">Exporter les coûts (CSV)</button>
+    </div>
+    <p class="small muted" id="expNote" style="margin:8px 0 0"></p>
+  </div>
+  <div class="card"><h3 style="font-size:16px">Sources des données</h3>
+    <dl class="kv small" style="margin-top:10px;max-width:80ch">
+      <dt>Exigences des cultures</dt><dd>FAO Ecocrop (base officielle de 1 710 espèces, diffusée avec le paquet R Recocrop) : pH, pluie annuelle, drainage et salinité tolérés.</dd>
+      <dt>Pluie mensuelle</dt><dd>Normales 1961-1990 de 11 stations (Odienné, Bouaké, Man, Bondoukou, Abidjan, Yamoussoukro, Gagnoa, Sassandra, Dimbokro, Adiaké, Séguéla), plus Korhogo (total annuel publié, profil mensuel d'Odienné). Chaque localité suit la station de sa zone, ajustée à sa pluie annuelle.</dd>
+      <dt>Climat local</dt><dd>Fichiers NASA POWER (climatologie) ou valeurs de station SODEXAM, importés localité par localité.</dd>
+      <dt>Sols</dt><dd>Fichier Excel d'origine : 12 profils de zone. Votre analyse de laboratoire ou vos villages ajoutés les remplacent.</dd>
+      <dt>Réglementation phyto</dt><dd>Arrêté MINAGRI n°159 du 21/06/2004 ; circulaire n°1743 du 20/11/2015 (arrêté n°030 MINAGRI 2015).</dd>
+    </dl>
+  </div>
+  <div class="card"><h3 style="font-size:16px">Anomalies du fichier d'origine</h3><div id="qList"></div></div>
+  <div class="card"><h3 style="font-size:16px">Régions signalées « non couvertes » dans le fichier</h3>
+    <div class="tbl-wrap" style="margin-top:10px"><table class="t" id="zTbl"></table></div></div>
+  <div class="card"><h3 style="font-size:16px">Comment le score est calculé</h3>
+    <div class="small" style="margin-top:6px;max-width:72ch">
+      <p>Le score sur 100 additionne six facteurs : <b>pH</b> (25 pts), <b>matière organique</b> (10), <b>drainage</b> (10), <b>pluie annuelle</b> (25), <b>calendrier</b> (10) et <b>contraintes du sol</b> (20). Le pH, la pluie, le drainage et la salinité tolérés viennent de FAO Ecocrop.</p>
+      <p>Pour une culture annuelle pluviale, le <b>calendrier</b> cherche le mois de semis qui donne le plus de mois assez arrosés pendant le cycle (100 mm/mois pour une culture exigeante, 75 pour une culture moyenne, 50 pour une culture tolérante à la sécheresse). Pour une pérenne, il compte les mois de moins de 50 mm. Pour une culture irriguée, il indique la période de contre-saison.</p>
+      <p>Un facteur majeur très défavorable (pH ou pluie) plafonne le score à 64, un facteur hors des limites Ecocrop à 44. Une culture d'altitude hors de la zone montagneuse perd 25 points.</p>
+      <p><b>75 et plus</b> : favorable · <b>60 à 74</b> : faisable sous conditions · <b>45 à 59</b> : risqué · <b>moins de 45</b> : déconseillé.</p>
+      <p>L'indicateur de fiabilité dit d'où viennent les données : <b>élevée</b> quand le sol est analysé et le climat local (station ou NASA POWER), <b>moyenne</b> quand l'un des deux l'est, <b>indicative</b> quand tout vient de moyennes de zone.</p>
+    </div>
+  </div>
+</section>
+</main>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const D = {"locs":[{"id":1,"nom":"Doba, Grabo, Taté","sp":"Grabo","dep":"Tabou","reg":"San-Pédro","reg0":"San-Pédro","zone":"Forêt Dense Humide Sud-Ouest","sol":"Ferralsol / Acrisol","ph":4.9,"mo":4.2,"drain":"Bon","contr":"Al échangeable, pH bas, Déficit P","pluie":1800,"secs":3,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Doba, Grabo, Taté","ref":{"Cacao":72,"Palmier à huile":64,"Hévéa":64,"Banane plantain":72,"Manioc":72,"Igname":72,"Taro":64,"Maïs (grain)":72,"Riz pluvial":72,"Gombo":72,"Piment":64,"Aubergine":72,"Noix de cola":64,"Ananas":72},"st":"Sassandra"},{"id":2,"nom":"Djouroutou, Niégré","sp":"Tabou","dep":"Tabou","reg":"San-Pédro","reg0":"San-Pédro","zone":"Forêt Dense Humide Sud-Ouest","sol":"Ferralsol / Acrisol","ph":4.9,"mo":4.2,"drain":"Bon","contr":"Al échangeable, pH bas, Déficit P","pluie":1800,"secs":3,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Djouroutou, Niégré","ref":{"Cacao":72,"Palmier à huile":64,"Hévéa":64,"Banane plantain":72,"Manioc":72,"Igname":72,"Taro":64,"Maïs (grain)":72,"Riz pluvial":72,"Gombo":72,"Piment":64,"Aubergine":72,"Noix de cola":64,"Ananas":72},"st":"Sassandra"},{"id":3,"nom":"Méagui, Oupoyo","sp":"Méagui","dep":"Méagui","reg":"Nawa","reg0":"San-Pédro","zone":"Forêt Dense Humide Sud-Ouest","sol":"Ferralsol / Acrisol","ph":4.9,"mo":4.2,"drain":"Bon","contr":"Al échangeable, pH bas, Déficit P","pluie":1800,"secs":3,"pluieSrc":"zone","statut":"corrige","note":"Méagui est un département de la région de la Nawa (et non San-Pédro). Département aussi à corriger : Méagui.","orig":"Méagui, Oupoyo","ref":{"Cacao":72,"Palmier à huile":64,"Hévéa":64,"Banane plantain":72,"Manioc":72,"Igname":72,"Taro":64,"Maïs (grain)":72,"Riz pluvial":72,"Gombo":72,"Piment":64,"Aubergine":72,"Noix de cola":64,"Ananas":72},"st":"Sassandra"},{"id":4,"nom":"Grand-Béréby, Roc","sp":"Grand-Béréby","dep":"San-Pédro","reg":"San-Pédro","reg0":"San-Pédro","zone":"Forêt Dense Humide Sud-Ouest","sol":"Ferralsol / Acrisol","ph":4.9,"mo":4.2,"drain":"Bon","contr":"Al échangeable, pH bas, Déficit P","pluie":1800,"secs":3,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Grand-Béréby, Roc","ref":{"Cacao":72,"Palmier à huile":64,"Hévéa":64,"Banane plantain":72,"Manioc":72,"Igname":72,"Taro":64,"Maïs (grain)":72,"Riz pluvial":72,"Gombo":72,"Piment":64,"Aubergine":72,"Noix de cola":64,"Ananas":72},"st":"Sassandra"},{"id":5,"nom":"Soubré, Buyo","sp":"Soubré","dep":"Soubré","reg":"Nawa","reg0":"San-Pédro","zone":"Forêt Dense Humide Sud-Ouest","sol":"Ferralsol / Acrisol","ph":4.9,"mo":4.2,"drain":"Bon","contr":"Al échangeable, pH bas, Déficit P","pluie":1800,"secs":3,"pluieSrc":"zone","statut":"corrige","note":"Soubré est le chef-lieu de la région de la Nawa.","orig":"Soubré, Buyo","ref":{"Cacao":72,"Palmier à huile":64,"Hévéa":64,"Banane plantain":72,"Manioc":72,"Igname":72,"Taro":64,"Maïs (grain)":72,"Riz pluvial":72,"Gombo":72,"Piment":64,"Aubergine":72,"Noix de cola":64,"Ananas":72},"st":"Sassandra"},{"id":6,"nom":"Buyo, Guezon","sp":"Buyo","dep":"Soubré","reg":"Nawa","reg0":"San-Pédro","zone":"Forêt Dense Humide Sud-Ouest","sol":"Ferralsol / Acrisol","ph":4.9,"mo":4.2,"drain":"Bon","contr":"Al échangeable, pH bas, Déficit P","pluie":1800,"secs":3,"pluieSrc":"zone","statut":"corrige","note":"Buyo relève du département de Buyo, région de la Nawa.","orig":"Buyo, Guezon","ref":{"Cacao":72,"Palmier à huile":64,"Hévéa":64,"Banane plantain":72,"Manioc":72,"Igname":72,"Taro":64,"Maïs (grain)":72,"Riz pluvial":72,"Gombo":72,"Piment":64,"Aubergine":72,"Noix de cola":64,"Ananas":72},"st":"Sassandra"},{"id":7,"nom":"Duékoué, Bagohouo","sp":"Duékoué","dep":"Duékoué","reg":"Guémon","reg0":"Guémon","zone":"Forêt Dense Humide Ouest","sol":"Ferralsol","ph":5.1,"mo":3.8,"drain":"Bon","contr":"Acidité, compaction légère","pluie":1600,"secs":3,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Duékoué, Bagohouo","ref":{"Cacao":85,"Café Robusta":77,"Hévéa":77,"Banane plantain":85,"Manioc":85,"Igname":85,"Taro":77,"Maïs (grain)":85,"Riz pluvial":85,"Palmier à huile":77,"Noix de cola":77,"Piment":77,"Aubergine":85,"Patate douce":77},"st":"Man"},{"id":8,"nom":"Bangolo, Gaapleu","sp":"Bangolo","dep":"Guiglo","reg":"Guémon","reg0":"Guémon","zone":"Forêt Dense Humide Ouest","sol":"Ferralsol","ph":5.1,"mo":3.8,"drain":"Bon","contr":"Acidité, compaction légère","pluie":1600,"secs":3,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Bangolo, Gaapleu","ref":{"Cacao":85,"Café Robusta":77,"Hévéa":77,"Banane plantain":85,"Manioc":85,"Igname":85,"Taro":77,"Maïs (grain)":85,"Riz pluvial":85,"Palmier à huile":77,"Noix de cola":77,"Piment":77,"Aubergine":85,"Patate douce":77},"st":"Man"},{"id":9,"nom":"Guiglo, Nizahon","sp":"Guiglo","dep":"Guiglo","reg":"Cavally","reg0":"Guémon","zone":"Forêt Dense Humide Ouest","sol":"Ferralsol","ph":5.1,"mo":3.8,"drain":"Bon","contr":"Acidité, compaction légère","pluie":1600,"secs":3,"pluieSrc":"zone","statut":"corrige","note":"Guiglo est le chef-lieu de la région du Cavally (et non Guémon).","orig":"Guiglo, Nizahon","ref":{"Cacao":85,"Café Robusta":77,"Hévéa":77,"Banane plantain":85,"Manioc":85,"Igname":85,"Taro":77,"Maïs (grain)":85,"Riz pluvial":85,"Palmier à huile":77,"Noix de cola":77,"Piment":77,"Aubergine":85,"Patate douce":77},"st":"Man"},{"id":10,"nom":"Kouibly, Nidrou","sp":"Kouibly","dep":"Duékoué","reg":"Guémon","reg0":"Guémon","zone":"Forêt Dense Humide Ouest","sol":"Ferralsol","ph":5.1,"mo":3.8,"drain":"Bon","contr":"Acidité, compaction légère","pluie":1600,"secs":3,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Kouibly, Nidrou","ref":{"Cacao":85,"Café Robusta":77,"Hévéa":77,"Banane plantain":85,"Manioc":85,"Igname":85,"Taro":77,"Maïs (grain)":85,"Riz pluvial":85,"Palmier à huile":77,"Noix de cola":77,"Piment":77,"Aubergine":85,"Patate douce":77},"st":"Man"},{"id":11,"nom":"Taï, Kéibli","sp":"Taï","dep":"Guiglo","reg":"Cavally","reg0":"Cavally","zone":"Forêt Dense Humide Ouest","sol":"Ferralsol","ph":5.1,"mo":3.8,"drain":"Bon","contr":"Acidité, compaction légère","pluie":1600,"secs":3,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Taï, Kéibli","ref":{"Cacao":85,"Café Robusta":77,"Hévéa":77,"Banane plantain":85,"Manioc":85,"Igname":85,"Taro":77,"Maïs (grain)":85,"Riz pluvial":85,"Palmier à huile":77,"Noix de cola":77,"Piment":77,"Aubergine":85,"Patate douce":77},"st":"Man"},{"id":12,"nom":"Bloléquin, Péhé","sp":"Bloléquin","dep":"Guiglo","reg":"Cavally","reg0":"Cavally","zone":"Forêt Dense Humide Ouest","sol":"Ferralsol","ph":5.1,"mo":3.8,"drain":"Bon","contr":"Acidité, compaction légère","pluie":1600,"secs":3,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Bloléquin, Péhé","ref":{"Cacao":85,"Café Robusta":77,"Hévéa":77,"Banane plantain":85,"Manioc":85,"Igname":85,"Taro":77,"Maïs (grain)":85,"Riz pluvial":85,"Palmier à huile":77,"Noix de cola":77,"Piment":77,"Aubergine":85,"Patate douce":77},"st":"Man"},{"id":13,"nom":"Toulepleu, Glôkê","sp":"Toulepleu","dep":"Guiglo","reg":"Cavally","reg0":"Cavally","zone":"Forêt Dense Humide Ouest","sol":"Ferralsol","ph":5.1,"mo":3.8,"drain":"Bon","contr":"Acidité, compaction légère","pluie":1600,"secs":3,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Toulepleu, Glôkê","ref":{"Cacao":85,"Café Robusta":77,"Hévéa":77,"Banane plantain":85,"Manioc":85,"Igname":85,"Taro":77,"Maïs (grain)":85,"Riz pluvial":85,"Palmier à huile":77,"Noix de cola":77,"Piment":77,"Aubergine":85,"Patate douce":77},"st":"Man"},{"id":14,"nom":"Agboville, Loviguié","sp":"Agboville","dep":"Agboville","reg":"Agnéby-Tiassa","reg0":"Agnéby-Tiassa","zone":"Forêt Dense Humide Centre-Sud","sol":"Ferralsol","ph":5.5,"mo":3.2,"drain":"Bon","contr":"Déficit P, lessivage","pluie":1450,"secs":3,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Agboville, Loviguié","ref":{"Cacao":72,"Hévéa":64,"Ananas":72,"Banane plantain":72,"Manioc":72,"Igname":72,"Maïs (grain)":72,"Riz pluvial":72,"Gombo":72,"Tomate":72,"Concombre":72,"Aubergine":72,"Pastèque":72},"st":"Gagnoa"},{"id":15,"nom":"Tiassalé, N'Douci","sp":"Tiassalé","dep":"Agboville","reg":"Agnéby-Tiassa","reg0":"Agnéby-Tiassa","zone":"Forêt Dense Humide Centre-Sud","sol":"Ferralsol","ph":5.5,"mo":3.2,"drain":"Bon","contr":"Déficit P, lessivage","pluie":1450,"secs":3,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Tiassalé, N'Douci","ref":{"Cacao":72,"Hévéa":64,"Ananas":72,"Banane plantain":72,"Manioc":72,"Igname":72,"Maïs (grain)":72,"Riz pluvial":72,"Gombo":72,"Tomate":72,"Concombre":72,"Aubergine":72,"Pastèque":72},"st":"Gagnoa"},{"id":16,"nom":"Sikensi, Rubino","sp":"Sikensi","dep":"Agboville","reg":"Agnéby-Tiassa","reg0":"Agnéby-Tiassa","zone":"Forêt Dense Humide Centre-Sud","sol":"Ferralsol","ph":5.5,"mo":3.2,"drain":"Bon","contr":"Déficit P, lessivage","pluie":1450,"secs":3,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Sikensi, Rubino","ref":{"Cacao":72,"Hévéa":64,"Ananas":72,"Banane plantain":72,"Manioc":72,"Igname":72,"Maïs (grain)":72,"Riz pluvial":72,"Gombo":72,"Tomate":72,"Concombre":72,"Aubergine":72,"Pastèque":72},"st":"Gagnoa"},{"id":17,"nom":"Taabo, Allangouassou","sp":"Taabo","dep":"Tiassalé","reg":"Agnéby-Tiassa","reg0":"Agnéby-Tiassa","zone":"Forêt Dense Humide Centre-Sud","sol":"Ferralsol","ph":5.5,"mo":3.2,"drain":"Bon","contr":"Déficit P, lessivage","pluie":1450,"secs":3,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Taabo, Allangouassou","ref":{"Cacao":72,"Hévéa":64,"Ananas":72,"Banane plantain":72,"Manioc":72,"Igname":72,"Maïs (grain)":72,"Riz pluvial":72,"Gombo":72,"Tomate":72,"Concombre":72,"Aubergine":72,"Pastèque":72},"st":"Gagnoa"},{"id":18,"nom":"Adzopé, Ahouabo","sp":"Adzopé","dep":"Adzopé","reg":"La Mé","reg0":"La Mé","zone":"Forêt Dense Humide Centre-Sud","sol":"Ferralsol","ph":5.5,"mo":3.2,"drain":"Bon","contr":"Déficit P, lessivage","pluie":1450,"secs":3,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Adzopé, Ahouabo","ref":{"Cacao":72,"Hévéa":64,"Ananas":72,"Banane plantain":72,"Manioc":72,"Igname":72,"Maïs (grain)":72,"Riz pluvial":72,"Gombo":72,"Tomate":72,"Concombre":72,"Aubergine":72,"Pastèque":72},"st":"Gagnoa"},{"id":19,"nom":"Aboisso, Adjouan","sp":"Aboisso","dep":"Aboisso","reg":"Sud-Comoé","reg0":"Sud-Comoé","zone":"Forêt Dense Humide Est","sol":"Acrisol / Arenosol","ph":5,"mo":2.8,"drain":"Rapide","contr":"Faible rétention eau","pluie":1900,"secs":2,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Aboisso, Adjouan","ref":{"Cacao":85,"Hévéa":77,"Palmier à huile":77,"Ananas":85,"Banane plantain":85,"Manioc":85,"Noix de cola":77,"Maïs (grain)":85,"Piment":77,"Aubergine":85,"Igname":85,"Banane douce":77},"st":"Adiaké"},{"id":20,"nom":"Adiaké, Assinie","sp":"Adiaké","dep":"Aboisso","reg":"Sud-Comoé","reg0":"Sud-Comoé","zone":"Forêt Dense Humide Est","sol":"Acrisol / Arenosol","ph":5,"mo":2.8,"drain":"Rapide","contr":"Faible rétention eau","pluie":1922,"secs":1,"pluieSrc":"station Adiaké","statut":"ok","note":null,"orig":"Adiaké, Assinie","ref":{"Cacao":85,"Hévéa":77,"Palmier à huile":77,"Ananas":85,"Banane plantain":85,"Manioc":85,"Noix de cola":77,"Maïs (grain)":85,"Piment":77,"Aubergine":85,"Igname":85,"Banane douce":77},"st":"Adiaké"},{"id":21,"nom":"Bonoua","sp":"Bonoua","dep":"Grand-Bassam","reg":"Sud-Comoé","reg0":"Sud-Comoé","zone":"Forêt Dense Humide Est","sol":"Acrisol / Arenosol","ph":5,"mo":2.8,"drain":"Rapide","contr":"Faible rétention eau","pluie":1900,"secs":2,"pluieSrc":"zone","statut":"corrige","note":"Doublon Grand-Bassam : la ligne 21 devient Bonoua (Sud-Comoé), Grand-Bassam reste sur la ligne 80.","orig":"Grand-Bassam, Bonoua","ref":{"Cacao":85,"Hévéa":77,"Palmier à huile":77,"Ananas":85,"Banane plantain":85,"Manioc":85,"Noix de cola":77,"Maïs (grain)":85,"Piment":77,"Aubergine":85,"Igname":85,"Banane douce":77},"st":"Adiaké"},{"id":22,"nom":"Alépé, Bianouan","sp":"Alépé","dep":"Adzopé","reg":"La Mé","reg0":"La Mé","zone":"Forêt Dense Humide Centre-Sud","sol":"Ferralsol","ph":5.5,"mo":3.2,"drain":"Bon","contr":"Déficit P, lessivage","pluie":1450,"secs":3,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Alépé, Bianouan","ref":{"Cacao":72,"Hévéa":64,"Ananas":72,"Banane plantain":72,"Manioc":72,"Igname":72,"Maïs (grain)":72,"Riz pluvial":72,"Gombo":72,"Tomate":72,"Concombre":72,"Aubergine":72,"Pastèque":72},"st":"Gagnoa"},{"id":23,"nom":"Yakassé-Attobrou","sp":"Yakassé-Attobrou","dep":"Adzopé","reg":"La Mé","reg0":"La Mé","zone":"Forêt Dense Humide Centre-Sud","sol":"Ferralsol","ph":5.5,"mo":3.2,"drain":"Bon","contr":"Déficit P, lessivage","pluie":1450,"secs":3,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Yakassé-Attobrou","ref":{"Cacao":72,"Hévéa":64,"Ananas":72,"Banane plantain":72,"Manioc":72,"Igname":72,"Maïs (grain)":72,"Riz pluvial":72,"Gombo":72,"Tomate":72,"Concombre":72,"Aubergine":72,"Pastèque":72},"st":"Gagnoa"},{"id":24,"nom":"Grand-Lahou","sp":"Fresco","dep":"Grand-Lahou","reg":"Grands-Ponts","reg0":"Grands-Ponts","zone":"Littoral / Forêt Humide","sol":"Arenosol / Gleysol","ph":5.5,"mo":1.5,"drain":"Variable","contr":"Salinité, engorgement","pluie":1800,"secs":3,"pluieSrc":"zone","statut":"corrige","note":"Grand-Lahou (Grands-Ponts) et Fresco (Gbôklé) : paire scindée en deux localités.","orig":"Grand-Lahou, Fresco","ref":{"Cocotier":77,"Manioc":85,"Banane plantain":85,"Maraîchage (salades)":77,"Tomate":85,"Piment":77,"Aubergine":85,"Crabe / Crevettes (aquaculture)":77,"Pastèque":85},"st":"Abidjan"},{"id":2401,"nom":"Fresco","sp":"Fresco","dep":"Fresco","reg":"Gbôklé","reg0":"Grands-Ponts","zone":"Littoral / Forêt Humide","sol":"Arenosol / Gleysol","ph":5.5,"mo":1.5,"drain":"Variable","contr":"Salinité, engorgement","pluie":1800,"secs":3,"pluieSrc":"zone","statut":"corrige","note":"Grand-Lahou (Grands-Ponts) et Fresco (Gbôklé) : paire scindée en deux localités.","orig":"Grand-Lahou, Fresco","ref":{"Cocotier":77,"Manioc":85,"Banane plantain":85,"Maraîchage (salades)":77,"Tomate":85,"Piment":77,"Aubergine":85,"Crabe / Crevettes (aquaculture)":77,"Pastèque":85},"st":"Abidjan"},{"id":25,"nom":"Jacqueville, Adjoukrou","sp":"Jacqueville","dep":"Dabou","reg":"Grands-Ponts","reg0":"Grands-Ponts","zone":"Littoral / Forêt Humide","sol":"Arenosol / Gleysol","ph":5.5,"mo":1.5,"drain":"Variable","contr":"Salinité, engorgement","pluie":1800,"secs":3,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Jacqueville, Adjoukrou","ref":{"Cocotier":77,"Manioc":85,"Banane plantain":85,"Maraîchage (salades)":77,"Tomate":85,"Piment":77,"Aubergine":85,"Crabe / Crevettes (aquaculture)":77,"Pastèque":85},"st":"Abidjan"},{"id":26,"nom":"Dabou, Lopou","sp":"Dabou","dep":"Dabou","reg":"Grands-Ponts","reg0":"Grands-Ponts","zone":"Littoral / Forêt Humide","sol":"Arenosol / Gleysol","ph":5.5,"mo":1.5,"drain":"Variable","contr":"Salinité, engorgement","pluie":1800,"secs":3,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Dabou, Lopou","ref":{"Cocotier":77,"Manioc":85,"Banane plantain":85,"Maraîchage (salades)":77,"Tomate":85,"Piment":77,"Aubergine":85,"Crabe / Crevettes (aquaculture)":77,"Pastèque":85},"st":"Abidjan"},{"id":27,"nom":"Daloa, Zaïbo","sp":"Daloa","dep":"Daloa","reg":"Haut-Sassandra","reg0":"Haut-Sassandra","zone":"Zone de Transition Forêt-Savane","sol":"Lixisol","ph":5.8,"mo":2.5,"drain":"Moyen","contr":"Sécheresse partielle, érosion","pluie":1250,"secs":4,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Daloa, Zaïbo","ref":{"Cacao":85,"Café Robusta":77,"Hévéa":77,"Coton":85,"Maïs (grain)":85,"Riz pluvial":85,"Igname":85,"Manioc":85,"Banane plantain":85,"Tomate":85,"Gombo":85,"Piment":77,"Aubergine":85,"Anacarde":85,"Soja":77,"Niébé":77},"st":"Yamoussoukro"},{"id":28,"nom":"Issia, Gboguhé","sp":"Issia","dep":"Daloa","reg":"Haut-Sassandra","reg0":"Haut-Sassandra","zone":"Zone de Transition Forêt-Savane","sol":"Lixisol","ph":5.8,"mo":2.5,"drain":"Moyen","contr":"Sécheresse partielle, érosion","pluie":1250,"secs":4,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Issia, Gboguhé","ref":{"Cacao":85,"Café Robusta":77,"Hévéa":77,"Coton":85,"Maïs (grain)":85,"Riz pluvial":85,"Igname":85,"Manioc":85,"Banane plantain":85,"Tomate":85,"Gombo":85,"Piment":77,"Aubergine":85,"Anacarde":85,"Soja":77,"Niébé":77},"st":"Yamoussoukro"},{"id":29,"nom":"Vavoua","sp":"Vavoua","dep":"Vavoua","reg":"Haut-Sassandra","reg0":"Haut-Sassandra","zone":"Zone de Transition Forêt-Savane","sol":"Lixisol","ph":5.8,"mo":2.5,"drain":"Moyen","contr":"Sécheresse partielle, érosion","pluie":1250,"secs":4,"pluieSrc":"zone","statut":"corrige","note":"Gagnoa existe déjà (ligne « Gagnoa, Gnago ») : la ligne devient Vavoua (Haut-Sassandra).","orig":"Vavoua, Gagnoa","ref":{"Cacao":85,"Café Robusta":77,"Hévéa":77,"Coton":85,"Maïs (grain)":85,"Riz pluvial":85,"Igname":85,"Manioc":85,"Banane plantain":85,"Tomate":85,"Gombo":85,"Piment":77,"Aubergine":85,"Anacarde":85,"Soja":77,"Niébé":77},"st":"Yamoussoukro"},{"id":30,"nom":"Zoukougbeu, Bognonzra","sp":"Zoukougbeu","dep":"Daloa","reg":"Haut-Sassandra","reg0":"Haut-Sassandra","zone":"Zone de Transition Forêt-Savane","sol":"Lixisol","ph":5.8,"mo":2.5,"drain":"Moyen","contr":"Sécheresse partielle, érosion","pluie":1250,"secs":4,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Zoukougbeu, Bognonzra","ref":{"Cacao":85,"Café Robusta":77,"Hévéa":77,"Coton":85,"Maïs (grain)":85,"Riz pluvial":85,"Igname":85,"Manioc":85,"Banane plantain":85,"Tomate":85,"Gombo":85,"Piment":77,"Aubergine":85,"Anacarde":85,"Soja":77,"Niébé":77},"st":"Yamoussoukro"},{"id":31,"nom":"Bouaflé, Bonon","sp":"Bouaflé","dep":"Bouaflé","reg":"Marahoué","reg0":"Marahoué","zone":"Zone de Transition Forêt-Savane","sol":"Lixisol","ph":5.8,"mo":2.5,"drain":"Moyen","contr":"Sécheresse partielle, érosion","pluie":1250,"secs":4,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Bouaflé, Bonon","ref":{"Cacao":85,"Café Robusta":77,"Hévéa":77,"Coton":85,"Maïs (grain)":85,"Riz pluvial":85,"Igname":85,"Manioc":85,"Banane plantain":85,"Tomate":85,"Gombo":85,"Piment":77,"Aubergine":85,"Anacarde":85,"Soja":77,"Niébé":77},"st":"Yamoussoukro"},{"id":32,"nom":"Zuénoula","sp":"Zuénoula","dep":"Zuénoula","reg":"Marahoué","reg0":"Marahoué","zone":"Zone de Transition Forêt-Savane","sol":"Lixisol","ph":5.8,"mo":2.5,"drain":"Moyen","contr":"Sécheresse partielle, érosion","pluie":1250,"secs":4,"pluieSrc":"zone","statut":"corrige","note":"Kounahiri existe déjà avec Mankono (Béré) : la ligne devient Zuénoula (Marahoué).","orig":"Zuénoula, Kounahiri","ref":{"Cacao":85,"Café Robusta":77,"Hévéa":77,"Coton":85,"Maïs (grain)":85,"Riz pluvial":85,"Igname":85,"Manioc":85,"Banane plantain":85,"Tomate":85,"Gombo":85,"Piment":77,"Aubergine":85,"Anacarde":85,"Soja":77,"Niébé":77},"st":"Yamoussoukro"},{"id":33,"nom":"Sinfra, Orofla","sp":"Sinfra","dep":"Bouaflé","reg":"Marahoué","reg0":"Marahoué","zone":"Zone de Transition Forêt-Savane","sol":"Lixisol","ph":5.8,"mo":2.5,"drain":"Moyen","contr":"Sécheresse partielle, érosion","pluie":1250,"secs":4,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Sinfra, Orofla","ref":{"Cacao":85,"Café Robusta":77,"Hévéa":77,"Coton":85,"Maïs (grain)":85,"Riz pluvial":85,"Igname":85,"Manioc":85,"Banane plantain":85,"Tomate":85,"Gombo":85,"Piment":77,"Aubergine":85,"Anacarde":85,"Soja":77,"Niébé":77},"st":"Yamoussoukro"},{"id":34,"nom":"Gagnoa, Gnago","sp":"Gagnoa","dep":"Gagnoa","reg":"Gôh","reg0":"Gôh","zone":"Zone de Transition Forêt-Savane","sol":"Lixisol","ph":5.8,"mo":2.5,"drain":"Moyen","contr":"Sécheresse partielle, érosion","pluie":1406,"secs":2,"pluieSrc":"station Gagnoa","statut":"ok","note":null,"orig":"Gagnoa, Gnago","ref":{"Cacao":85,"Café Robusta":77,"Hévéa":77,"Coton":85,"Maïs (grain)":85,"Riz pluvial":85,"Igname":85,"Manioc":85,"Banane plantain":85,"Tomate":85,"Gombo":85,"Piment":77,"Aubergine":85,"Anacarde":85,"Soja":77,"Niébé":77},"st":"Gagnoa"},{"id":35,"nom":"Oumé, Guibéroua","sp":"Oumé","dep":"Gagnoa","reg":"Gôh","reg0":"Gôh","zone":"Zone de Transition Forêt-Savane","sol":"Lixisol","ph":5.8,"mo":2.5,"drain":"Moyen","contr":"Sécheresse partielle, érosion","pluie":1250,"secs":4,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Oumé, Guibéroua","ref":{"Cacao":85,"Café Robusta":77,"Hévéa":77,"Coton":85,"Maïs (grain)":85,"Riz pluvial":85,"Igname":85,"Manioc":85,"Banane plantain":85,"Tomate":85,"Gombo":85,"Piment":77,"Aubergine":85,"Anacarde":85,"Soja":77,"Niébé":77},"st":"Yamoussoukro"},{"id":36,"nom":"Méadji","sp":"Méadji","dep":"Soubré","reg":"Nawa","reg0":"Gôh","zone":"Forêt Dense Humide Sud-Ouest","sol":"Ferralsol / Acrisol","ph":4.9,"mo":4.2,"drain":"Bon","contr":"Al échangeable, pH bas, Déficit P","pluie":1800,"secs":3,"pluieSrc":"zone","statut":"corrige","note":"Méadji (Nawa, profil de sol Sud-Ouest) et Bayota (Gôh) : paire scindée.","orig":"Méadji, Bayota","ref":{"Cacao":85,"Café Robusta":77,"Hévéa":77,"Coton":85,"Maïs (grain)":85,"Riz pluvial":85,"Igname":85,"Manioc":85,"Banane plantain":85,"Tomate":85,"Gombo":85,"Piment":77,"Aubergine":85,"Anacarde":85,"Soja":77,"Niébé":77},"st":"Sassandra"},{"id":3601,"nom":"Bayota","sp":"Méadji","dep":"Gagnoa","reg":"Gôh","reg0":"Gôh","zone":"Zone de Transition Forêt-Savane","sol":"Lixisol","ph":5.8,"mo":2.5,"drain":"Moyen","contr":"Sécheresse partielle, érosion","pluie":1250,"secs":4,"pluieSrc":"zone","statut":"corrige","note":"Méadji (Nawa, profil de sol Sud-Ouest) et Bayota (Gôh) : paire scindée.","orig":"Méadji, Bayota","ref":{"Cacao":85,"Café Robusta":77,"Hévéa":77,"Coton":85,"Maïs (grain)":85,"Riz pluvial":85,"Igname":85,"Manioc":85,"Banane plantain":85,"Tomate":85,"Gombo":85,"Piment":77,"Aubergine":85,"Anacarde":85,"Soja":77,"Niébé":77},"st":"Yamoussoukro"},{"id":37,"nom":"Toumodi","sp":"Toumodi","dep":"Toumodi","reg":"Bélier","reg0":"Bélier","zone":"Zone de Transition Forêt-Savane","sol":"Lixisol","ph":5.8,"mo":2.5,"drain":"Moyen","contr":"Sécheresse partielle, érosion","pluie":1250,"secs":4,"pluieSrc":"zone","statut":"corrige","note":"Djébonoua existe déjà avec Bouaké (Gbêkê) : la ligne devient Toumodi (Bélier).","orig":"Toumodi, Djébonoua","ref":{"Cacao":85,"Café Robusta":77,"Hévéa":77,"Coton":85,"Maïs (grain)":85,"Riz pluvial":85,"Igname":85,"Manioc":85,"Banane plantain":85,"Tomate":85,"Gombo":85,"Piment":77,"Aubergine":85,"Anacarde":85,"Soja":77,"Niébé":77},"st":"Yamoussoukro"},{"id":38,"nom":"Bongouanou","sp":"Bongouanou","dep":"Bongouanou","reg":"Moronou","reg0":"Bélier","zone":"Zone de Transition Forêt-Savane","sol":"Lixisol","ph":5.8,"mo":2.5,"drain":"Moyen","contr":"Sécheresse partielle, érosion","pluie":1250,"secs":4,"pluieSrc":"zone","statut":"corrige","note":"Dimbokro existe déjà (N'Zi) : la ligne devient Bongouanou, région du Moronou.","orig":"Dimbokro, Bongouanou","ref":{"Cacao":85,"Café Robusta":77,"Hévéa":77,"Coton":85,"Maïs (grain)":85,"Riz pluvial":85,"Igname":85,"Manioc":85,"Banane plantain":85,"Tomate":85,"Gombo":85,"Piment":77,"Aubergine":85,"Anacarde":85,"Soja":77,"Niébé":77},"st":"Yamoussoukro"},{"id":39,"nom":"N'Zianouan","sp":"Tié N'Diekro","dep":"Tiassalé","reg":"Agnéby-Tiassa","reg0":"Bélier","zone":"Forêt Dense Humide Centre-Sud","sol":"Ferralsol","ph":5.5,"mo":3.2,"drain":"Bon","contr":"Déficit P, lessivage","pluie":1450,"secs":3,"pluieSrc":"zone","statut":"corrige","note":"N'Zianouan (Agnéby-Tiassa, profil Centre-Sud) et Tié-N'Diékro (Bélier) : paire scindée.","orig":"N'Zianouan, Tié N'Diekro","ref":{"Cacao":85,"Café Robusta":77,"Hévéa":77,"Coton":85,"Maïs (grain)":85,"Riz pluvial":85,"Igname":85,"Manioc":85,"Banane plantain":85,"Tomate":85,"Gombo":85,"Piment":77,"Aubergine":85,"Anacarde":85,"Soja":77,"Niébé":77},"st":"Gagnoa"},{"id":3901,"nom":"Tié-N'Diékro","sp":"Tié N'Diekro","dep":"Didiévi","reg":"Bélier","reg0":"Bélier","zone":"Zone de Transition Forêt-Savane","sol":"Lixisol","ph":5.8,"mo":2.5,"drain":"Moyen","contr":"Sécheresse partielle, érosion","pluie":1250,"secs":4,"pluieSrc":"zone","statut":"corrige","note":"N'Zianouan (Agnéby-Tiassa, profil Centre-Sud) et Tié-N'Diékro (Bélier) : paire scindée.","orig":"N'Zianouan, Tié N'Diekro","ref":{"Cacao":85,"Café Robusta":77,"Hévéa":77,"Coton":85,"Maïs (grain)":85,"Riz pluvial":85,"Igname":85,"Manioc":85,"Banane plantain":85,"Tomate":85,"Gombo":85,"Piment":77,"Aubergine":85,"Anacarde":85,"Soja":77,"Niébé":77},"st":"Yamoussoukro"},{"id":40,"nom":"Abengourou, Niable","sp":"Abengourou","dep":"Abengourou","reg":"Indénié-Djuablin","reg0":"Indénié-Djuablin","zone":"Zone de Transition Est","sol":"Lixisol / Luvisol","ph":6.1,"mo":2.2,"drain":"Moyen","contr":"Compaction, faible MO","pluie":1250,"secs":4,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Abengourou, Niable","ref":{"Cacao":85,"Café Robusta":77,"Anacarde":85,"Maïs (grain)":85,"Igname":85,"Manioc":85,"Banane plantain":85,"Riz pluvial":85,"Niébé":77,"Gombo":85,"Tomate":85,"Piment":77},"st":"Bondoukou"},{"id":41,"nom":"Agnibilékrou, Anoumaba","sp":"Agnibilékrou","dep":"Abengourou","reg":"Indénié-Djuablin","reg0":"Indénié-Djuablin","zone":"Zone de Transition Est","sol":"Lixisol / Luvisol","ph":6.1,"mo":2.2,"drain":"Moyen","contr":"Compaction, faible MO","pluie":1250,"secs":4,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Agnibilékrou, Anoumaba","ref":{"Cacao":85,"Café Robusta":77,"Anacarde":85,"Maïs (grain)":85,"Igname":85,"Manioc":85,"Banane plantain":85,"Riz pluvial":85,"Niébé":77,"Gombo":85,"Tomate":85,"Piment":77},"st":"Bondoukou"},{"id":42,"nom":"Bettié, Amelekia","sp":"Bettié","dep":"Abengourou","reg":"Indénié-Djuablin","reg0":"Indénié-Djuablin","zone":"Zone de Transition Est","sol":"Lixisol / Luvisol","ph":6.1,"mo":2.2,"drain":"Moyen","contr":"Compaction, faible MO","pluie":1250,"secs":4,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Bettié, Amelekia","ref":{"Cacao":85,"Café Robusta":77,"Anacarde":85,"Maïs (grain)":85,"Igname":85,"Manioc":85,"Banane plantain":85,"Riz pluvial":85,"Niébé":77,"Gombo":85,"Tomate":85,"Piment":77},"st":"Bondoukou"},{"id":43,"nom":"Bouaké, Djébonoua","sp":"Bouaké","dep":"Bouaké","reg":"Gbêkê","reg0":"Gbêkê","zone":"Savane Guinéenne","sol":"Lixisol / Cambisol","ph":6.5,"mo":1.7,"drain":"Rapide","contr":"Sécheresse, faible MO, érosion","pluie":1100,"secs":4,"pluieSrc":"station Bouaké","statut":"ok","note":null,"orig":"Bouaké, Djébonoua","ref":{"Anacarde":85,"Igname":85,"Maïs (grain)":85,"Riz pluvial":85,"Sorgho":85,"Mil":77,"Niébé":77,"Arachide":85,"Manioc":85,"Tomate":85,"Oignon (sec)":85,"Piment":77,"Aubergine":85,"Gombo":85,"Patate douce":77,"Coton":85,"Soja":77},"st":"Bouaké"},{"id":44,"nom":"Sakassou, Languibonou","sp":"Sakassou","dep":"Bouaké","reg":"Gbêkê","reg0":"Gbêkê","zone":"Savane Guinéenne","sol":"Lixisol / Cambisol","ph":6.5,"mo":1.7,"drain":"Rapide","contr":"Sécheresse, faible MO, érosion","pluie":1100,"secs":4,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Sakassou, Languibonou","ref":{"Anacarde":85,"Igname":85,"Maïs (grain)":85,"Riz pluvial":85,"Sorgho":85,"Mil":77,"Niébé":77,"Arachide":85,"Manioc":85,"Tomate":85,"Oignon (sec)":85,"Piment":77,"Aubergine":85,"Gombo":85,"Patate douce":77,"Coton":85,"Soja":77},"st":"Bouaké"},{"id":45,"nom":"Béoumi, Bodokro","sp":"Béoumi","dep":"Bouaké","reg":"Gbêkê","reg0":"Gbêkê","zone":"Savane Guinéenne","sol":"Lixisol / Cambisol","ph":6.5,"mo":1.7,"drain":"Rapide","contr":"Sécheresse, faible MO, érosion","pluie":1100,"secs":4,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Béoumi, Bodokro","ref":{"Anacarde":85,"Igname":85,"Maïs (grain)":85,"Riz pluvial":85,"Sorgho":85,"Mil":77,"Niébé":77,"Arachide":85,"Manioc":85,"Tomate":85,"Oignon (sec)":85,"Piment":77,"Aubergine":85,"Gombo":85,"Patate douce":77,"Coton":85,"Soja":77},"st":"Bouaké"},{"id":46,"nom":"Katiola, Fronan","sp":"Katiola","dep":"Katiola","reg":"Hambol","reg0":"Hambol","zone":"Savane Guinéenne","sol":"Lixisol / Cambisol","ph":6.5,"mo":1.7,"drain":"Rapide","contr":"Sécheresse, faible MO, érosion","pluie":1100,"secs":4,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Katiola, Fronan","ref":{"Anacarde":85,"Igname":85,"Maïs (grain)":85,"Riz pluvial":85,"Sorgho":85,"Mil":77,"Niébé":77,"Arachide":85,"Manioc":85,"Tomate":85,"Oignon (sec)":85,"Piment":77,"Aubergine":85,"Gombo":85,"Patate douce":77,"Coton":85,"Soja":77},"st":"Bouaké"},{"id":47,"nom":"Niakaramadougou, Tafiré","sp":"Niakaramadougou","dep":"Katiola","reg":"Hambol","reg0":"Hambol","zone":"Savane Guinéenne","sol":"Lixisol / Cambisol","ph":6.5,"mo":1.7,"drain":"Rapide","contr":"Sécheresse, faible MO, érosion","pluie":1100,"secs":4,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Niakaramadougou, Tafiré","ref":{"Anacarde":85,"Igname":85,"Maïs (grain)":85,"Riz pluvial":85,"Sorgho":85,"Mil":77,"Niébé":77,"Arachide":85,"Manioc":85,"Tomate":85,"Oignon (sec)":85,"Piment":77,"Aubergine":85,"Gombo":85,"Patate douce":77,"Coton":85,"Soja":77},"st":"Bouaké"},{"id":48,"nom":"Dabakala, Boniérédougou","sp":"Dabakala","dep":"Katiola","reg":"Hambol","reg0":"Hambol","zone":"Savane Guinéenne","sol":"Lixisol / Cambisol","ph":6.5,"mo":1.7,"drain":"Rapide","contr":"Sécheresse, faible MO, érosion","pluie":1100,"secs":4,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Dabakala, Boniérédougou","ref":{"Anacarde":85,"Igname":85,"Maïs (grain)":85,"Riz pluvial":85,"Sorgho":85,"Mil":77,"Niébé":77,"Arachide":85,"Manioc":85,"Tomate":85,"Oignon (sec)":85,"Piment":77,"Aubergine":85,"Gombo":85,"Patate douce":77,"Coton":85,"Soja":77},"st":"Bouaké"},{"id":49,"nom":"Daoukro, Kouassi-Dadiès","sp":"Daoukro","dep":"Daoukro","reg":"Iffou","reg0":"Iffou","zone":"Savane Guinéenne","sol":"Lixisol / Cambisol","ph":6.5,"mo":1.7,"drain":"Rapide","contr":"Sécheresse, faible MO, érosion","pluie":1100,"secs":4,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Daoukro, Kouassi-Dadiès","ref":{"Anacarde":85,"Igname":85,"Maïs (grain)":85,"Riz pluvial":85,"Sorgho":85,"Mil":77,"Niébé":77,"Arachide":85,"Manioc":85,"Tomate":85,"Oignon (sec)":85,"Piment":77,"Aubergine":85,"Gombo":85,"Patate douce":77,"Coton":85,"Soja":77},"st":"Bouaké"},{"id":50,"nom":"M'Bahiakro, Ettrokro","sp":"M'Bahiakro","dep":"Daoukro","reg":"Iffou","reg0":"Iffou","zone":"Savane Guinéenne","sol":"Lixisol / Cambisol","ph":6.5,"mo":1.7,"drain":"Rapide","contr":"Sécheresse, faible MO, érosion","pluie":1100,"secs":4,"pluieSrc":"zone","statut":"ok","note":null,"orig":"M'Bahiakro, Ettrokro","ref":{"Anacarde":85,"Igname":85,"Maïs (grain)":85,"Riz pluvial":85,"Sorgho":85,"Mil":77,"Niébé":77,"Arachide":85,"Manioc":85,"Tomate":85,"Oignon (sec)":85,"Piment":77,"Aubergine":85,"Gombo":85,"Patate douce":77,"Coton":85,"Soja":77},"st":"Bouaké"},{"id":51,"nom":"Prikro, Kouassi-Kouassikro","sp":"Prikro","dep":"Daoukro","reg":"Iffou","reg0":"Iffou","zone":"Savane Guinéenne","sol":"Lixisol / Cambisol","ph":6.5,"mo":1.7,"drain":"Rapide","contr":"Sécheresse, faible MO, érosion","pluie":1100,"secs":4,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Prikro, Kouassi-Kouassikro","ref":{"Anacarde":85,"Igname":85,"Maïs (grain)":85,"Riz pluvial":85,"Sorgho":85,"Mil":77,"Niébé":77,"Arachide":85,"Manioc":85,"Tomate":85,"Oignon (sec)":85,"Piment":77,"Aubergine":85,"Gombo":85,"Patate douce":77,"Coton":85,"Soja":77},"st":"Bouaké"},{"id":52,"nom":"Dimbokro, Kouassi-N'Goran","sp":"Dimbokro","dep":"Dimbokro","reg":"N'Zi","reg0":"N'Zi","zone":"Savane Guinéenne","sol":"Lixisol / Cambisol","ph":6.5,"mo":1.7,"drain":"Rapide","contr":"Sécheresse, faible MO, érosion","pluie":1093,"secs":4,"pluieSrc":"station Dimbokro","statut":"ok","note":null,"orig":"Dimbokro, Kouassi-N'Goran","ref":{"Anacarde":85,"Igname":85,"Maïs (grain)":85,"Riz pluvial":85,"Sorgho":85,"Mil":77,"Niébé":77,"Arachide":85,"Manioc":85,"Tomate":85,"Oignon (sec)":85,"Piment":77,"Aubergine":85,"Gombo":85,"Patate douce":77,"Coton":85,"Soja":77},"st":"Dimbokro"},{"id":53,"nom":"Bocanda, Diabo","sp":"Bocanda","dep":"Dimbokro","reg":"N'Zi","reg0":"N'Zi","zone":"Savane Guinéenne","sol":"Lixisol / Cambisol","ph":6.5,"mo":1.7,"drain":"Rapide","contr":"Sécheresse, faible MO, érosion","pluie":1100,"secs":4,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Bocanda, Diabo","ref":{"Anacarde":85,"Igname":85,"Maïs (grain)":85,"Riz pluvial":85,"Sorgho":85,"Mil":77,"Niébé":77,"Arachide":85,"Manioc":85,"Tomate":85,"Oignon (sec)":85,"Piment":77,"Aubergine":85,"Gombo":85,"Patate douce":77,"Coton":85,"Soja":77},"st":"Bouaké"},{"id":54,"nom":"Kpouèbo","sp":"Toumodi","dep":"Toumodi","reg":"Bélier","reg0":"N'Zi","zone":"Zone de Transition Forêt-Savane","sol":"Lixisol","ph":5.8,"mo":2.5,"drain":"Moyen","contr":"Sécheresse partielle, érosion","pluie":1250,"secs":4,"pluieSrc":"zone","statut":"corrige","note":"N'Douci existe déjà avec Tiassalé : la ligne devient Kpouèbo (Bélier, profil de transition).","orig":"Ndouci, Kpouebo","ref":{"Anacarde":85,"Igname":85,"Maïs (grain)":85,"Riz pluvial":85,"Sorgho":85,"Mil":77,"Niébé":77,"Arachide":85,"Manioc":85,"Tomate":85,"Oignon (sec)":85,"Piment":77,"Aubergine":85,"Gombo":85,"Patate douce":77,"Coton":85,"Soja":77},"st":"Yamoussoukro"},{"id":55,"nom":"Korhogo, Sinématiali","sp":"Korhogo","dep":"Korhogo","reg":"Poro","reg0":"Poro","zone":"Savane Soudanienne","sol":"Cambisol","ph":6.8,"mo":1.3,"drain":"Rapide","contr":"Sécheresse longue, pauvre en MO","pluie":1243,"secs":5,"pluieSrc":"station Korhogo","statut":"ok","note":null,"orig":"Korhogo, Sinématiali","ref":{"Anacarde":85,"Coton":85,"Sorgho":85,"Mil":77,"Maïs (grain)":85,"Niébé":77,"Arachide":85,"Sésame":77,"Manioc":85,"Igname":85,"Oignon (sec)":85,"Tomate":85,"Gombo":85,"Piment":77,"Gingembre":77,"Karité (collecte)":77},"st":"Korhogo"},{"id":56,"nom":"Sinématiali, Nganon","sp":"Sinématiali","dep":"Korhogo","reg":"Poro","reg0":"Poro","zone":"Savane Soudanienne","sol":"Cambisol","ph":6.8,"mo":1.3,"drain":"Rapide","contr":"Sécheresse longue, pauvre en MO","pluie":1250,"secs":5,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Sinématiali, Nganon","ref":{"Anacarde":85,"Coton":85,"Sorgho":85,"Mil":77,"Maïs (grain)":85,"Niébé":77,"Arachide":85,"Sésame":77,"Manioc":85,"Igname":85,"Oignon (sec)":85,"Tomate":85,"Gombo":85,"Piment":77,"Gingembre":77,"Karité (collecte)":77},"st":"Korhogo"},{"id":57,"nom":"M'Bengué, Nielle","sp":"M'Bengué","dep":"Korhogo","reg":"Poro","reg0":"Poro","zone":"Savane Soudanienne","sol":"Cambisol","ph":6.8,"mo":1.3,"drain":"Rapide","contr":"Sécheresse longue, pauvre en MO","pluie":1250,"secs":5,"pluieSrc":"zone","statut":"ok","note":null,"orig":"M'Bengué, Nielle","ref":{"Anacarde":85,"Coton":85,"Sorgho":85,"Mil":77,"Maïs (grain)":85,"Niébé":77,"Arachide":85,"Sésame":77,"Manioc":85,"Igname":85,"Oignon (sec)":85,"Tomate":85,"Gombo":85,"Piment":77,"Gingembre":77,"Karité (collecte)":77},"st":"Korhogo"},{"id":58,"nom":"Napié, Lataha","sp":"Napié","dep":"Korhogo","reg":"Poro","reg0":"Poro","zone":"Savane Soudanienne","sol":"Cambisol","ph":6.8,"mo":1.3,"drain":"Rapide","contr":"Sécheresse longue, pauvre en MO","pluie":1250,"secs":5,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Napié, Lataha","ref":{"Anacarde":85,"Coton":85,"Sorgho":85,"Mil":77,"Maïs (grain)":85,"Niébé":77,"Arachide":85,"Sésame":77,"Manioc":85,"Igname":85,"Oignon (sec)":85,"Tomate":85,"Gombo":85,"Piment":77,"Gingembre":77,"Karité (collecte)":77},"st":"Korhogo"},{"id":59,"nom":"Boundiali, Kouto","sp":"Boundiali","dep":"Boundiali","reg":"Bagoué","reg0":"Bagoué","zone":"Savane Soudanienne","sol":"Cambisol","ph":6.8,"mo":1.3,"drain":"Rapide","contr":"Sécheresse longue, pauvre en MO","pluie":1250,"secs":5,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Boundiali, Kouto","ref":{"Anacarde":85,"Coton":85,"Sorgho":85,"Mil":77,"Maïs (grain)":85,"Niébé":77,"Arachide":85,"Sésame":77,"Manioc":85,"Igname":85,"Oignon (sec)":85,"Tomate":85,"Gombo":85,"Piment":77,"Gingembre":77,"Karité (collecte)":77},"st":"Korhogo"},{"id":60,"nom":"Tingrela, Gbon","sp":"Tingrela","dep":"Boundiali","reg":"Bagoué","reg0":"Bagoué","zone":"Savane Soudanienne","sol":"Cambisol","ph":6.8,"mo":1.3,"drain":"Rapide","contr":"Sécheresse longue, pauvre en MO","pluie":1250,"secs":5,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Tingrela, Gbon","ref":{"Anacarde":85,"Coton":85,"Sorgho":85,"Mil":77,"Maïs (grain)":85,"Niébé":77,"Arachide":85,"Sésame":77,"Manioc":85,"Igname":85,"Oignon (sec)":85,"Tomate":85,"Gombo":85,"Piment":77,"Gingembre":77,"Karité (collecte)":77},"st":"Korhogo"},{"id":61,"nom":"Kouto, Siempurgo","sp":"Kouto","dep":"Boundiali","reg":"Bagoué","reg0":"Bagoué","zone":"Savane Soudanienne","sol":"Cambisol","ph":6.8,"mo":1.3,"drain":"Rapide","contr":"Sécheresse longue, pauvre en MO","pluie":1250,"secs":5,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Kouto, Siempurgo","ref":{"Anacarde":85,"Coton":85,"Sorgho":85,"Mil":77,"Maïs (grain)":85,"Niébé":77,"Arachide":85,"Sésame":77,"Manioc":85,"Igname":85,"Oignon (sec)":85,"Tomate":85,"Gombo":85,"Piment":77,"Gingembre":77,"Karité (collecte)":77},"st":"Korhogo"},{"id":62,"nom":"Ferkessédougou, Ouangolodougou","sp":"Ferkessédougou","dep":"Ferkessédougou","reg":"Tchologo","reg0":"Tchologo","zone":"Savane Soudanienne","sol":"Cambisol","ph":6.8,"mo":1.3,"drain":"Rapide","contr":"Sécheresse longue, pauvre en MO","pluie":1250,"secs":5,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Ferkessédougou, Ouangolodougou","ref":{"Anacarde":85,"Coton":85,"Sorgho":85,"Mil":77,"Maïs (grain)":85,"Niébé":77,"Arachide":85,"Sésame":77,"Manioc":85,"Igname":85,"Oignon (sec)":85,"Tomate":85,"Gombo":85,"Piment":77,"Gingembre":77,"Karité (collecte)":77},"st":"Korhogo"},{"id":63,"nom":"Kong, Niofoin","sp":"Kong","dep":"Ferkessédougou","reg":"Tchologo","reg0":"Tchologo","zone":"Savane Soudanienne","sol":"Cambisol","ph":6.8,"mo":1.3,"drain":"Rapide","contr":"Sécheresse longue, pauvre en MO","pluie":1250,"secs":5,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Kong, Niofoin","ref":{"Anacarde":85,"Coton":85,"Sorgho":85,"Mil":77,"Maïs (grain)":85,"Niébé":77,"Arachide":85,"Sésame":77,"Manioc":85,"Igname":85,"Oignon (sec)":85,"Tomate":85,"Gombo":85,"Piment":77,"Gingembre":77,"Karité (collecte)":77},"st":"Korhogo"},{"id":64,"nom":"Ouangolodougou, Togoniéré","sp":"Ouangolodougou","dep":"Ferkessédougou","reg":"Tchologo","reg0":"Tchologo","zone":"Savane Soudanienne","sol":"Cambisol","ph":6.8,"mo":1.3,"drain":"Rapide","contr":"Sécheresse longue, pauvre en MO","pluie":1250,"secs":5,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Ouangolodougou, Togoniéré","ref":{"Anacarde":85,"Coton":85,"Sorgho":85,"Mil":77,"Maïs (grain)":85,"Niébé":77,"Arachide":85,"Sésame":77,"Manioc":85,"Igname":85,"Oignon (sec)":85,"Tomate":85,"Gombo":85,"Piment":77,"Gingembre":77,"Karité (collecte)":77},"st":"Korhogo"},{"id":65,"nom":"Odienné, Séguélon","sp":"Odienné","dep":"Odienné","reg":"Kabadougou","reg0":"Kabadougou","zone":"Savane Soudanienne Ouest","sol":"Lixisol / Cambisol","ph":7,"mo":1.2,"drain":"Rapide","contr":"Très sèche, déficit hydrique sévère","pluie":1345,"secs":5,"pluieSrc":"station Odienné","statut":"ok","note":null,"orig":"Odienné, Séguélon","ref":{"Anacarde":85,"Coton":85,"Sorgho":85,"Mil":77,"Maïs (grain)":85,"Niébé":77,"Arachide":85,"Sésame":77,"Karité (collecte)":77,"Manioc":85,"Igname":85,"Gombo":85,"Oignon (sec)":85},"st":"Odienné"},{"id":66,"nom":"Minignan","sp":"Minignan","dep":"Minignan","reg":"Folon","reg0":"Kabadougou","zone":"Savane Soudanienne Ouest","sol":"Lixisol / Cambisol","ph":7,"mo":1.2,"drain":"Rapide","contr":"Très sèche, déficit hydrique sévère","pluie":1350,"secs":5,"pluieSrc":"zone","statut":"corrige","note":"Minignan (Folon) et Madinani (Kabadougou) : paire scindée.","orig":"Minignan, Madinani","ref":{"Anacarde":85,"Coton":85,"Sorgho":85,"Mil":77,"Maïs (grain)":85,"Niébé":77,"Arachide":85,"Sésame":77,"Karité (collecte)":77,"Manioc":85,"Igname":85,"Gombo":85,"Oignon (sec)":85},"st":"Odienné"},{"id":6601,"nom":"Madinani","sp":"Minignan","dep":"Madinani","reg":"Kabadougou","reg0":"Kabadougou","zone":"Savane Soudanienne Ouest","sol":"Lixisol / Cambisol","ph":7,"mo":1.2,"drain":"Rapide","contr":"Très sèche, déficit hydrique sévère","pluie":1350,"secs":5,"pluieSrc":"zone","statut":"corrige","note":"Minignan (Folon) et Madinani (Kabadougou) : paire scindée.","orig":"Minignan, Madinani","ref":{"Anacarde":85,"Coton":85,"Sorgho":85,"Mil":77,"Maïs (grain)":85,"Niébé":77,"Arachide":85,"Sésame":77,"Karité (collecte)":77,"Manioc":85,"Igname":85,"Gombo":85,"Oignon (sec)":85},"st":"Odienné"},{"id":67,"nom":"Koro","sp":"Koro","dep":"Koro","reg":"Bafing","reg0":"Kabadougou","zone":"Savane Soudanienne Ouest","sol":"Lixisol / Cambisol","ph":7,"mo":1.2,"drain":"Rapide","contr":"Très sèche, déficit hydrique sévère","pluie":1350,"secs":5,"pluieSrc":"zone","statut":"corrige","note":"Koro (Bafing) et Tienko (Folon) : paire scindée.","orig":"Koro, Tienko","ref":{"Anacarde":85,"Coton":85,"Sorgho":85,"Mil":77,"Maïs (grain)":85,"Niébé":77,"Arachide":85,"Sésame":77,"Karité (collecte)":77,"Manioc":85,"Igname":85,"Gombo":85,"Oignon (sec)":85},"st":"Odienné"},{"id":6701,"nom":"Tienko","sp":"Koro","dep":"Minignan","reg":"Folon","reg0":"Kabadougou","zone":"Savane Soudanienne Ouest","sol":"Lixisol / Cambisol","ph":7,"mo":1.2,"drain":"Rapide","contr":"Très sèche, déficit hydrique sévère","pluie":1350,"secs":5,"pluieSrc":"zone","statut":"corrige","note":"Koro (Bafing) et Tienko (Folon) : paire scindée.","orig":"Koro, Tienko","ref":{"Anacarde":85,"Coton":85,"Sorgho":85,"Mil":77,"Maïs (grain)":85,"Niébé":77,"Arachide":85,"Sésame":77,"Karité (collecte)":77,"Manioc":85,"Igname":85,"Gombo":85,"Oignon (sec)":85},"st":"Odienné"},{"id":68,"nom":"Touba, Ouaninou","sp":"Touba","dep":"Touba","reg":"Bafing","reg0":"Folon","zone":"Savane Soudanienne Ouest","sol":"Lixisol / Cambisol","ph":7,"mo":1.2,"drain":"Rapide","contr":"Très sèche, déficit hydrique sévère","pluie":1350,"secs":5,"pluieSrc":"zone","statut":"corrige","note":"Touba est le chef-lieu de la région du Bafing (et non Folon).","orig":"Touba, Ouaninou","ref":{"Anacarde":85,"Coton":85,"Sorgho":85,"Mil":77,"Maïs (grain)":85,"Niébé":77,"Arachide":85,"Sésame":77,"Karité (collecte)":77,"Manioc":85,"Igname":85,"Gombo":85,"Oignon (sec)":85},"st":"Odienné"},{"id":69,"nom":"Ouaninou, Koonan","sp":"Ouaninou","dep":"Touba","reg":"Bafing","reg0":"Folon","zone":"Savane Soudanienne Ouest","sol":"Lixisol / Cambisol","ph":7,"mo":1.2,"drain":"Rapide","contr":"Très sèche, déficit hydrique sévère","pluie":1350,"secs":5,"pluieSrc":"zone","statut":"corrige","note":"Ouaninou est un département de la région du Bafing (et non Folon).","orig":"Ouaninou, Koonan","ref":{"Anacarde":85,"Coton":85,"Sorgho":85,"Mil":77,"Maïs (grain)":85,"Niébé":77,"Arachide":85,"Sésame":77,"Karité (collecte)":77,"Manioc":85,"Igname":85,"Gombo":85,"Oignon (sec)":85},"st":"Odienné"},{"id":70,"nom":"Mankono, Kounahiri","sp":"Mankono","dep":"Mankono","reg":"Béré","reg0":"Béré","zone":"Savane Guinéenne / Woroba","sol":"Lixisol","ph":6.4,"mo":1.6,"drain":"Rapide","contr":"Dégradation sols, érosion","pluie":1300,"secs":5,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Mankono, Kounahiri","ref":{"Anacarde":85,"Café Robusta":77,"Maïs (grain)":85,"Igname":85,"Manioc":85,"Sorgho":85,"Niébé":77,"Arachide":85,"Coton":85,"Gombo":85,"Piment":77,"Sésame":77},"st":"Séguéla"},{"id":71,"nom":"Séguéla, Kani","sp":"Séguéla","dep":"Séguéla","reg":"Worodougou","reg0":"Worodougou","zone":"Savane Guinéenne / Woroba","sol":"Lixisol","ph":6.4,"mo":1.6,"drain":"Rapide","contr":"Dégradation sols, érosion","pluie":1360,"secs":5,"pluieSrc":"station Séguéla","statut":"ok","note":null,"orig":"Séguéla, Kani","ref":{"Anacarde":85,"Café Robusta":77,"Maïs (grain)":85,"Igname":85,"Manioc":85,"Sorgho":85,"Niébé":77,"Arachide":85,"Coton":85,"Gombo":85,"Piment":77,"Sésame":77},"st":"Séguéla"},{"id":72,"nom":"Vavoua Nord","sp":"Zuénoula","dep":"Vavoua","reg":"Haut-Sassandra","reg0":"Worodougou","zone":"Savane Guinéenne / Woroba","sol":"Lixisol","ph":6.4,"mo":1.6,"drain":"Rapide","contr":"Dégradation sols, érosion","pluie":1300,"secs":5,"pluieSrc":"zone","statut":"corrige","note":"Zuénoula existe déjà (Marahoué) : la ligne devient Vavoua Nord (Haut-Sassandra), profil Woroba conservé.","orig":"Vavoua (Nord), Zuénoula","ref":{"Anacarde":85,"Café Robusta":77,"Maïs (grain)":85,"Igname":85,"Manioc":85,"Sorgho":85,"Niébé":77,"Arachide":85,"Coton":85,"Gombo":85,"Piment":77,"Sésame":77},"st":"Séguéla"},{"id":73,"nom":"Man, Logoualé","sp":"Man","dep":"Man","reg":"Tonkpi","reg0":"Tonkpi","zone":"Zone Montagneuse Ouest","sol":"Andosol / Ferralsol","ph":5.4,"mo":4.5,"drain":"Bon","contr":"Relief accidenté, déficit P","pluie":1588,"secs":4,"pluieSrc":"station Man","statut":"ok","note":null,"orig":"Man, Logoualé","ref":{"Café Arabica":64,"Café Robusta":64,"Cacao":72,"Hévéa":64,"Riz pluvial":72,"Maïs (grain)":72,"Igname":72,"Manioc":72,"Taro":64,"Légumes de montagne (choux, carottes, poireaux)":64,"Tomate":72,"Haricot (vert)":72,"Banane plantain":72,"Ananas":72,"Poivre":64},"st":"Man"},{"id":74,"nom":"Biankouma, Gouané","sp":"Biankouma","dep":"Man","reg":"Tonkpi","reg0":"Tonkpi","zone":"Zone Montagneuse Ouest","sol":"Andosol / Ferralsol","ph":5.4,"mo":4.5,"drain":"Bon","contr":"Relief accidenté, déficit P","pluie":1600,"secs":4,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Biankouma, Gouané","ref":{"Café Arabica":64,"Café Robusta":64,"Cacao":72,"Hévéa":64,"Riz pluvial":72,"Maïs (grain)":72,"Igname":72,"Manioc":72,"Taro":64,"Légumes de montagne (choux, carottes, poireaux)":64,"Tomate":72,"Haricot (vert)":72,"Banane plantain":72,"Ananas":72,"Poivre":64},"st":"Man"},{"id":75,"nom":"Danané, Zouan-Hounien","sp":"Danané","dep":"Man","reg":"Tonkpi","reg0":"Tonkpi","zone":"Zone Montagneuse Ouest","sol":"Andosol / Ferralsol","ph":5.4,"mo":4.5,"drain":"Bon","contr":"Relief accidenté, déficit P","pluie":1600,"secs":4,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Danané, Zouan-Hounien","ref":{"Café Arabica":64,"Café Robusta":64,"Cacao":72,"Hévéa":64,"Riz pluvial":72,"Maïs (grain)":72,"Igname":72,"Manioc":72,"Taro":64,"Légumes de montagne (choux, carottes, poireaux)":64,"Tomate":72,"Haricot (vert)":72,"Banane plantain":72,"Ananas":72,"Poivre":64},"st":"Man"},{"id":76,"nom":"Zouan-Hounien, Gbonné","sp":"Zouan-Hounien","dep":"Man","reg":"Tonkpi","reg0":"Tonkpi","zone":"Zone Montagneuse Ouest","sol":"Andosol / Ferralsol","ph":5.4,"mo":4.5,"drain":"Bon","contr":"Relief accidenté, déficit P","pluie":1600,"secs":4,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Zouan-Hounien, Gbonné","ref":{"Café Arabica":64,"Café Robusta":64,"Cacao":72,"Hévéa":64,"Riz pluvial":72,"Maïs (grain)":72,"Igname":72,"Manioc":72,"Taro":64,"Légumes de montagne (choux, carottes, poireaux)":64,"Tomate":72,"Haricot (vert)":72,"Banane plantain":72,"Ananas":72,"Poivre":64},"st":"Man"},{"id":77,"nom":"Facobly, Gblêkê","sp":"Facobly","dep":"Man","reg":"Guémon","reg0":"Tonkpi","zone":"Zone Montagneuse Ouest","sol":"Andosol / Ferralsol","ph":5.4,"mo":4.5,"drain":"Bon","contr":"Relief accidenté, déficit P","pluie":1600,"secs":4,"pluieSrc":"zone","statut":"corrige","note":"Facobly est un département de la région du Guémon (et non Tonkpi).","orig":"Facobly, Gblêkê","ref":{"Café Arabica":64,"Café Robusta":64,"Cacao":72,"Hévéa":64,"Riz pluvial":72,"Maïs (grain)":72,"Igname":72,"Manioc":72,"Taro":64,"Légumes de montagne (choux, carottes, poireaux)":64,"Tomate":72,"Haricot (vert)":72,"Banane plantain":72,"Ananas":72,"Poivre":64},"st":"Man"},{"id":78,"nom":"Anyama, Songon","sp":"Anyama","dep":"Abidjan","reg":"District Autonome d'Abidjan","reg0":"District Autonome d'Abidjan","zone":"Périurbain / Littoral","sol":"Ferralsol dégradé","ph":5.8,"mo":1.2,"drain":"Moyen","contr":"Pollution, dégradation anthropique","pluie":1848,"secs":3,"pluieSrc":"station Abidjan","statut":"ok","note":null,"orig":"Anyama, Songon","ref":{"Maraîchage intensif (feuilles, laitue)":77,"Tomate":85,"Aubergine":85,"Piment":77,"Gombo":85,"Manioc":85,"Banane plantain":85,"Cocotier":77,"Concombre":85,"Pastèque":85},"st":"Abidjan"},{"id":79,"nom":"Bingerville, Abobo","sp":"Bingerville","dep":"Abidjan","reg":"District Autonome d'Abidjan","reg0":"District Autonome d'Abidjan","zone":"Périurbain / Littoral","sol":"Ferralsol dégradé","ph":5.8,"mo":1.2,"drain":"Moyen","contr":"Pollution, dégradation anthropique","pluie":1848,"secs":3,"pluieSrc":"station Abidjan","statut":"ok","note":null,"orig":"Bingerville, Abobo","ref":{"Maraîchage intensif (feuilles, laitue)":77,"Tomate":85,"Aubergine":85,"Piment":77,"Gombo":85,"Manioc":85,"Banane plantain":85,"Cocotier":77,"Concombre":85,"Pastèque":85},"st":"Abidjan"},{"id":80,"nom":"Grand-Bassam, Bassam","sp":"Grand-Bassam","dep":"Grand-Bassam","reg":"Sud-Comoé","reg0":"Sud-Comoé","zone":"Littoral Est","sol":"Arenosol","ph":5.5,"mo":1.4,"drain":"Rapide","contr":"Salinité côtière, faible fertilité","pluie":1900,"secs":2,"pluieSrc":"zone","statut":"ok","note":null,"orig":"Grand-Bassam, Bassam","ref":{"Cocotier":77,"Ananas":85,"Palmier à huile":77,"Manioc":85,"Maraîchage côtier":77,"Banane douce":77,"Piment":77,"Gombo":85},"st":"Adiaké"},{"id":900,"nom":"Sassandra","sp":"Sassandra","dep":"Sassandra","reg":"Gbôklé","reg0":"Gbôklé","zone":"Forêt Dense Humide Sud-Ouest","sol":"Ferralsol / Acrisol","ph":4.9,"mo":4.2,"drain":"Bon","contr":"Al échangeable, pH bas, Déficit P","pluie":1509,"secs":4,"pluieSrc":"station Sassandra","statut":"ajoutee","note":"Localité ajoutée pour couvrir la région Gbôklé. Sol repris du profil de zone voisin : à confirmer par analyse.","orig":null,"ref":{},"st":"Sassandra"},{"id":901,"nom":"Divo","sp":"Divo","dep":"Divo","reg":"Lôh-Djiboua","reg0":"Lôh-Djiboua","zone":"Forêt Dense Humide Centre-Sud","sol":"Ferralsol","ph":5.5,"mo":3.2,"drain":"Bon","contr":"Déficit P, lessivage","pluie":1450,"secs":3,"pluieSrc":"zone","statut":"ajoutee","note":"Localité ajoutée pour couvrir la région Lôh-Djiboua. Sol repris du profil de zone voisin : à confirmer par analyse.","orig":null,"ref":{},"st":"Gagnoa"},{"id":902,"nom":"Yamoussoukro","sp":"Yamoussoukro","dep":"Yamoussoukro","reg":"District Autonome de Yamoussoukro","reg0":"District Autonome de Yamoussoukro","zone":"Zone de Transition Forêt-Savane","sol":"Lixisol","ph":5.8,"mo":2.5,"drain":"Moyen","contr":"Sécheresse partielle, érosion","pluie":1174,"secs":3,"pluieSrc":"station Yamoussoukro","statut":"ajoutee","note":"Localité ajoutée pour couvrir la région District Autonome de Yamoussoukro. Sol repris du profil de zone voisin : à confirmer par analyse.","orig":null,"ref":{},"st":"Yamoussoukro"},{"id":903,"nom":"Bondoukou","sp":"Bondoukou","dep":"Bondoukou","reg":"Gontougo","reg0":"Gontougo","zone":"Zone de Transition Est","sol":"Lixisol / Luvisol","ph":6.1,"mo":2.2,"drain":"Moyen","contr":"Compaction, faible MO","pluie":1102,"secs":4,"pluieSrc":"station Bondoukou","statut":"ajoutee","note":"Localité ajoutée pour couvrir la région Gontougo. Sol repris du profil de zone voisin : à confirmer par analyse.","orig":null,"ref":{},"st":"Bondoukou"},{"id":904,"nom":"Bouna","sp":"Bouna","dep":"Bouna","reg":"Bounkani","reg0":"Bounkani","zone":"Savane Soudanienne","sol":"Cambisol","ph":6.8,"mo":1.3,"drain":"Rapide","contr":"Sécheresse longue, pauvre en MO","pluie":1250,"secs":5,"pluieSrc":"zone","statut":"ajoutee","note":"Localité ajoutée pour couvrir la région Bounkani. Sol repris du profil de zone voisin : à confirmer par analyse.","orig":null,"ref":{},"st":"Korhogo"}],"cults":[{"nom":"Cacao","slug":"cacao","fam":"Pérenne oléagineux","saison":"Toute l'année","rmoy":0.6,"rmax":1.8,"diff":"Modéré","com":"Export","eng":"10-18-18+Mg 300 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[4.0,5.0,6.5,8.0],"pl":[900.0,1200.0,3000.0,7600.0],"drain":"B","sec":0,"irr":0,"per":1,"doublon":false,"sal":false,"alt":false,"feuille":false,"cycle":365,"drainI":false,"drainE":false,"eco":"Cacao (Theobroma cacao L.)","ecoT":[21.0,32.0],"ecoG":[180.0,365.0],"engF":"10-18-18+Mg","engKg":300},{"nom":"Palmier à huile","slug":"palmier-a-huile","fam":"Pérenne oléagineux","saison":"Toute l'année","rmoy":3.5,"rmax":7,"diff":"Modéré","com":"Agro-industrie","eng":"15-15-15 600 kg/ha","calc":"Non - paramètres à compléter","horsModele":false,"ph":[4.0,5.5,7.0,8.0],"pl":[1000.0,1500.0,3000.0,8000.0],"drain":"B","sec":0,"irr":0,"per":1,"doublon":false,"sal":false,"alt":false,"feuille":false,"cycle":365,"drainI":false,"drainE":false,"eco":"African oil palm (Elaeis guineensis Jacq.)","ecoT":[21.0,32.0],"ecoG":[300.0,365.0],"engF":"15-15-15","engKg":600},{"nom":"Hévéa","slug":"hevea","fam":"Pérenne latex","saison":"Toute l'année","rmoy":1.5,"rmax":3,"diff":"Modéré","com":"Export","eng":"13-13-21 200 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[3.5,4.5,6.0,8.0],"pl":[1200.0,2000.0,4000.0,6000.0],"drain":"B","sec":0,"irr":0,"per":1,"doublon":false,"sal":false,"alt":false,"feuille":false,"cycle":365,"drainI":false,"drainE":false,"eco":"Rubber * (Hevea brasiliensis (Willd.))","ecoT":[24.0,30.0],"ecoG":[365.0,365.0],"engF":"13-13-21","engKg":200},{"nom":"Banane plantain","slug":"banane-plantain","fam":"Vivrier bananier","saison":"Bisannuel","rmoy":9,"rmax":18,"diff":"Facile","com":"Marché local","eng":"10-6-26 400 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[4.5,5.5,7.0,7.5],"pl":[1000.0,1300.0,3000.0,5000.0],"drain":"B","sec":0,"irr":0,"per":1,"doublon":false,"sal":false,"alt":false,"feuille":false,"cycle":365,"drainI":false,"drainE":false,"eco":"Plantain bananas (Musa balbisiana Colla)","ecoT":[23.0,28.0],"ecoG":[365.0,365.0],"engF":"10-6-26","engKg":400},{"nom":"Manioc","slug":"manioc","fam":"Vivrier tubercule","saison":"12-18 mois","rmoy":10,"rmax":25,"diff":"Facile","com":"Marché local","eng":"13-13-21 150 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[4.0,5.5,8.0,9.0],"pl":[500.0,1000.0,1500.0,5000.0],"drain":"B","sec":2,"irr":0,"per":0,"doublon":false,"sal":false,"alt":false,"feuille":false,"cycle":365,"drainI":false,"drainE":true,"eco":"Cassava (Manihot esculenta Crantz.)","ecoT":[20.0,29.0],"ecoG":[180.0,365.0],"engF":"13-13-21","engKg":150},{"nom":"Igname","slug":"igname","fam":"Vivrier tubercule","saison":"Annuel","rmoy":8,"rmax":14,"diff":"Modéré","com":"Marché local","eng":"15-15-15 200 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[4.8,5.5,6.7,8.5],"pl":[700.0,1000.0,2000.0,8000.0],"drain":"T","sec":1,"irr":0,"per":0,"doublon":false,"sal":false,"alt":false,"feuille":false,"cycle":240,"drainI":true,"drainE":false,"eco":"Greater yam (Dioscorea alata L.) + White yam (Dioscorea rotundata Poir.)","ecoT":[22.0,32.0],"ecoG":[180.0,300.0],"engF":"15-15-15","engKg":200},{"nom":"Taro","slug":"taro","fam":"Vivrier tubercule","saison":"Annuel","rmoy":7,"rmax":12,"diff":"Facile","com":"Marché local","eng":"15-15-15 180 kg/ha","calc":"Non - paramètres à compléter","horsModele":false,"ph":[4.3,5.5,6.5,8.2],"pl":[1000.0,1800.0,2700.0,4100.0],"drain":"T","sec":0,"irr":0,"per":0,"doublon":false,"sal":true,"alt":false,"feuille":false,"cycle":240,"drainI":true,"drainE":false,"eco":"Cocoyam (Colocasia esculenta (L.) S.)","ecoT":[21.0,28.0],"ecoG":[180.0,300.0],"engF":"15-15-15","engKg":180},{"nom":"Maïs (grain)","slug":"mais-grain","fam":"Céréale annuelle","saison":"2 saisons/an","rmoy":2,"rmax":4.5,"diff":"Facile","com":"Marché local","eng":"15-15-15 150 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[4.5,5.0,7.0,8.5],"pl":[400.0,600.0,1200.0,1800.0],"drain":"B","sec":1,"irr":0,"per":0,"doublon":false,"sal":true,"alt":false,"feuille":false,"cycle":110,"drainI":false,"drainE":true,"eco":"Maize (Zea mays L. s. mays)","ecoT":[18.0,33.0],"ecoG":[65.0,365.0],"engF":"15-15-15","engKg":150},{"nom":"Riz pluvial","slug":"riz-pluvial","fam":"Céréale annuelle","saison":"Saison 1","rmoy":2.5,"rmax":5,"diff":"Modéré","com":"Marché local","eng":"18-18-0 100 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[3.5,5.5,7.0,9.0],"pl":[750.0,1000.0,1700.0,3500.0],"drain":"T","sec":0,"irr":0,"per":0,"doublon":false,"sal":true,"alt":false,"feuille":false,"cycle":120,"drainI":true,"drainE":false,"eco":"Rice upland (Indica) (Oryza sativa L. s. indica)","ecoT":[25.0,35.0],"ecoG":[80.0,150.0],"engF":"18-18-0","engKg":100},{"nom":"Gombo","slug":"gombo","fam":"Maraîchage","saison":"Toute l'année","rmoy":5,"rmax":12,"diff":"Facile","com":"Marché local","eng":"15-15-15 150 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[4.5,5.5,7.0,8.7],"pl":[300.0,600.0,1200.0,2500.0],"drain":"B","sec":1,"irr":0,"per":0,"doublon":false,"sal":false,"alt":false,"feuille":true,"cycle":90,"drainI":false,"drainE":false,"eco":"Okra, lady fingers (Abelmoschus esculentus (L.))","ecoT":[20.0,30.0],"ecoG":[50.0,180.0],"engF":"15-15-15","engKg":150},{"nom":"Piment","slug":"piment","fam":"Maraîchage","saison":"Toute l'année","rmoy":4,"rmax":10,"diff":"Modéré","com":"Marché local/Export","eng":"15-15-15 200 kg/ha","calc":"Non - paramètres à compléter","horsModele":false,"ph":[4.3,5.5,6.8,8.3],"pl":[400.0,600.0,1500.0,2000.0],"drain":"B","sec":1,"irr":0,"per":0,"doublon":false,"sal":true,"alt":false,"feuille":false,"cycle":150,"drainI":false,"drainE":false,"eco":"Hot pepper (Capsicum frutescens L.)","ecoT":[18.0,30.0],"ecoG":[120.0,180.0],"engF":"15-15-15","engKg":200},{"nom":"Aubergine","slug":"aubergine","fam":"Maraîchage","saison":"Toute l'année","rmoy":8,"rmax":20,"diff":"Facile","com":"Marché local","eng":"15-15-15 200 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[4.3,5.5,6.8,8.5],"pl":[800.0,1200.0,1600.0,4000.0],"drain":"B","sec":1,"irr":0,"per":0,"doublon":false,"sal":false,"alt":false,"feuille":false,"cycle":120,"drainI":false,"drainE":false,"eco":"Eggplant (Solanum melongena L.)","ecoT":[20.0,35.0],"ecoG":[70.0,120.0],"engF":"15-15-15","engKg":200},{"nom":"Noix de cola","slug":"noix-de-cola","fam":"Pérenne","saison":"Toute l'année","rmoy":0.5,"rmax":1.2,"diff":"Modéré","com":"Marché local","eng":"13-13-21 200 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[4.3,5.0,6.0,7.0],"pl":[1200.0,1400.0,2500.0,3500.0],"drain":"T","sec":0,"irr":0,"per":1,"doublon":false,"sal":false,"alt":false,"feuille":false,"cycle":365,"drainI":true,"drainE":false,"eco":"Cola-nut, commercial * (Cola nitida (Vert.) Schott)","ecoT":[21.0,30.0],"ecoG":[150.0,365.0],"engF":"13-13-21","engKg":200},{"nom":"Ananas","slug":"ananas","fam":"Vivrier fruits","saison":"8-18 mois","rmoy":22,"rmax":45,"diff":"Modéré","com":"Export/local","eng":"12-12-17+2S 500 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[3.5,4.5,8.0,9.0],"pl":[550.0,800.0,2500.0,3500.0],"drain":"B","sec":2,"irr":0,"per":1,"doublon":false,"sal":true,"alt":false,"feuille":false,"cycle":365,"drainI":false,"drainE":true,"eco":"Pineapple (Ananas comosus (L) Merr.)","ecoT":[21.0,30.0],"ecoG":[330.0,365.0],"engF":"12-12-17+2S","engKg":500},{"nom":"Café Robusta","slug":"cafe-robusta","fam":"Pérenne stimulant","saison":"Toute l'année","rmoy":0.3,"rmax":0.8,"diff":"Modéré","com":"Export","eng":"14-23-14 250 kg/ha","calc":"Non - paramètres à compléter","horsModele":false,"ph":[4.0,5.0,6.3,8.0],"pl":[900.0,1700.0,3000.0,4000.0],"drain":"T","sec":0,"irr":0,"per":1,"doublon":false,"sal":false,"alt":false,"feuille":false,"cycle":365,"drainI":true,"drainE":false,"eco":"Coffee robusta (Coffea canephora Pierre)","ecoT":[20.0,30.0],"ecoG":[270.0,300.0],"engF":"14-23-14","engKg":250},{"nom":"Patate douce","slug":"patate-douce","fam":"Vivrier tubercule","saison":"4-5 mois","rmoy":8,"rmax":15,"diff":"Facile","com":"Marché local","eng":"15-15-15 150 kg/ha","calc":"Non - paramètres à compléter","horsModele":false,"ph":[4.0,5.0,7.0,8.0],"pl":[500.0,750.0,1250.0,5000.0],"drain":"B","sec":1,"irr":0,"per":0,"doublon":false,"sal":false,"alt":false,"feuille":false,"cycle":120,"drainI":false,"drainE":false,"eco":"Sweet potato (Ipomoea batatas (L.) Lam.)","ecoT":[18.0,28.0],"ecoG":[80.0,170.0],"engF":"15-15-15","engKg":150},{"nom":"Tomate","slug":"tomate","fam":"Maraîchage","saison":"Nov-Fév","rmoy":12,"rmax":28,"diff":"Complexe","com":"Marché local","eng":"15-15-15 300 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[5.0,5.5,6.8,7.5],"pl":[400.0,600.0,1300.0,1800.0],"drain":"B","sec":0,"irr":1,"per":0,"doublon":false,"sal":false,"alt":false,"feuille":false,"cycle":100,"drainI":false,"drainE":false,"eco":"Tomato (Lycopersicon esculentum M.)","ecoT":[20.0,27.0],"ecoG":[70.0,150.0],"engF":"15-15-15","engKg":300},{"nom":"Concombre","slug":"concombre","fam":"Maraîchage","saison":"Nov-Mars","rmoy":10,"rmax":22,"diff":"Modéré","com":"Marché local","eng":"15-15-15 200 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[4.5,6.0,7.5,8.7],"pl":[400.0,1000.0,1200.0,4300.0],"drain":"B","sec":0,"irr":1,"per":0,"doublon":false,"sal":false,"alt":false,"feuille":false,"cycle":75,"drainI":false,"drainE":false,"eco":"Cucumber (Cucumis sativus L.)","ecoT":[18.0,32.0],"ecoG":[40.0,180.0],"engF":"15-15-15","engKg":200},{"nom":"Pastèque","slug":"pasteque","fam":"Maraîchage","saison":"Nov-Fév","rmoy":15,"rmax":35,"diff":"Modéré","com":"Marché local","eng":"15-15-15 200 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[5.5,6.0,7.0,7.5],"pl":[400.0,500.0,750.0,1800.0],"drain":"B","sec":1,"irr":1,"per":0,"doublon":false,"sal":true,"alt":false,"feuille":false,"cycle":90,"drainI":false,"drainE":false,"eco":"Watermelon (Citrullus lanatus (T) Mansf)","ecoT":[20.0,30.0],"ecoG":[80.0,160.0],"engF":"15-15-15","engKg":200},{"nom":"Huile de palme artisanale","slug":"huile-de-palme-artisanale","fam":"Pérenne oléagineux","saison":"Toute l'année","rmoy":2.5,"rmax":5,"diff":"Facile","com":"Marché local","eng":"15-15-15 500 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[4.0,5.5,7.0,8.0],"pl":[1000.0,1500.0,3000.0,8000.0],"drain":"B","sec":0,"irr":0,"per":1,"doublon":true,"sal":false,"alt":false,"feuille":false,"cycle":365,"drainI":false,"drainE":false,"eco":"African oil palm (Elaeis guineensis Jacq.)","ecoT":[21.0,32.0],"ecoG":[300.0,365.0],"engF":"15-15-15","engKg":500},{"nom":"Banane douce","slug":"banane-douce","fam":"Vivrier bananier","saison":"Toute l'année","rmoy":12,"rmax":25,"diff":"Facile","com":"Marché local","eng":"10-6-26 350 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[4.0,5.5,7.5,8.4],"pl":[650.0,1200.0,3600.0,5000.0],"drain":"B","sec":0,"irr":0,"per":1,"doublon":false,"sal":false,"alt":false,"feuille":false,"cycle":365,"drainI":false,"drainE":false,"eco":"Banana (Musa acuminata Colla)","ecoT":[23.0,33.0],"ecoG":[180.0,365.0],"engF":"10-6-26","engKg":350},{"nom":"Cocotier","slug":"cocotier","fam":"Pérenne oléagineux","saison":"Toute l'année","rmoy":50,"rmax":100,"diff":"Modéré","com":"Marché local","eng":"15-5-20+2MgO 500 kg/ha","calc":"Non - paramètres à compléter","horsModele":false,"ph":[4.3,5.0,8.0,8.7],"pl":[650.0,1200.0,2400.0,4000.0],"drain":"B","sec":1,"irr":0,"per":1,"doublon":false,"sal":true,"alt":false,"feuille":false,"cycle":365,"drainI":false,"drainE":false,"eco":"Coconut (Cocos nucifera L.)","ecoT":[22.0,34.0],"ecoG":[270.0,365.0],"engF":"15-5-20+2MgO","engKg":500},{"nom":"Maraîchage (salades)","slug":"maraichage-salades","fam":"Maraîchage","saison":"Toute l'année","rmoy":10,"rmax":25,"diff":"Complexe","com":"Marché Abidjan","eng":"15-15-15 250 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[4.2,6.0,7.0,7.5],"pl":[900.0,1100.0,1400.0,4100.0],"drain":"B","sec":0,"irr":1,"per":0,"doublon":false,"sal":false,"alt":false,"feuille":true,"cycle":60,"drainI":false,"drainE":false,"eco":"Lettuce (Lactuca sativa L.)","ecoT":[12.0,21.0],"ecoG":[35.0,85.0],"engF":"15-15-15","engKg":250},{"nom":"Crabe / Crevettes (aquaculture)","slug":"crabe-crevettes-aquaculture","fam":"Aquaculture","saison":"Toute l'année","rmoy":2,"rmax":5,"diff":"Complexe","com":"Marché local","eng":"Sans objet (aquaculture)","calc":"Oui / déjà présent","horsModele":true,"doublon":false,"sal":false,"alt":false,"feuille":false},{"nom":"Coton","slug":"coton","fam":"Annuel textile","saison":"Mai-Déc","rmoy":1,"rmax":2.5,"diff":"Complexe","com":"Agro-industrie","eng":"14-22-12+B 200 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[5.0,6.0,7.5,9.5],"pl":[450.0,750.0,1200.0,1500.0],"drain":"B","sec":2,"irr":0,"per":0,"doublon":false,"sal":true,"alt":false,"feuille":false,"cycle":150,"drainI":false,"drainE":false,"eco":"Cotton, American upland (Gossypium hirsutum L.)","ecoT":[22.0,36.0],"ecoG":[150.0,200.0],"engF":"14-22-12+B","engKg":200},{"nom":"Anacarde","slug":"anacarde","fam":"Pérenne noix","saison":"Fév-Mai","rmoy":0.5,"rmax":1.5,"diff":"Modéré","com":"Export","eng":"10-20-10 100 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[3.8,4.5,6.5,8.7],"pl":[400.0,750.0,1600.0,4000.0],"drain":"B","sec":2,"irr":0,"per":1,"doublon":false,"sal":false,"alt":false,"feuille":false,"cycle":365,"drainI":false,"drainE":true,"eco":"Cashew (Anacardium occidentale L.)","ecoT":[15.0,35.0],"ecoG":[190.0,260.0],"engF":"10-20-10","engKg":100},{"nom":"Soja","slug":"soja","fam":"Légumineuse annuelle","saison":"Juin-Oct","rmoy":1,"rmax":2.5,"diff":"Modéré","com":"Agro-industrie","eng":"15-15-15 100 kg/ha","calc":"Non - paramètres à compléter","horsModele":false,"ph":[4.5,5.5,6.5,8.4],"pl":[450.0,600.0,1500.0,1800.0],"drain":"T","sec":1,"irr":0,"per":0,"doublon":false,"sal":true,"alt":false,"feuille":false,"cycle":110,"drainI":true,"drainE":true,"eco":"Soyabean (Glycine max (L.) Merrill)","ecoT":[20.0,33.0],"ecoG":[75.0,180.0],"engF":"15-15-15","engKg":100},{"nom":"Niébé","slug":"niebe","fam":"Légumineuse annuelle","saison":"Juin-Oct","rmoy":0.5,"rmax":1.5,"diff":"Facile","com":"Marché local","eng":"Superphosphate 50 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[4.3,5.5,7.5,8.8],"pl":[400.0,600.0,1500.0,4100.0],"drain":"B","sec":2,"irr":0,"per":0,"doublon":false,"sal":false,"alt":false,"feuille":false,"cycle":75,"drainI":false,"drainE":true,"eco":"Cowpea (Vigna unguiculata unguic. L)","ecoT":[20.0,35.0],"ecoG":[60.0,240.0],"engF":"Superphosphate","engKg":50},{"nom":"Sorgho","slug":"sorgho","fam":"Céréale annuelle","saison":"Saison unique","rmoy":1,"rmax":2.5,"diff":"Facile","com":"Marché local","eng":"15-15-15 100 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[5.0,6.0,7.0,8.5],"pl":[300.0,500.0,1000.0,3000.0],"drain":"T","sec":2,"irr":0,"per":0,"doublon":false,"sal":true,"alt":false,"feuille":false,"cycle":120,"drainI":true,"drainE":true,"eco":"Sorghum (low altitude) (Sorghum bicolor (L.) Moench)","ecoT":[27.0,35.0],"ecoG":[90.0,300.0],"engF":"15-15-15","engKg":100},{"nom":"Mil","slug":"mil","fam":"Céréale annuelle","saison":"Saison unique","rmoy":0.8,"rmax":2,"diff":"Facile","com":"Marché local","eng":"15-15-15 80 kg/ha","calc":"Non - paramètres à compléter","horsModele":false,"ph":[4.5,5.0,6.5,8.3],"pl":[200.0,400.0,900.0,1700.0],"drain":"B","sec":2,"irr":0,"per":0,"doublon":false,"sal":true,"alt":false,"feuille":false,"cycle":90,"drainI":false,"drainE":true,"eco":"Pearl millet (Pennisetum glaucum (L)R.Br.)","ecoT":[25.0,35.0],"ecoG":[60.0,120.0],"engF":"15-15-15","engKg":80},{"nom":"Arachide","slug":"arachide","fam":"Légumineuse annuelle","saison":"Juin-Sept","rmoy":0.8,"rmax":1.8,"diff":"Facile","com":"Marché local","eng":"Superphosphate 100 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[4.5,5.5,6.5,8.5],"pl":[400.0,600.0,1500.0,4000.0],"drain":"B","sec":2,"irr":0,"per":0,"doublon":false,"sal":false,"alt":false,"feuille":false,"cycle":100,"drainI":false,"drainE":false,"eco":"Groundnut (Arachis hypogaea L.)","ecoT":[22.0,32.0],"ecoG":[90.0,150.0],"engF":"Superphosphate","engKg":100},{"nom":"Oignon (sec)","slug":"oignon-sec","fam":"Maraîchage","saison":"Nov-Fév","rmoy":10,"rmax":25,"diff":"Complexe","com":"Marché local","eng":"15-15-15 250 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[4.3,6.0,7.0,8.3],"pl":[300.0,350.0,600.0,2800.0],"drain":"B","sec":1,"irr":1,"per":0,"doublon":false,"sal":true,"alt":false,"feuille":false,"cycle":120,"drainI":false,"drainE":false,"eco":"Onion (Allium cepa L. v cepa)","ecoT":[12.0,25.0],"ecoG":[85.0,175.0],"engF":"15-15-15","engKg":250},{"nom":"Sésame","slug":"sesame","fam":"Oléagineux annuel","saison":"Juil-Nov","rmoy":0.4,"rmax":0.8,"diff":"Modéré","com":"Export","eng":"15-15-15 80 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[4.5,5.5,7.5,8.0],"pl":[300.0,500.0,1000.0,1500.0],"drain":"B","sec":2,"irr":0,"per":0,"doublon":false,"sal":false,"alt":false,"feuille":false,"cycle":100,"drainI":false,"drainE":true,"eco":"Sesame seed (Sesamum indicum L.)","ecoT":[20.0,30.0],"ecoG":[40.0,180.0],"engF":"15-15-15","engKg":80},{"nom":"Gingembre","slug":"gingembre","fam":"Spéculation","saison":"Annuel","rmoy":3,"rmax":8,"diff":"Modéré","com":"Marché local","eng":"15-15-15 200 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[4.3,6.0,7.0,7.5],"pl":[700.0,1400.0,3000.0,4000.0],"drain":"B","sec":0,"irr":0,"per":0,"doublon":false,"sal":false,"alt":false,"feuille":false,"cycle":270,"drainI":false,"drainE":true,"eco":"Ginger (Zingiber officinale Rosc.)","ecoT":[19.0,29.0],"ecoG":[270.0,365.0],"engF":"15-15-15","engKg":200},{"nom":"Karité (collecte)","slug":"karite-collecte","fam":"Pérenne cueillette","saison":"Fév-Mai","rmoy":0.3,"rmax":0.6,"diff":"Facile","com":"Export niche","eng":"Sans objet (cueillette)","calc":"Non - paramètres à compléter","horsModele":false,"ph":[5.5,6.0,7.0,8.0],"pl":[300.0,500.0,1000.0,1800.0],"drain":"B","sec":2,"irr":0,"per":1,"doublon":false,"sal":false,"alt":false,"feuille":false,"cycle":365,"drainI":false,"drainE":true,"eco":"Shea butter tree * (Butyrospermum paradoxum (G))","ecoT":[29.0,38.0],"ecoG":[180.0,240.0],"engF":null,"engKg":null},{"nom":"Café Arabica","slug":"cafe-arabica","fam":"Pérenne stimulant","saison":"Toute l'année","rmoy":0.2,"rmax":0.6,"diff":"Très complexe","com":"Export niche","eng":"17-17-17 300 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[4.3,5.5,7.0,8.4],"pl":[750.0,1400.0,2300.0,4200.0],"drain":"B","sec":0,"irr":0,"per":1,"doublon":false,"sal":false,"alt":true,"feuille":false,"cycle":365,"drainI":false,"drainE":false,"eco":"Coffee arabica (Coffea arabica L.)","ecoT":[14.0,28.0],"ecoG":[210.0,330.0],"engF":"17-17-17","engKg":300},{"nom":"Légumes de montagne (choux, carottes, poireaux)","slug":"legumes-de-montagne-choux-carottes-poireaux","fam":"Maraîchage","saison":"Contre-saison","rmoy":12,"rmax":28,"diff":"Complexe","com":"Marché régional","eng":"15-15-15 300 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[4.2,5.8,7.5,8.7],"pl":[300.0,500.0,1200.0,4000.0],"drain":"B","sec":0,"irr":1,"per":0,"doublon":false,"sal":false,"alt":true,"feuille":true,"cycle":90,"drainI":false,"drainE":false,"eco":"Cabbage (Brassica oleracea L.v capi.) + Carrot (Daucus carota L.)","ecoT":[15.0,24.0],"ecoG":[40.0,200.0],"engF":"15-15-15","engKg":300},{"nom":"Haricot (vert)","slug":"haricot-vert","fam":"Maraîchage","saison":"Nov-Fév","rmoy":5,"rmax":12,"diff":"Complexe","com":"Export/Marché","eng":"10-20-10 150 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[4.0,5.5,7.5,9.0],"pl":[300.0,500.0,2000.0,4300.0],"drain":"B","sec":0,"irr":1,"per":0,"doublon":false,"sal":false,"alt":false,"feuille":false,"cycle":70,"drainI":false,"drainE":false,"eco":"Bean, Common (Phaseolus vulgaris L.)","ecoT":[16.0,25.0],"ecoG":[50.0,270.0],"engF":"10-20-10","engKg":150},{"nom":"Poivre","slug":"poivre","fam":"Epice pérenne","saison":"Toute l'année","rmoy":0.5,"rmax":1.5,"diff":"Complexe","com":"Export niche","eng":"13-13-21 250 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[5.0,6.0,7.0,7.5],"pl":[2000.0,2500.0,4000.0,5500.0],"drain":"B","sec":0,"irr":0,"per":1,"doublon":false,"sal":false,"alt":false,"feuille":false,"cycle":365,"drainI":false,"drainE":false,"eco":"Pepper, black or white (Piper nigrum L.)","ecoT":[22.0,35.0],"ecoG":[180.0,270.0],"engF":"13-13-21","engKg":250},{"nom":"Maraîchage intensif (feuilles, laitue)","slug":"maraichage-intensif-feuilles-laitue","fam":"Maraîchage","saison":"Toute l'année","rmoy":15,"rmax":40,"diff":"Complexe","com":"Marché Abidjan","eng":"15-15-15 250 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[4.2,6.0,7.0,7.5],"pl":[900.0,1100.0,1400.0,4100.0],"drain":"B","sec":0,"irr":1,"per":0,"doublon":false,"sal":false,"alt":false,"feuille":true,"cycle":60,"drainI":false,"drainE":false,"eco":"Lettuce (Lactuca sativa L.)","ecoT":[12.0,21.0],"ecoG":[35.0,85.0],"engF":"15-15-15","engKg":250},{"nom":"Maraîchage côtier","slug":"maraichage-cotier","fam":"Maraîchage","saison":"Toute l'année","rmoy":10,"rmax":22,"diff":"Complexe","com":"Marché local","eng":"15-15-15 250 kg/ha","calc":"Oui / déjà présent","horsModele":false,"ph":[4.3,5.5,7.5,8.5],"pl":[200.0,1100.0,1400.0,4200.0],"drain":"B","sec":0,"irr":1,"per":0,"doublon":false,"sal":true,"alt":false,"feuille":true,"cycle":60,"drainI":false,"drainE":true,"eco":"Amaranthus (Amaranthus spp.)","ecoT":[19.0,30.0],"ecoG":[30.0,300.0],"engF":"15-15-15","engKg":250},{"nom":"Riz de bas-fond","slug":"riz-de-bas-fond","fam":"Céréale annuelle","saison":"Selon maîtrise de l'eau (1 à 2 cycles/an)","rmoy":null,"rmax":null,"diff":"Modéré","com":"Marché local","eng":null,"calc":"Ajoutée dans l'app","horsModele":false,"ajoutee":true,"ph":[3.5,5.0,8.0,9.0],"pl":[1000.0,1500.0,2000.0,4000.0],"drain":"T","sec":0,"irr":1,"per":0,"sal":false,"alt":false,"feuille":false,"cycle":120,"drainI":true,"drainE":false,"eco":"Rice, paddy (Indica) (Oryza sativa L. s. indica)","ecoT":[25.0,35.0],"ecoG":[80.0,200.0],"engF":null,"engKg":null},{"nom":"Riz irrigué","slug":"riz-irrigue","fam":"Céréale annuelle","saison":"Selon maîtrise de l'eau","rmoy":null,"rmax":null,"diff":"Modéré","com":"Marché local","eng":null,"calc":"Ajoutée dans l'app","horsModele":false,"ajoutee":true,"ph":[3.5,5.0,8.0,9.0],"pl":[1000.0,1500.0,2000.0,4000.0],"drain":"T","sec":1,"irr":1,"per":0,"sal":false,"alt":false,"feuille":false,"cycle":120,"drainI":true,"drainE":false,"eco":"Rice, paddy (Indica) (Oryza sativa L. s. indica)","ecoT":[25.0,35.0],"ecoG":[80.0,200.0],"engF":null,"engKg":null}],"risques":[{"cult":"Maïs (grain)","cult0":"Maïs (grain)","pb":"Striga (Striga hermonthica)","pb0":"Striga (Striga hermonthica)","type":"Adventice parasite","prod":"Imazapyr + semences IR-Maïze","ma":"Imazapyr","per":"Pré-levée + levée","niv":"Élevé","pertes":"20-40% si non traité","stade":"Début culture","st":"verifier","msg":"Une matière active de la famille « imaza… » figure sur la liste d'interdiction de 2015 (texte illisible dans la source). Vérifier le statut de l'imazapyr auprès du Comité Pesticides avant de recommander.","alt":null,"corr":null},{"cult":"Maïs (grain)","cult0":"Maïs (grain)","pb":"Helminthosporiose (Exserohilum)","pb0":"Helminthosporiose (Exserohilum)","type":"Fongique","prod":"Ridomil Gold MZ","ma":"Métalaxyl+Mancozèbe","per":"Tallage","niv":"Modéré","pertes":"10-20%","stade":"Floraison-fructif.","st":"verifier","msg":"Ridomil Gold contient du métalaxyl-M. Le métalaxyl (racémique) est interdit depuis 2015 : corriger la matière active en « métalaxyl-M » et vérifier l'homologation.","alt":null,"corr":null},{"cult":"Maïs (grain)","cult0":"Maïs (grain)","pb":"Foreurs de tige (Busseola fusca)","pb0":"Foreurs de tige (Busseola fusca)","type":"Insecte","prod":"Karaté Zéon 5 CS","ma":"Lambda-cyhalothrine","per":"30 et 50 JAS","niv":"Élevé","pertes":"15-30%","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Maïs (grain)","cult0":"Maïs (grain)","pb":"Borer du maïs (Sesamia)","pb0":"Borer du maïs (Sesamia)","type":"Insecte","prod":"Coragen 20 SC","ma":"Chlorantraniliprole","per":"Floraison","niv":"Modéré","pertes":"10-20%","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Maïs (grain)","cult0":"Maïs (grain)","pb":"Charbon de maïs (Ustilago)","pb0":"Charbon de maïs (Ustilago)","type":"Fongique","prod":"Semences traitées Thirame","ma":"Thirame","per":"Au semis","niv":"Faible","pertes":"5-10%","stade":"Début culture","st":"verifier","msg":"Le thirame est interdit ou retiré dans plusieurs pays (UE notamment). Vérifier son homologation actuelle en Côte d'Ivoire.","alt":null,"corr":null},{"cult":"Maïs (doux)","cult0":"Maïs (doux)","pb":"Striga","pb0":"Striga","type":"Adventice parasite","prod":"Imazapyr","ma":"Imazapyr","per":"Pré-levée","niv":"Élevé","pertes":"20-40%","stade":"Début culture","st":"verifier","msg":"Une matière active de la famille « imaza… » figure sur la liste d'interdiction de 2015 (texte illisible dans la source). Vérifier le statut de l'imazapyr auprès du Comité Pesticides avant de recommander.","alt":null,"corr":null},{"cult":"Maïs (doux)","cult0":"Maïs (doux)","pb":"Foreurs de tige","pb0":"Foreurs de tige","type":"Insecte","prod":"Karaté Zéon","ma":"Lambda-cyhalothrine","per":"30-50 JAS","niv":"Élevé","pertes":"15-25%","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Maïs (doux)","cult0":"Maïs (doux)","pb":"Pucerons (Rhopalosiphum)","pb0":"Pucerons (Rhopalosiphum)","type":"Insecte","prod":"Confidor 200 SL","ma":"Imidaclopride","per":"Sur observation","niv":"Modéré","pertes":"5-15%","stade":"Toute la culture","st":"verifier","msg":"Le imidaclopride est interdit ou retiré dans plusieurs pays (UE notamment). Vérifier son homologation actuelle en Côte d'Ivoire.","alt":null,"corr":null},{"cult":"Riz de bas-fond","cult0":"Riz de bas-fond","pb":"Pyriculariose (Pyricularia oryzae)","pb0":"Pyriculariose (Pyricularia oryzae)","type":"Fongique","prod":"Tricyclazole 75 WP","ma":"Tricyclazole","per":"Tallage + montaison","niv":"Élevé","pertes":"20-50%","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Riz de bas-fond","cult0":"Riz de bas-fond","pb":"Helminthosporiose (Bipolaris)","pb0":"Helminthosporiose (Bipolaris)","type":"Fongique","prod":"Score 250 EC","ma":"Difénoconazole","per":"Montaison","niv":"Modéré","pertes":"10-25%","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Riz de bas-fond","cult0":"Riz de bas-fond","pb":"Foreurs de tige (Chilo zacconius, Maliarpha separatella)","pb0":"Borer du riz (Chilo suppressalis)","type":"Insecte","prod":"Décis 25 EC","ma":"Deltaméthrine","per":"Tallage","niv":"Modéré","pertes":"10-20%","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":"Chilo suppressalis est une espèce asiatique : remplacée par les foreurs présents en Afrique de l'Ouest."},{"cult":"Riz de bas-fond","cult0":"Riz de bas-fond","pb":"Scutigerelle (Scutigerella)","pb0":"Scutigerelle (Scutigerella)","type":"Insecte","prod":"Lorsban 48 EC","ma":"Chlorpyrifos","per":"Plantation","niv":"Modéré","pertes":"10-15%","stade":"Début culture","st":"verifier","msg":"Le chlorpyrifos est interdit ou retiré dans plusieurs pays (UE notamment). Vérifier son homologation actuelle en Côte d'Ivoire.","alt":null,"corr":null},{"cult":"Riz de bas-fond","cult0":"Riz de bas-fond","pb":"Mauvaises herbes (Echinochloa, cypéracées)","pb0":"Mauvaises herbes (Striga, Echinochloa)","type":"Adventice","prod":"Propanil + Bentazone","ma":"Propanil","per":"20-30 JAS","niv":"Élevé","pertes":"30-60% si non traité","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":"Striga retiré : adventice des sols exondés, absente en bas-fond inondé."},{"cult":"Riz irrigué","cult0":"Riz irrigué","pb":"Pyriculariose","pb0":"Pyriculariose","type":"Fongique","prod":"Tricyclazole 75 WP","ma":"Tricyclazole","per":"Tallage + épiaison","niv":"Élevé","pertes":"30-80%","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Riz irrigué","cult0":"Riz irrigué","pb":"Bactériose (Xanthomonas oryzae)","pb0":"Bactériose (Xanthomonas oryzae)","type":"Bactérienne","prod":"Cuivre 50 WP","ma":"Oxychlorure de cuivre","per":"Sur observation","niv":"Modéré","pertes":"15-30%","stade":"Toute la culture","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Riz irrigué","cult0":"Riz irrigué","pb":"Borer du riz","pb0":"Borer du riz","type":"Insecte","prod":"Décis 25 EC","ma":"Deltaméthrine","per":"Tallage","niv":"Modéré","pertes":"10-20%","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Riz irrigué","cult0":"Riz irrigué","pb":"Thrips (Stenchaetothrips)","pb0":"Thrips (Stenchaetothrips)","type":"Insecte","prod":"Karaté 5 EC","ma":"Lambda-cyhalothrine","per":"Pépinière","niv":"Modéré","pertes":"10-20%","stade":"Début culture","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Riz irrigué","cult0":"Riz irrigué","pb":"Algues & mauvaises herbes","pb0":"Algues & mauvaises herbes","type":"Adventice","prod":"Oxadiazon + Butachlore","ma":"Oxadiazon","per":"Repiquage","niv":"Modéré","pertes":"20-40%","stade":"Début culture","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Riz pluvial","cult0":"Riz pluvial","pb":"Pyriculariose","pb0":"Pyriculariose","type":"Fongique","prod":"Tricyclazole 75 WP","ma":"Tricyclazole","per":"Tallage","niv":"Modéré","pertes":"15-40%","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Riz pluvial","cult0":"Riz pluvial","pb":"Foreurs (Maliarpha)","pb0":"Foreurs (Maliarpha)","type":"Insecte","prod":"Décis 25 EC","ma":"Deltaméthrine","per":"Tallage","niv":"Modéré","pertes":"10-15%","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Riz pluvial","cult0":"Riz pluvial","pb":"Striga","pb0":"Striga","type":"Adventice","prod":"Imazapyr (NERICA)","ma":"Imazapyr","per":"Pré-levée","niv":"Élevé","pertes":"30-60%","stade":"Début culture","st":"verifier","msg":"Une matière active de la famille « imaza… » figure sur la liste d'interdiction de 2015 (texte illisible dans la source). Vérifier le statut de l'imazapyr auprès du Comité Pesticides avant de recommander.","alt":null,"corr":null},{"cult":"Riz pluvial","cult0":"Riz pluvial","pb":"Schistocerque (criquets)","pb0":"Schistocerque (criquets)","type":"Insecte","prod":"Karaté Zéon","ma":"Lambda-cyhalothrine","per":"Sur observation","niv":"Variable","pertes":"Catastrophique","stade":"Toute la culture","st":"ok","msg":null,"alt":null,"corr":"Le criquet pèlerin (Schistocerca) n'est pas un ravageur habituel en Côte d'Ivoire : à valider ou remplacer par les sautériaux locaux."},{"cult":"Tomate","cult0":"Tomate","pb":"Tuta absoluta","pb0":"Tuta absoluta","type":"Insecte","prod":"Coragen 20 SC / SpinTor","ma":"Chlorantraniliprole","per":"7 jours","niv":"Très élevé","pertes":"80-100% si non traité","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Tomate","cult0":"Tomate","pb":"Mildiou (Phytophthora infestans)","pb0":"Mildiou (Phytophthora infestans)","type":"Fongique","prod":"Ridomil Gold MZ","ma":"Métalaxyl+Mancozèbe","per":"10 jours saison pluies","niv":"Élevé","pertes":"50-70%","stade":"Floraison-fructif.","st":"verifier","msg":"Ridomil Gold contient du métalaxyl-M. Le métalaxyl (racémique) est interdit depuis 2015 : corriger la matière active en « métalaxyl-M » et vérifier l'homologation.","alt":null,"corr":null},{"cult":"Tomate","cult0":"Tomate","pb":"Virus TYLCV (Tomato Yellow Leaf Curl)","pb0":"Virus TYLCV (Tomato Yellow Leaf Curl)","type":"Viral","prod":"Insecticide anti-aleurodes","ma":"Imidaclopride","per":"Au repiquage","niv":"Élevé","pertes":"30-80%","stade":"Début culture","st":"verifier","msg":"Le imidaclopride est interdit ou retiré dans plusieurs pays (UE notamment). Vérifier son homologation actuelle en Côte d'Ivoire.","alt":null,"corr":null},{"cult":"Tomate","cult0":"Tomate","pb":"Fusariose vasculaire","pb0":"Fusariose vasculaire","type":"Fongique","prod":"Trichoderma + rotation","ma":"Trichoderma","per":"Pépinière + sol","niv":"Modéré","pertes":"20-40%","stade":"Début culture","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Tomate","cult0":"Tomate","pb":"Acariens (Tetranychus)","pb0":"Acariens (Tetranychus)","type":"Acarien","prod":"Abamectine 1.8 EC","ma":"Abamectine","per":"Sur observation","niv":"Modéré","pertes":"15-30%","stade":"Toute la culture","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Cacao","cult0":"Cacao","pb":"Pourriture brune (Phytophthora)","pb0":"Pourriture brune (Phytophthora)","type":"Fongique","prod":"Ridomil Gold MZ / Aliette","ma":"Métalaxyl-M + Mancozèbe","per":"3-4 sem. saison pluies","niv":"Élevé","pertes":"30-80%","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Cacao","cult0":"Cacao","pb":"Mirides (Sahlbergella)","pb0":"Mirides (Sahlbergella)","type":"Insecte","prod":"Actara 25 WG","ma":"Thiamétoxame","per":"2×/an (transition saison)","niv":"Élevé","pertes":"30-60%","stade":"Floraison-fructif.","st":"verifier","msg":"Le thiaméthoxame est interdit ou retiré dans plusieurs pays (UE notamment). Vérifier son homologation actuelle en Côte d'Ivoire.","alt":null,"corr":null},{"cult":"Cacao","cult0":"Cacao","pb":"Swollen shoot CSSV","pb0":"Swollen shoot CSSV","type":"Virale","prod":"Arrachage + replantation","ma":"—","per":"Dès détection","niv":"Très élevé","pertes":"Total si épidémie","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Cacao","cult0":"Cacao","pb":"Anthracnose (Colletotrichum)","pb0":"Anthracnose (Colletotrichum)","type":"Fongique","prod":"Score 250 EC","ma":"Difénoconazole","per":"Floraison","niv":"Modéré","pertes":"10-20%","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Arachide","cult0":"Arachide","pb":"Cercosporiose (Cercospora)","pb0":"Cercosporiose (Cercospora)","type":"Fongique","prod":"Score 250 EC","ma":"Difénoconazole","per":"40 JAS puis 3 sem.","niv":"Modéré","pertes":"10-30%","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Arachide","cult0":"Arachide","pb":"Rosette virus","pb0":"Rosette virus","type":"Virale","prod":"Insecticide anti-pucerons (vecteurs)","ma":"Dimethoate","per":"30 JAS","niv":"Élevé","pertes":"50-100%","stade":"Floraison-fructif.","st":"verifier","msg":"Le diméthoate est interdit ou retiré dans plusieurs pays (UE notamment). Vérifier son homologation actuelle en Côte d'Ivoire.","alt":null,"corr":null},{"cult":"Arachide","cult0":"Arachide","pb":"Sclerotinia (pourriture du collet)","pb0":"Sclerotinia (pourriture du collet)","type":"Fongique","prod":"Thirame + rotation longue","ma":"Thirame","per":"Semis","niv":"Modéré","pertes":"15-25%","stade":"Début culture","st":"verifier","msg":"Le thirame est interdit ou retiré dans plusieurs pays (UE notamment). Vérifier son homologation actuelle en Côte d'Ivoire.","alt":null,"corr":null},{"cult":"Arachide","cult0":"Arachide","pb":"Termites","pb0":"Termites","type":"Insecte","prod":"Lorsban 48 EC sol","ma":"Chlorpyrifos","per":"Au semis","niv":"Modéré","pertes":"10-20%","stade":"Début culture","st":"verifier","msg":"Le chlorpyrifos est interdit ou retiré dans plusieurs pays (UE notamment). Vérifier son homologation actuelle en Côte d'Ivoire.","alt":null,"corr":null},{"cult":"Oignon (sec)","cult0":"Oignon (sec)","pb":"Mildiou de l'oignon (Peronospora)","pb0":"Mildiou de l'oignon (Peronospora)","type":"Fongique","prod":"Ridomil Gold MZ","ma":"Métalaxyl","per":"10 jours","niv":"Élevé","pertes":"30-60%","stade":"Floraison-fructif.","st":"verifier","msg":"Ridomil Gold contient du métalaxyl-M. Le métalaxyl (racémique) est interdit depuis 2015 : corriger la matière active en « métalaxyl-M » et vérifier l'homologation.","alt":null,"corr":null},{"cult":"Oignon (sec)","cult0":"Oignon (sec)","pb":"Thrips (Thrips tabaci)","pb0":"Thrips (Thrips tabaci)","type":"Insecte","prod":"Karaté 5 EC","ma":"Lambda-cyhalothrine","per":"7-10 jours","niv":"Élevé","pertes":"20-40%","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Oignon (sec)","cult0":"Oignon (sec)","pb":"Alternariose","pb0":"Alternariose","type":"Fongique","prod":"Score 250 EC","ma":"Difénoconazole","per":"Sur observation","niv":"Modéré","pertes":"15-25%","stade":"Toute la culture","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Oignon (sec)","cult0":"Oignon (sec)","pb":"Mouche de l'oignon","pb0":"Mouche de l'oignon","type":"Insecte","prod":"Lorsban sol","ma":"Chlorpyrifos","per":"Au repiquage","niv":"Modéré","pertes":"10-20%","stade":"Début culture","st":"verifier","msg":"Le chlorpyrifos est interdit ou retiré dans plusieurs pays (UE notamment). Vérifier son homologation actuelle en Côte d'Ivoire.","alt":null,"corr":null},{"cult":"Sorgho","cult0":"Sorgho","pb":"Mildiou du sorgho (Sclerospora)","pb0":"Mildiou du sorgho (Sclerospora)","type":"Fongique","prod":"Métalaxyl traitement semences","ma":"Métalaxyl","per":"Au semis","niv":"Modéré","pertes":"10-30%","stade":"Début culture","st":"interdit","msg":"Métalaxyl (racémique) interdit en Côte d'Ivoire depuis 2015. N'utiliser qu'une spécialité homologuée à base de métalaxyl-M.","alt":"Semences traitées avec une spécialité homologuée à base de métalaxyl-M, variétés résistantes au mildiou, arrachage des plants atteints.","corr":null},{"cult":"Sorgho","cult0":"Sorgho","pb":"Striga","pb0":"Striga","type":"Adventice","prod":"Imazapyr + variétés résistantes","ma":"Imazapyr","per":"Pré-levée","niv":"Élevé","pertes":"20-50%","stade":"Début culture","st":"verifier","msg":"Une matière active de la famille « imaza… » figure sur la liste d'interdiction de 2015 (texte illisible dans la source). Vérifier le statut de l'imazapyr auprès du Comité Pesticides avant de recommander.","alt":null,"corr":null},{"cult":"Sorgho","cult0":"Sorgho","pb":"Cécidomyie du sorgho (Contarinia)","pb0":"Cécidomyie du sorgho (Contarinia)","type":"Insecte","prod":"Décis 25 EC","ma":"Deltaméthrine","per":"Épiaison","niv":"Élevé","pertes":"30-70%","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Sorgho","cult0":"Sorgho","pb":"Pucerons","pb0":"Pucerons","type":"Insecte","prod":"Confidor 200 SL","ma":"Imidaclopride","per":"Sur observation","niv":"Faible","pertes":"5-15%","stade":"Toute la culture","st":"verifier","msg":"Le imidaclopride est interdit ou retiré dans plusieurs pays (UE notamment). Vérifier son homologation actuelle en Côte d'Ivoire.","alt":null,"corr":null},{"cult":"Anacarde","cult0":"Anacarde","pb":"Anthracnose (Colletotrichum)","pb0":"Anthracnose (Colletotrichum)","type":"Fongique","prod":"Score 250 EC","ma":"Difénoconazole","per":"Floraison 3×","niv":"Modéré","pertes":"15-30%","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Anacarde","cult0":"Anacarde","pb":"Thrips du cajou","pb0":"Thrips du cajou","type":"Insecte","prod":"Décis 25 EC","ma":"Deltaméthrine","per":"Floraison","niv":"Modéré","pertes":"10-20%","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Anacarde","cult0":"Anacarde","pb":"Hélopeltis (Helopeltis anacardii)","pb0":"Hélopeltis (Helopeltis anacardii)","type":"Insecte","prod":"Actara 25 WG","ma":"Thiamétoxame","per":"Floraison","niv":"Élevé","pertes":"20-50%","stade":"Floraison-fructif.","st":"verifier","msg":"Le thiaméthoxame est interdit ou retiré dans plusieurs pays (UE notamment). Vérifier son homologation actuelle en Côte d'Ivoire.","alt":null,"corr":null},{"cult":"Igname","cult0":"Igname","pb":"Anthracnose (Colletotrichum)","pb0":"Anthracnose (Colletotrichum)","type":"Fongique","prod":"Score 250 EC","ma":"Difénoconazole","per":"Levée","niv":"Modéré","pertes":"10-20%","stade":"Début culture","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Igname","cult0":"Igname","pb":"Viroses (IYMV)","pb0":"Viroses (IYMV)","type":"Virale","prod":"Insecticide anti-pucerons","ma":"Lambda-cyhalothrine","per":"Sur observation","niv":"Élevé","pertes":"20-60%","stade":"Toute la culture","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Igname","cult0":"Igname","pb":"Nématodes (Scutellonema)","pb0":"Nématodes (Scutellonema)","type":"Nématode","prod":"Nemacur 10 GR","ma":"Fénamiphos","per":"Plantation","niv":"Élevé","pertes":"20-40%","stade":"Début culture","st":"verifier","msg":"Le fénamiphos est interdit ou retiré dans plusieurs pays (UE notamment). Vérifier son homologation actuelle en Côte d'Ivoire.","alt":"Semenceaux sains, traitement des semenceaux à l'eau chaude (environ 50 °C pendant 30 à 40 min), rotation avec légumineuses.","corr":null},{"cult":"Igname","cult0":"Igname","pb":"Termites","pb0":"Termites","type":"Insecte","prod":"Furadan 5G","ma":"Carbofuran","per":"Plantation","niv":"Modéré","pertes":"10-20%","stade":"Début culture","st":"interdit","msg":"Carbofuran interdit en Côte d'Ivoire (circulaire douanes n°1743 du 20/11/2015 sur l'arrêté MINAGRI de 2015).","alt":"Semenceaux sains, poudrage à la cendre de bois, rotation ; si un insecticide sol est nécessaire, choisir une spécialité homologuée.","corr":null},{"cult":"Manioc","cult0":"Manioc","pb":"Acariens du manioc (Mononychellus)","pb0":"Acariens du manioc (Mononychellus)","type":"Acarien","prod":"Abamectine 1.8 EC","ma":"Abamectine","per":"Sur observation","niv":"Modéré","pertes":"15-30%","stade":"Toute la culture","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Manioc","cult0":"Manioc","pb":"Cochenilles (Phenacoccus)","pb0":"Cochenilles (Phenacoccus)","type":"Insecte","prod":"Confidor 200 SL","ma":"Imidaclopride","per":"Sur observation","niv":"Modéré","pertes":"10-25%","stade":"Toute la culture","st":"verifier","msg":"Le imidaclopride est interdit ou retiré dans plusieurs pays (UE notamment). Vérifier son homologation actuelle en Côte d'Ivoire.","alt":null,"corr":null},{"cult":"Manioc","cult0":"Manioc","pb":"Mosaïque du manioc (CMD)","pb0":"Mosaïque du manioc (CMD)","type":"Virale","prod":"Variétés résistantes","ma":"—","per":"Planting","niv":"Très élevé","pertes":"20-100%","stade":"Début culture","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Manioc","cult0":"Manioc","pb":"Anthracnose (Colletotrichum)","pb0":"Anthracnose (Colletotrichum)","type":"Fongique","prod":"Score 250 EC","ma":"Difénoconazole","per":"Sur observation","niv":"Faible","pertes":"5-15%","stade":"Toute la culture","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Banane plantain","cult0":"Banane plantain","pb":"Cercosporiose noire (Sigatoka)","pb0":"Cercosporiose noire (Sigatoka)","type":"Fongique","prod":"Calixin 750 EC","ma":"Tridemorphe","per":"3 semaines","niv":"Élevé","pertes":"30-70%","stade":"Floraison-fructif.","st":"verifier","msg":"Le tridémorphe est interdit ou retiré dans plusieurs pays (UE notamment). Vérifier son homologation actuelle en Côte d'Ivoire.","alt":null,"corr":null},{"cult":"Banane plantain","cult0":"Banane plantain","pb":"Fusariose Panama (Fusarium)","pb0":"Fusariose Panama (Fusarium)","type":"Fongique","prod":"Rotation + variétés","ma":"—","per":"Sol","niv":"Modéré","pertes":"10-40%","stade":"Début culture","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Banane plantain","cult0":"Banane plantain","pb":"Charançon du bananier (Cosmopolites)","pb0":"Charançon du bananier (Cosmopolites)","type":"Insecte","prod":"Furadan 5G sol","ma":"Carbofuran","per":"Plantation","niv":"Élevé","pertes":"20-40%","stade":"Début culture","st":"interdit","msg":"Carbofuran interdit en Côte d'Ivoire (circulaire douanes n°1743 du 20/11/2015 sur l'arrêté MINAGRI de 2015).","alt":"Vitroplants ou rejets parés et pralinés, pièges à pseudo-tronc, Beauveria bassiana, élimination des résidus de récolte.","corr":null},{"cult":"Banane plantain","cult0":"Banane plantain","pb":"Thrips des fleurs (Thrips hawaiiensis)","pb0":"Thrips des fleurs (Thrips hawaiiensis)","type":"Insecte","prod":"Karaté 5 EC","ma":"Lambda-cyhalothrine","per":"Floraison","niv":"Modéré","pertes":"5-15%","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Coton","cult0":"Coton","pb":"Helicoverpa armigera","pb0":"Helicoverpa armigera","type":"Insecte","prod":"Karaté Zéon / Décis","ma":"Lambda-cyhalothrine","per":"Toutes 2 sem.","niv":"Très élevé","pertes":"30-80%","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Coton","cult0":"Coton","pb":"Mouche blanche (Bemisia tabaci)","pb0":"Mouche blanche (Bemisia tabaci)","type":"Insecte","prod":"Confidor + Actara","ma":"Imidaclopride+Thiamétoxame","per":"10 jours","niv":"Élevé","pertes":"20-50%","stade":"Floraison-fructif.","st":"verifier","msg":"Le imidaclopride est interdit ou retiré dans plusieurs pays (UE notamment). Vérifier son homologation actuelle en Côte d'Ivoire.","alt":null,"corr":null},{"cult":"Coton","cult0":"Coton","pb":"Jassides (Empoasca)","pb0":"Jassides (Empoasca)","type":"Insecte","prod":"Imidaclopride traitement semences","ma":"Imidaclopride","per":"Levée-40 J","niv":"Modéré","pertes":"10-20%","stade":"Début culture","st":"verifier","msg":"Le imidaclopride est interdit ou retiré dans plusieurs pays (UE notamment). Vérifier son homologation actuelle en Côte d'Ivoire.","alt":null,"corr":null},{"cult":"Coton","cult0":"Coton","pb":"Verticilliose (Verticillium)","pb0":"Verticilliose (Verticillium)","type":"Fongique","prod":"Rotation + PCNB sol","ma":"PCNB","per":"Sol avant semis","niv":"Modéré","pertes":"10-30%","stade":"Début culture","st":"interdit","msg":"Quintozène (PCNB) interdit en Côte d'Ivoire depuis l'arrêté MINAGRI n°159 du 21/06/2004.","alt":"Rotation longue (3 ans et plus), variétés tolérantes, destruction des résidus, éviter les parcelles infestées.","corr":null},{"cult":"Gombo","cult0":"Gombo","pb":"YVMV (jaunisse du gombo)","pb0":"YVMV (jaunisse du gombo)","type":"Virale","prod":"Insecticide anti-mouche blanche","ma":"Imidaclopride","per":"Sur observation","niv":"Élevé","pertes":"30-80%","stade":"Toute la culture","st":"verifier","msg":"Le imidaclopride est interdit ou retiré dans plusieurs pays (UE notamment). Vérifier son homologation actuelle en Côte d'Ivoire.","alt":null,"corr":null},{"cult":"Gombo","cult0":"Gombo","pb":"Pucerons (Aphis gossypii)","pb0":"Pucerons (Aphis gossypii)","type":"Insecte","prod":"Karaté 5 EC","ma":"Lambda-cyhalothrine","per":"Sur observation","niv":"Modéré","pertes":"10-20%","stade":"Toute la culture","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Gombo","cult0":"Gombo","pb":"Pourriture du fruit (Phytophthora)","pb0":"Pourriture du fruit (Phytophthora)","type":"Fongique","prod":"Ridomil Gold MZ","ma":"Métalaxyl","per":"10 jours","niv":"Modéré","pertes":"15-30%","stade":"Floraison-fructif.","st":"verifier","msg":"Ridomil Gold contient du métalaxyl-M. Le métalaxyl (racémique) est interdit depuis 2015 : corriger la matière active en « métalaxyl-M » et vérifier l'homologation.","alt":null,"corr":null},{"cult":"Légumes de montagne (choux, carottes, poireaux)","cult0":"Chou","pb":"Teigne du chou (Plutella xylostella)","pb0":"Teigne du chou (Plutella xylostella)","type":"Insecte","prod":"SpinTor 48 SC","ma":"Spinosad","per":"7 jours","niv":"Élevé","pertes":"30-70%","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Légumes de montagne (choux, carottes, poireaux)","cult0":"Chou","pb":"Fonte de semis (Pythium)","pb0":"Fonte de semis (Pythium)","type":"Fongique","prod":"Thirame WP","ma":"Thirame","per":"Pépinière","niv":"Modéré","pertes":"10-30%","stade":"Début culture","st":"verifier","msg":"Le thirame est interdit ou retiré dans plusieurs pays (UE notamment). Vérifier son homologation actuelle en Côte d'Ivoire.","alt":null,"corr":null},{"cult":"Légumes de montagne (choux, carottes, poireaux)","cult0":"Chou","pb":"Hernie du chou (Plasmodiophora)","pb0":"Hernie du chou (Plasmodiophora)","type":"Fongique/Sol","prod":"Chaulage sol pH>7","ma":"Chaux","per":"Sol","niv":"Modéré","pertes":"10-40%","stade":"Début culture","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Concombre","cult0":"Concombre","pb":"Mildiou (Pseudoperonospora)","pb0":"Mildiou (Pseudoperonospora)","type":"Fongique","prod":"Ridomil Gold MZ","ma":"Métalaxyl","per":"10 jours","niv":"Modéré","pertes":"20-40%","stade":"Floraison-fructif.","st":"verifier","msg":"Ridomil Gold contient du métalaxyl-M. Le métalaxyl (racémique) est interdit depuis 2015 : corriger la matière active en « métalaxyl-M » et vérifier l'homologation.","alt":null,"corr":null},{"cult":"Concombre","cult0":"Concombre","pb":"Mouche des cucurbitacées (Dacus)","pb0":"Mouche des cucurbitacées (Dacus)","type":"Insecte","prod":"Décis 25 EC","ma":"Deltaméthrine","per":"Floraison","niv":"Élevé","pertes":"20-60%","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Concombre","cult0":"Concombre","pb":"CMV (Cucumber Mosaic Virus)","pb0":"CMV (Cucumber Mosaic Virus)","type":"Virale","prod":"Anti-pucerons vecteurs","ma":"Pyréthrinoïdes","per":"Sur observation","niv":"Modéré","pertes":"20-50%","stade":"Toute la culture","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Pastèque","cult0":"Pastèque","pb":"Fusariose (Fusarium oxysporum)","pb0":"Fusariose (Fusarium oxysporum)","type":"Fongique","prod":"Rotation 4 ans + greffage","ma":"—","per":"Sol","niv":"Élevé","pertes":"20-60%","stade":"Début culture","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Pastèque","cult0":"Pastèque","pb":"Mouche des cucurbitacées","pb0":"Mouche des cucurbitacées","type":"Insecte","prod":"Décis 25 EC","ma":"Deltaméthrine","per":"Floraison","niv":"Élevé","pertes":"30-60%","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Pastèque","cult0":"Pastèque","pb":"Anthracnose","pb0":"Anthracnose","type":"Fongique","prod":"Score 250 EC","ma":"Difénoconazole","per":"Sur observation","niv":"Modéré","pertes":"10-25%","stade":"Toute la culture","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Ananas","cult0":"Ananas","pb":"Phytophthora du cœur","pb0":"Phytophthora du cœur","type":"Fongique","prod":"Aliette 80 WG","ma":"Fosétyl-Al","per":"Plantation","niv":"Modéré","pertes":"10-30%","stade":"Début culture","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Ananas","cult0":"Ananas","pb":"Cochenilles / PMWaV","pb0":"Cochenilles / PMWaV","type":"Insecte/Viral","prod":"Dursban 48 EC","ma":"Chlorpyrifos","per":"Plantation + 3 mois","niv":"Modéré","pertes":"10-40%","stade":"Début culture","st":"verifier","msg":"Le chlorpyrifos est interdit ou retiré dans plusieurs pays (UE notamment). Vérifier son homologation actuelle en Côte d'Ivoire.","alt":null,"corr":null},{"cult":"Ananas","cult0":"Ananas","pb":"Wilt virus","pb0":"Wilt virus","type":"Virale","prod":"Contrôle vecteur cochenille","ma":"—","per":"Plantation","niv":"Élevé","pertes":"20-60%","stade":"Début culture","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Légumes de montagne (choux, carottes, poireaux)","cult0":"Carotte","pb":"Alternariose (Alternaria dauci)","pb0":"Alternariose (Alternaria dauci)","type":"Fongique","prod":"Score 250 EC","ma":"Difénoconazole","per":"Sur observation","niv":"Modéré","pertes":"10-25%","stade":"Toute la culture","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Légumes de montagne (choux, carottes, poireaux)","cult0":"Carotte","pb":"Mouche de la carotte","pb0":"Mouche de la carotte","type":"Insecte","prod":"Lorsban 48 EC","ma":"Chlorpyrifos","per":"Semis","niv":"Modéré","pertes":"10-20%","stade":"Début culture","st":"verifier","msg":"Le chlorpyrifos est interdit ou retiré dans plusieurs pays (UE notamment). Vérifier son homologation actuelle en Côte d'Ivoire.","alt":null,"corr":null},{"cult":"Haricot (vert)","cult0":"Haricot (vert)","pb":"Anthracnose (Colletotrichum)","pb0":"Anthracnose (Colletotrichum)","type":"Fongique","prod":"Score 250 EC","ma":"Difénoconazole","per":"Sur observation","niv":"Modéré","pertes":"10-30%","stade":"Toute la culture","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Haricot (vert)","cult0":"Haricot (vert)","pb":"Bruche (Callosobruchus)","pb0":"Bruche (Callosobruchus)","type":"Insecte","prod":"Décis 25 EC","ma":"Deltaméthrine","per":"Floraison-fructif.","niv":"Modéré","pertes":"15-30%","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Haricot (vert)","cult0":"Haricot (vert)","pb":"Mouche mineuse (Liriomyza)","pb0":"Mouche mineuse (Liriomyza)","type":"Insecte","prod":"Karaté 5 EC","ma":"Lambda-cyhalothrine","per":"Sur observation","niv":"Modéré","pertes":"10-20%","stade":"Toute la culture","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Aubergine","cult0":"Aubergine","pb":"Anthracnose (Colletotrichum)","pb0":"Anthracnose (Colletotrichum)","type":"Fongique","prod":"Score 250 EC","ma":"Difénoconazole","per":"Sur observation","niv":"Modéré","pertes":"10-20%","stade":"Toute la culture","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Aubergine","cult0":"Aubergine","pb":"Foreur du fruit (Leucinodes)","pb0":"Foreur du fruit (Leucinodes)","type":"Insecte","prod":"Coragen 20 SC","ma":"Chlorantraniliprole","per":"7 jours","niv":"Élevé","pertes":"20-60%","stade":"Floraison-fructif.","st":"ok","msg":null,"alt":null,"corr":null},{"cult":"Aubergine","cult0":"Aubergine","pb":"Flétrissure bactérienne (Ralstonia)","pb0":"Flétrissure bactérienne (Ralstonia)","type":"Bactérienne","prod":"Rotation + résistance","ma":"—","per":"Sol","niv":"Élevé","pertes":"20-50%","stade":"Début culture","st":"ok","msg":null,"alt":null,"corr":null}],"anomalies":[{"cat":"Administratif","objet":"Méagui, Oupoyo","detail":"Région « San-Pédro » → « Nawa ». Méagui est un département de la région de la Nawa (et non San-Pédro). Département aussi à corriger : Méagui.","statut":"Corrigé dans l'app"},{"cat":"Administratif","objet":"Soubré, Buyo","detail":"Région « San-Pédro » → « Nawa ». Soubré est le chef-lieu de la région de la Nawa.","statut":"Corrigé dans l'app"},{"cat":"Administratif","objet":"Buyo, Guezon","detail":"Région « San-Pédro » → « Nawa ». Buyo relève du département de Buyo, région de la Nawa.","statut":"Corrigé dans l'app"},{"cat":"Administratif","objet":"Guiglo, Nizahon","detail":"Région « Guémon » → « Cavally ». Guiglo est le chef-lieu de la région du Cavally (et non Guémon).","statut":"Corrigé dans l'app"},{"cat":"Administratif","objet":"Grand-Bassam, Bonoua","detail":"Doublon Grand-Bassam : la ligne 21 devient Bonoua (Sud-Comoé), Grand-Bassam reste sur la ligne 80.","statut":"Corrigé dans l'app"},{"cat":"Administratif","objet":"Grand-Lahou, Fresco","detail":"Grand-Lahou (Grands-Ponts) et Fresco (Gbôklé) : paire scindée en deux localités.","statut":"Corrigé dans l'app"},{"cat":"Administratif","objet":"Vavoua, Gagnoa","detail":"Gagnoa existe déjà (ligne « Gagnoa, Gnago ») : la ligne devient Vavoua (Haut-Sassandra).","statut":"Corrigé dans l'app"},{"cat":"Administratif","objet":"Zuénoula, Kounahiri","detail":"Kounahiri existe déjà avec Mankono (Béré) : la ligne devient Zuénoula (Marahoué).","statut":"Corrigé dans l'app"},{"cat":"Administratif","objet":"Méadji, Bayota","detail":"Méadji (Nawa, profil de sol Sud-Ouest) et Bayota (Gôh) : paire scindée.","statut":"Corrigé dans l'app"},{"cat":"Administratif","objet":"Toumodi, Djébonoua","detail":"Djébonoua existe déjà avec Bouaké (Gbêkê) : la ligne devient Toumodi (Bélier).","statut":"Corrigé dans l'app"},{"cat":"Administratif","objet":"Dimbokro, Bongouanou","detail":"Dimbokro existe déjà (N'Zi) : la ligne devient Bongouanou, région du Moronou.","statut":"Corrigé dans l'app"},{"cat":"Administratif","objet":"N'Zianouan, Tié N'Diekro","detail":"N'Zianouan (Agnéby-Tiassa, profil Centre-Sud) et Tié-N'Diékro (Bélier) : paire scindée.","statut":"Corrigé dans l'app"},{"cat":"Administratif","objet":"Ndouci, Kpouebo","detail":"N'Douci existe déjà avec Tiassalé : la ligne devient Kpouèbo (Bélier, profil de transition).","statut":"Corrigé dans l'app"},{"cat":"Administratif","objet":"Minignan, Madinani","detail":"Minignan (Folon) et Madinani (Kabadougou) : paire scindée.","statut":"Corrigé dans l'app"},{"cat":"Administratif","objet":"Koro, Tienko","detail":"Koro (Bafing) et Tienko (Folon) : paire scindée.","statut":"Corrigé dans l'app"},{"cat":"Administratif","objet":"Touba, Ouaninou","detail":"Région « Folon » → « Bafing ». Touba est le chef-lieu de la région du Bafing (et non Folon).","statut":"Corrigé dans l'app"},{"cat":"Administratif","objet":"Ouaninou, Koonan","detail":"Région « Folon » → « Bafing ». Ouaninou est un département de la région du Bafing (et non Folon).","statut":"Corrigé dans l'app"},{"cat":"Administratif","objet":"Vavoua (Nord), Zuénoula","detail":"Zuénoula existe déjà (Marahoué) : la ligne devient Vavoua Nord (Haut-Sassandra), profil Woroba conservé.","statut":"Corrigé dans l'app"},{"cat":"Administratif","objet":"Facobly, Gblêkê","detail":"Région « Tonkpi » → « Guémon ». Facobly est un département de la région du Guémon (et non Tonkpi).","statut":"Corrigé dans l'app"},{"cat":"Couverture","objet":"Régions non couvertes","detail":"Ajout de Sassandra (Gbôklé), Divo (Lôh-Djiboua), Yamoussoukro, Bondoukou (Gontougo) et Bouna (Bounkani). Nawa, Bafing et Moronou sont couverts après correction. Ces localités n'ont pas de liste de cultures pratiquées : toutes les cultures sont évaluées.","statut":"Corrigé dans l'app"},{"cat":"Sol","objet":"Toutes les localités","detail":"Seulement 14 profils de sol distincts pour 90 localités : pH, MO et drainage sont des valeurs moyennes de zone, pas des mesures locales. L'app permet de saisir une analyse de sol de terrain pour recalculer.","statut":"Limite signalée"},{"cat":"Sol","objet":"Colonne ville_etp_reference","detail":"Vide pour les 80 localités : aucun bilan hydrique (ETP) n'est possible. L'app utilise les normales de 12 stations météo (Odienné, Korhogo, Bouaké, Man, Abidjan, Gagnoa…) et, ailleurs, une valeur de zone recalée sur ces stations. Chaque localité peut recevoir ses données NASA POWER par import.","statut":"Corrigé dans l'app"},{"cat":"Climat","objet":"Savane Soudanienne Ouest (Odienné…)","detail":"Contrainte « très sèche, déficit hydrique sévère » alors que la station d'Odienné reçoit 1 345 mm/an (normale 1961-1990) : le déficit vient de la longueur de la saison sèche. L'app le traite via le nombre de mois secs.","statut":"Corrigé dans l'app"},{"cat":"Cultures","objet":"Riz de bas-fond, Riz irrigué","detail":"Présents dans Risques_Phyto mais absents de la feuille Cultures et du référentiel. Ajoutés dans l'app (paramètres sol/climat), rendements à renseigner.","statut":"Corrigé dans l'app"},{"cat":"Cultures","objet":"Huile de palme artisanale","detail":"C'est un produit transformé, pas une culture : doublon du palmier à huile. Retirée des classements, le palmier à huile la remplace.","statut":"Corrigé dans l'app"},{"cat":"Cultures","objet":"Crabe / Crevettes (aquaculture)","detail":"Activité aquacole notée avec un engrais 15-15-15 100 kg/ha : sans objet. Exclue du score sol/climat.","statut":"Corrigé dans l'app"},{"cat":"Cultures","objet":"Karité (collecte), Niébé, Arachide","detail":"Champ engrais de fond mal formé (« — — », « Superphosphate 50 kg/ha — ») : nettoyé, « sans objet » pour le karité et l'aquaculture.","statut":"Corrigé dans l'app"},{"cat":"Cultures","objet":"Cocotier","detail":"Rendement 50–100 « t/ha » : l'unité est probablement le nombre de noix (×1 000/ha) ou le coprah doit être exprimé en t/ha.","statut":"À valider"},{"cat":"Score","objet":"Colonne amendement_recommande","detail":"898 lignes sur 1 155 disent « À préciser selon contrainte locale ». L'app génère les amendements à partir du pH, de la MO et des contraintes réelles.","statut":"Corrigé dans l'app"},{"cat":"Coûts","objet":"Feuille Intrants_Couts","detail":"Les 41 cultures ont toutes les colonnes de coût vides. À remplir dans l'onglet Rentabilité : les valeurs saisies sont enregistrées et exportables.","statut":"À compléter"},{"cat":"Phytosanitaire","objet":"4 recommandations","detail":"Matière active interdite en Côte d'Ivoire (carbofuran, quintozène/PCNB, métalaxyl racémique). Marquées en rouge dans l'onglet Cultures, avec une alternative à la place.","statut":"Corrigé dans l'app"},{"cat":"Phytosanitaire","objet":"29 recommandations","detail":"Matière active à vérifier sur la liste des produits homologués (Comité Pesticides de Côte d'Ivoire).","statut":"À valider"},{"cat":"Phytosanitaire","objet":"Riz de bas-fond, riz irrigué","detail":"« Striga » listé en bas-fond inondé (adventice des sols exondés) et foreur « Chilo suppressalis » (espèce asiatique) : remplacés par Echinochloa / cypéracées et Chilo zacconius / Maliarpha separatella.","statut":"Corrigé dans l'app"},{"cat":"Phytosanitaire","objet":"Riz pluvial : criquet pèlerin","detail":"Le criquet pèlerin (Schistocerca) n'est pas un ravageur habituel en Côte d'Ivoire. À valider.","statut":"À valider"},{"cat":"Phytosanitaire","objet":"Produits interdits","detail":"Une alternative est proposée pour chaque produit interdit (igname, banane plantain, coton, sorgho) et pour le fénamiphos sur igname.","statut":"Corrigé dans l'app"},{"cat":"Phytosanitaire","objet":"Colonne stade_detection (18 lignes)","detail":"Des traitements de pépinière, semis, plantation ou « sur observation » étaient notés « Floraison-fructif. ». Stade recalculé à partir de la période d'application.","statut":"Corrigé dans l'app"},{"cat":"Phytosanitaire","objet":"Chou, Carotte","detail":"Noms absents de la feuille Cultures : rattachés à « Légumes de montagne ».","statut":"Corrigé dans l'app"},{"cat":"Score","objet":"Feuille Recommandations","detail":"Le score d'origine ne prend que 4 valeurs (85, 77, 72, 64) pour 1 155 lignes. Remplacé par un score calculé avec les paramètres officiels FAO Ecocrop (pH, pluie sur le cycle, drainage, salinité) et la pluie mensuelle des stations.","statut":"Corrigé dans l'app"},{"cat":"Climat","objet":"Korhogo","detail":"Seul le total annuel de la station est publié (1 243 mm) : le profil mensuel est celui d'Odienné ajusté à ce total. À remplacer par les données NASA POWER ou SODEXAM.","statut":"Limite signalée"}],"zones":[{"district":"Bas-Sassandra","region":"Gbôklé","chef":"Sassandra","revu":"Partiellement : Fresco figure dans une paire classée Grands-Ponts."},{"district":"Bas-Sassandra","region":"Nawa","chef":"Soubré","revu":"Couverte après correction : Soubré, Buyo, Méagui."},{"district":"Gôh-Djiboua","region":"Lôh-Djiboua","chef":"Divo","revu":"Non couverte : à ajouter (localités, sol, ville ETP)."},{"district":"Lacs","region":"Moronou","chef":"Bongouanou","revu":"Partiellement : Bongouanou figure dans une paire mixte classée Bélier."},{"district":"Woroba","region":"Bafing","chef":"Touba","revu":"Couverte après correction : Touba, Ouaninou (+ Koro dans une paire mixte)."},{"district":"Yamoussoukro","region":"District Autonome de Yamoussoukro","chef":"—","revu":"Non couverte : à ajouter (localités, sol, ville ETP)."},{"district":"Zanzan","region":"Bounkani","chef":"Bouna","revu":"Non couverte : à ajouter (localités, sol, ville ETP)."},{"district":"Zanzan","region":"Gontougo","chef":"Bondoukou","revu":"Non couverte : à ajouter (localités, sol, ville ETP)."}],"meta":{"lignesRef":1155,"source":"plan_correction_application_agro_ci.xlsx"},"stations":{"Odienné":[5.1,11.0,27.4,71.4,111.0,154.8,252.0,322.3,234.8,125.8,24.9,4.0],"Bouaké":[12.5,40.0,83.8,126.4,123.7,147.2,117.5,128.0,168.1,107.9,30.2,14.6],"Man":[10.8,43.4,109.3,152.8,147.5,183.7,185.6,273.6,285.0,134.5,42.1,19.5],"Bondoukou":[7.9,26.9,92.3,123.7,156.1,160.2,96.5,90.0,175.1,130.5,31.6,11.1],"Abidjan":[16.3,48.9,106.7,141.3,293.5,561.8,205.7,36.8,80.5,137.7,143.3,75.1],"Yamoussoukro":[11.7,47.2,107.8,141.7,155.1,159.5,108.9,86.7,146.0,138.3,54.7,16.6],"Gagnoa":[23.5,63.4,123.1,162.8,177.5,205.8,89.4,95.4,172.0,159.2,96.4,37.5],"Sassandra":[15.8,35.7,52.6,96.9,235.1,529.1,191.4,32.1,43.6,84.5,119.6,72.8],"Dimbokro":[11.9,48.0,11.9,139.4,161.0,205.6,112.4,74.8,125.5,119.9,60.4,22.6],"Adiaké":[24.7,68.9,111.4,150.4,287.3,528.2,206.4,69.7,117.0,158.7,140.2,58.9],"Séguéla":[5.1,23,48,81,150,150,190,310,240,120,33,10],"Korhogo":[4.7,10.2,25.3,66.0,102.6,143.1,233.0,298.0,217.1,116.3,23.0,3.7]},"stNote":{"Korhogo":"profil mensuel d'Odienné ajusté au total annuel de Korhogo (1 243 mm)"},"zoneSt":{"Forêt Dense Humide Sud-Ouest":"Sassandra","Forêt Dense Humide Ouest":"Man","Forêt Dense Humide Centre-Sud":"Gagnoa","Forêt Dense Humide Est":"Adiaké","Littoral / Forêt Humide":"Abidjan","Zone de Transition Forêt-Savane":"Yamoussoukro","Zone de Transition Est":"Bondoukou","Savane Guinéenne":"Bouaké","Savane Soudanienne":"Korhogo","Savane Soudanienne Ouest":"Odienné","Savane Guinéenne / Woroba":"Séguéla","Zone Montagneuse Ouest":"Man","Périurbain / Littoral":"Abidjan","Littoral Est":"Adiaké"},"zoneVals":{"Forêt Dense Humide Sud-Ouest":{"pluie":1800,"secs":3},"Forêt Dense Humide Ouest":{"pluie":1600,"secs":3},"Forêt Dense Humide Centre-Sud":{"pluie":1450,"secs":3},"Forêt Dense Humide Est":{"pluie":1900,"secs":2},"Littoral / Forêt Humide":{"pluie":1800,"secs":3},"Zone de Transition Forêt-Savane":{"pluie":1250,"secs":4},"Zone de Transition Est":{"pluie":1250,"secs":4},"Savane Guinéenne":{"pluie":1100,"secs":4},"Savane Soudanienne":{"pluie":1250,"secs":5},"Savane Soudanienne Ouest":{"pluie":1350,"secs":5},"Savane Guinéenne / Woroba":{"pluie":1300,"secs":5},"Zone Montagneuse Ouest":{"pluie":1600,"secs":4},"Périurbain / Littoral":{"pluie":null,"secs":null},"Littoral Est":{"pluie":1900,"secs":2}},"zoneProfiles":{"Forêt Dense Humide Sud-Ouest":{"sol":"Ferralsol / Acrisol","ph":4.9,"mo":4.2,"drain":"Bon","contr":"Al échangeable, pH bas, Déficit P"},"Forêt Dense Humide Ouest":{"sol":"Ferralsol","ph":5.1,"mo":3.8,"drain":"Bon","contr":"Acidité, compaction légère"},"Forêt Dense Humide Centre-Sud":{"sol":"Ferralsol","ph":5.5,"mo":3.2,"drain":"Bon","contr":"Déficit P, lessivage"},"Forêt Dense Humide Est":{"sol":"Acrisol / Arenosol","ph":5,"mo":2.8,"drain":"Rapide","contr":"Faible rétention eau"},"Littoral / Forêt Humide":{"sol":"Arenosol / Gleysol","ph":5.5,"mo":1.5,"drain":"Variable","contr":"Salinité, engorgement"},"Zone de Transition Forêt-Savane":{"sol":"Lixisol","ph":5.8,"mo":2.5,"drain":"Moyen","contr":"Sécheresse partielle, érosion"},"Zone de Transition Est":{"sol":"Lixisol / Luvisol","ph":6.1,"mo":2.2,"drain":"Moyen","contr":"Compaction, faible MO"},"Savane Guinéenne":{"sol":"Lixisol / Cambisol","ph":6.5,"mo":1.7,"drain":"Rapide","contr":"Sécheresse, faible MO, érosion"},"Savane Soudanienne":{"sol":"Cambisol","ph":6.8,"mo":1.3,"drain":"Rapide","contr":"Sécheresse longue, pauvre en MO"},"Savane Soudanienne Ouest":{"sol":"Lixisol / Cambisol","ph":7,"mo":1.2,"drain":"Rapide","contr":"Très sèche, déficit hydrique sévère"},"Savane Guinéenne / Woroba":{"sol":"Lixisol","ph":6.4,"mo":1.6,"drain":"Rapide","contr":"Dégradation sols, érosion"},"Zone Montagneuse Ouest":{"sol":"Andosol / Ferralsol","ph":5.4,"mo":4.5,"drain":"Bon","contr":"Relief accidenté, déficit P"},"Périurbain / Littoral":{"sol":"Ferralsol dégradé","ph":5.8,"mo":1.2,"drain":"Moyen","contr":"Pollution, dégradation anthropique"},"Littoral Est":{"sol":"Arenosol","ph":5.5,"mo":1.4,"drain":"Rapide","contr":"Salinité côtière, faible fertilité"}}};
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = (n, d=0) => n==null || isNaN(n) ? '—' : Number(n).toLocaleString('fr-FR', {maximumFractionDigits:d, minimumFractionDigits:d});
+const MOIS = ['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'];
+const MOIS_L = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+const CULT = Object.fromEntries(D.cults.map(c => [c.nom, c]));
+const ACTIVE = D.cults.filter(c => !c.doublon);
+const S = { loc:null, crop:null, over:null, costs:{}, fiches:{}, climat:{}, perso:{}, store:null, user:null, dl:null, online:false };
+const pref = { get(k){ try { return localStorage.getItem(k) } catch(e){ return null } }, set(k,v){ try { localStorage.setItem(k,v) } catch(e){} } };
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.hidden=false; clearTimeout(toast._t); toast._t=setTimeout(()=>t.hidden=true, 3000); }
+const slug = s => String(s).normalize('NFKD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+
+/* ================= Stockage : appareil (hors connexion) ou base partagée ================= */
+const LocalStore = {
+  kind:'local', subs:{},
+  key: c => 'agrodiag.v3.'+c,
+  read(c){ try { return JSON.parse(localStorage.getItem(this.key(c)) || '{}') || {}; } catch(e){ return {}; } },
+  write(c,o){ try { localStorage.setItem(this.key(c), JSON.stringify(o)); return true; } catch(e){ return false; } },
+  subscribe(c, cb){ (this.subs[c] = this.subs[c] || []).push(cb); cb(this.read(c)); },
+  emit(c){ const o=this.read(c); (this.subs[c]||[]).forEach(f=>f(o)); },
+  async set(c,id,data){ const o=this.read(c); o[id]=data; if(!this.write(c,o)) throw {code:'storage', message:"Mémoire de l'appareil indisponible (navigation privée ?)"}; this.emit(c); },
+  async add(c,data){ const id=Date.now().toString(36)+Math.random().toString(36).slice(2,7); await this.set(c,id,data); return id; },
+  async del(c,id){ const o=this.read(c); delete o[id]; this.write(c,o); this.emit(c); },
+  available(){ try { localStorage.setItem('agrodiag.t','1'); localStorage.removeItem('agrodiag.t'); return true; } catch(e){ return false; } }
+};
+function DbStore(db){ return {
+  kind:'db',
+  subscribe(c, cb){ db.collection(c).onSnapshot(s=>{ const o={}; s.docs.forEach(d=>o[d.id]=d.data()); cb(o); }, ()=>{}); },
+  set:(c,id,data)=>db.collection(c).doc(String(id)).set(data),
+  add:async(c,data)=>(await db.collection(c).add(data)).id,
+  del:(c,id)=>db.collection(c).doc(String(id)).delete()
+}; }
+const COLS = ['fiches','couts','climat','localites'];
+function bindStore(store){
+  S.store = store;
+  store.subscribe('fiches', o=>{ S.fiches=o; renderFiches(); });
+  store.subscribe('couts', o=>{ S.costs=o; renderCostCount(); refreshCostMeta(); });
+  store.subscribe('climat', o=>{ S.climat=o; if(S.loc){ renderLoc(); } });
+  store.subscribe('localites', o=>{ S.perso=o; refreshLocs(); });
+}
+function storeErr(e){ return e?.code==='not_granted' ? "Vous n'avez pas le droit d'enregistrer ici" : e?.code==='storage' ? e.message : 'Enregistrement impossible, réessayez'; }
+const IS_ANDROID = !!window.AgroDiagAndroid;
+function blobToBase64(blob){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(',')[1]||''); r.onerror=rej; r.readAsDataURL(blob); }); }
+async function saveFile(name, data, mime){
+  const blob = data instanceof Blob ? data : new Blob([data], {type:mime});
+  if (IS_ANDROID){
+    try {
+      const b64 = await blobToBase64(blob);
+      return await new Promise(res=>{ window.__agrodiagSaved = st=>{ window.__agrodiagSaved=null; res(st); }; window.AgroDiagAndroid.saveFile(name, mime||blob.type||'application/octet-stream', b64); });
+    } catch(e){ return 'error'; }
+  }
+  if (S.dl){ try { await S.dl.save({filename:name, data:blob}); return 'ok'; } catch(e){ return e?.code==='declined' ? 'declined' : 'error'; } }
+  try { const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1000); return 'ok'; }
+  catch(e){ return 'error'; }
+}
+
+/* ================= Localités (référentiel + villages ajoutés) ================= */
+function persoLocs(){
+  return Object.entries(S.perso).map(([id,p])=>{
+    const zv=D.zoneVals[p.zone]||{};
+    return { id:'p_'+id, pid:id, nom:p.nom, sp:p.nom, dep:'', reg:p.reg||'Mes villages', reg0:p.reg, zone:p.zone, sol:p.sol||'non précisé',
+      ph:p.ph, mo:p.mo, drain:p.drain, contr:p.contr||'', pluie:zv.pluie, pluieSrc:'zone', st:D.zoneSt[p.zone], statut:'perso',
+      note:'Village ajouté par vous : données de sol saisies.', ref:{}, orig:null, perso:true };
+  });
+}
+function allLocs(){ return D.locs.concat(persoLocs()); }
+function findLoc(id){ return allLocs().find(l=>String(l.id)===String(id)); }
+
+/* ================= Climat ================= */
+function stationMonthly(loc){
+  const base=D.stations[loc.st]; if(!base) return null;
+  const tot=base.reduce((a,b)=>a+b,0);
+  const own = loc.pluieSrc && loc.pluieSrc.startsWith('station');
+  const k = own ? 1 : (loc.pluie||tot)/tot;
+  return base.map(v=>Math.round(v*k));
+}
+function climOf(loc){
+  const c=S.climat[loc.id];
+  if (c && c.pluie>0){
+    const mens = Array.isArray(c.mensuel)&&c.mensuel.length===12 ? c.mensuel : (()=>{ const m=stationMonthly(loc); const t=m.reduce((a,b)=>a+b,0); return m.map(v=>Math.round(v*c.pluie/t)); })();
+    return { pluie:c.pluie, mens, secs: c.secs ?? mens.filter(v=>v<50).length, src:c.source||'import', local:true, date:c.date };
+  }
+  const mens=stationMonthly(loc);
+  const own = loc.pluieSrc && loc.pluieSrc.startsWith('station');
+  const src = own ? `${loc.pluieSrc} (normale 1961-1990)` : `zone, profil de la station ${loc.st}${D.stNote[loc.st]?' ('+D.stNote[loc.st]+')':''}`;
+  return { pluie:loc.pluie, mens, secs: mens.filter(v=>v<50).length, src, local:own };
+}
+function reliability(loc){
+  const k=climOf(loc), soil=!!S.over || loc.perso;
+  if (soil && k.local) return {lab:'Fiabilité élevée', cls:'p-fav', txt:'Sol mesuré et climat local (station ou NASA POWER).'};
+  if (soil || k.local) return {lab:'Fiabilité moyenne', cls:'p-cond', txt: soil ? 'Sol mesuré, climat issu de la zone : importez les données NASA POWER de la localité.' : 'Climat local, sol issu de la moyenne de zone : saisissez une analyse de sol de la parcelle.'};
+  return {lab:'Fiabilité indicative', cls:'p-risk', txt:'Sol et climat issus de moyennes de zone : à confirmer par une analyse de sol et les données NASA POWER.'};
+}
+function soilOf(loc){ const o=S.over; return { ph:o?.ph ?? loc.ph, mo:o?.mo ?? loc.mo, drain:o?.drain ?? loc.drain }; }
+
+/* ================= Calendrier ================= */
+function calendrier(c, mens){
+  const n=Math.max(1, Math.round((c.cycle||90)/30));
+  if (c.per || n>=12) return null;
+  const need = c.sec===0?100 : c.sec===1?75 : 50;
+  const win=[];
+  for (let s=0;s<12;s++){ let ok=0, tot=0, dry=0; for (let i=0;i<n;i++){ const m=mens[(s+i)%12]; tot+=m; if(m>=need) ok++; if(m<50) dry++; } win.push({s, ok, tot, dry}); }
+  if (c.irr){
+    const best=[...win].sort((a,b)=>a.tot-b.tot)[0];
+    return { irr:true, n, need, start:best.s, months:[...Array(n)].map((_,i)=>(best.s+i)%12), txt:`Contre-saison avec irrigation : semis ou repiquage en ${MOIS_L[best.s]}, période la plus sèche (${fmt(best.tot)} mm sur le cycle).` };
+  }
+  const maxOk=Math.max(...win.map(w=>w.ok));
+  const goods=win.filter(w=>w.ok===maxOk).sort((a,b)=>b.tot-a.tot);
+  const best=goods[0];
+  const second=goods.find(w=>{ const d=Math.min((w.s-best.s+12)%12,(best.s-w.s+12)%12); return d>=n; });
+  const months=[...Array(n)].map((_,i)=>(best.s+i)%12);
+  const starts=[...new Set(goods.map(w=>w.s))].sort((a,b)=>a-b).map(s=>MOIS_L[s]);
+  let txt = maxOk===0 ? `Aucun mois de semis ne donne ${need} mm/mois pendant le cycle : culture pluviale très risquée sans irrigation.`
+    : `Meilleur semis : ${MOIS_L[best.s]} (${maxOk} mois sur ${n} avec au moins ${need} mm${best.dry?`, ${best.dry} mois sous 50 mm`:''}).`;
+  if (maxOk>0 && second) txt += ` Deuxième saison possible : semis en ${MOIS_L[second.s]}.`;
+  else if (maxOk>0 && starts.length>1) txt += ` Fenêtre équivalente : ${starts.join(', ')}.`;
+  return { irr:false, n, need, ok:maxOk, start:best.s, months, second: second?.s, txt, pts: 10*maxOk/n };
+}
+
+/* ================= Moteur de score ================= */
+function rangePts(x, r, max, floor){
+  const [a,o1,o2,b]=r;
+  if (x>=o1 && x<=o2) return max;
+  if (x<o1 && x>=a) return floor + (max-floor)*(x-a)/(o1-a);
+  if (x>o2 && x<=b) return floor + (max-floor)*(b-x)/(b-o2);
+  return 0;
+}
+function decision(s){
+  if (s==null) return {lab:'Hors modèle', cls:'p-neutral', col:'var(--muted)'};
+  if (s>=75) return {lab:'Favorable', cls:'p-fav', col:'var(--good)'};
+  if (s>=60) return {lab:'Sous conditions', cls:'p-cond', col:'var(--warn)'};
+  if (s>=45) return {lab:'Risqué', cls:'p-risk', col:'var(--risk)'};
+  return {lab:'Déconseillé', cls:'p-bad', col:'var(--bad)'};
+}
+function evaluate(loc, c, soil){
+  soil = soil || soilOf(loc);
+  if (c.horsModele) return { score:null, facts:[], reco:["Activité hors du modèle sol/climat (aquaculture) : à évaluer avec des critères propres (eau, salinité, site)."], cal:null };
+  const facts=[], reco=[], ct=(loc.contr||'').toLowerCase(), fam=(c.fam||'').toLowerCase();
+  const K=climOf(loc);
+  // pH
+  const phPts=rangePts(soil.ph, c.ph, 25, 8);
+  facts.push(['pH', phPts, 25, soil.ph>=c.ph[1]&&soil.ph<=c.ph[2] ? `pH ${fmt(soil.ph,1)} dans l'optimum Ecocrop (${fmt(c.ph[1],1)}–${fmt(c.ph[2],1)})` : soil.ph<c.ph[0]||soil.ph>c.ph[3] ? `pH ${fmt(soil.ph,1)} hors des limites (${fmt(c.ph[0],1)}–${fmt(c.ph[3],1)})` : `pH ${fmt(soil.ph,1)} hors optimum (${fmt(c.ph[1],1)}–${fmt(c.ph[2],1)})`]);
+  if (soil.ph < c.ph[1]) reco.push(soil.ph < c.ph[1]-0.7 ? "Chauler : dolomie ou calcaire broyé 1 000–2 000 kg/ha, 1 à 2 mois avant semis ou plantation. Ajuster la dose sur l'analyse (Al échangeable)." : "Chauler légèrement : dolomie 500–1 000 kg/ha avant semis ou plantation, à ajuster selon l'analyse.");
+  if (soil.ph > c.ph[2]) reco.push("pH élevé pour cette culture : apporter de la matière organique et privilégier des engrais azotés acidifiants (sulfate d'ammonium).");
+  // MO
+  const mo=soil.mo, moPts=mo>=3?10:mo>=2?7:mo>=1.5?5:3;
+  facts.push(['Matière organique', moPts, 10, `${fmt(mo,1)} % ${mo>=3?'(bon niveau)':mo>=2?'(moyen)':'(faible)'}`]);
+  if (mo<2) reco.push("Relever la matière organique : compost ou fumier décomposé 5–10 t/ha, paillage, plantes de couverture (mucuna, pueraria) ou jachère améliorée.");
+  else if (mo<3) reco.push("Entretenir la matière organique : compost 3–5 t/ha et restitution des résidus de récolte.");
+  // Drainage (tolérances Ecocrop)
+  const dr=soil.drain; let drPts, drTxt=dr;
+  if (dr==='Bon') { drPts = (c.drainI && /riz/i.test(c.nom) && c.irr) ? 6 : 10; }
+  else if (dr==='Moyen') drPts = c.drainI?10:8;
+  else if (dr==='Rapide') { drPts = c.drainE?10:6; if(!c.drainE) drTxt+=' (sol filtrant, culture peu tolérante)'; }
+  else { drPts = c.drainI?9:5; if(!c.drainI) drTxt+=' (risque d\'engorgement, culture peu tolérante)'; }
+  facts.push(['Drainage', drPts, 10, drTxt + (c.drainI?' · tolère un drainage imparfait':'') + (c.drainE?' · tolère un sol filtrant':'')]);
+  // Pluie annuelle
+  const pl=K.pluie; let plPts, plTxt;
+  if (c.irr){
+    plPts = pl>=c.pl[0] ? 25 : 20;
+    plTxt = `~${fmt(pl)} mm/an · culture conduite avec maîtrise de l'eau`;
+    if (/bas-fond/i.test(c.nom)) reco.push("Bas-fond : aménager diguettes et canaux pour maîtriser la lame d'eau ; le profil de sol de zone ne décrit pas le bas-fond, faire une analyse (pH, MO, fer).");
+    else reco.push("Conduire en contre-saison avec irrigation, de préférence au goutte-à-goutte, pour limiter les maladies.");
+  } else {
+    plPts=rangePts(pl, c.pl, 25, 8);
+    plTxt = pl>=c.pl[1]&&pl<=c.pl[2] ? `${fmt(pl)} mm/an dans l'optimum Ecocrop (${fmt(c.pl[1])}–${fmt(c.pl[2])})` : pl<c.pl[0]||pl>c.pl[3] ? `${fmt(pl)} mm/an hors des limites (${fmt(c.pl[0])}–${fmt(c.pl[3])})` : `${fmt(pl)} mm/an hors optimum (${fmt(c.pl[1])}–${fmt(c.pl[2])})`;
+    if (pl>c.pl[2]) reco.push("Pluie au-dessus de l'optimum : risque de maladies fongiques, choisir des variétés tolérantes, bien espacer et drainer.");
+  }
+  facts.push(['Pluie annuelle', plPts, 25, plTxt]);
+  // Calendrier / saison sèche
+  const cal=calendrier(c, K.mens); let ssPts, ssTxt;
+  if (c.per || !cal){
+    const m=K.secs;
+    if (c.per && c.sec===0) ssPts = m<=3?10:m===4?5:0;
+    else if (c.per && c.sec===2) ssPts = m>=5?10:m===4?7:m===3?4:2;
+    else if (c.sec===2) ssPts = m>=3?10:m===2?7:5;
+    else ssPts = m<=5?10:7;
+    ssTxt = `${m} mois sous 50 mm${c.per&&c.sec===0?' (pérenne sensible au déficit hydrique)':''}${c.sec===2&&c.per?' (a besoin d\'une saison sèche marquée pour fleurir)':''}`;
+    if (c.per && c.sec===0 && m>=4) reco.push("Saison sèche marquée pour une pérenne : ombrage temporaire (bananier), paillage, irrigation de la pépinière et des jeunes plants la première année.");
+  } else if (cal.irr){ ssPts=10; ssTxt=cal.txt; }
+  else { ssPts=cal.pts; ssTxt=cal.txt; if(cal.ok<cal.n) reco.push("Pluie insuffisante sur une partie du cycle : variétés précoces, semis dès l'installation des pluies, paillage, irrigation d'appoint si possible."); }
+  facts.push([c.per||!cal?'Saison sèche':'Calendrier', ssPts, 10, ssTxt]);
+  // Contraintes
+  let pen=0; const pens=[];
+  const P=(n,why)=>{ if(n>0){ pen+=n; pens.push(`−${n} ${why}`); } };
+  if (/al échangeable|ph bas|acidit/.test(ct)) P(c.ph[1]>=5.5?6:2, 'acidité / aluminium');
+  if (/déficit p/.test(ct)) { P(fam.includes('légumineuse')?4:2, 'déficit en phosphore'); reco.push("Fumure phosphatée de fond : phosphate naturel ou TSP, localisé au semis ou à la plantation."); }
+  if (/lessivage/.test(ct)) { P(2, 'lessivage'); reco.push("Fractionner l'azote et la potasse en 2 ou 3 apports pour limiter les pertes par lessivage."); }
+  if (/faible rétention/.test(ct)) { P(c.drainE?1:5, 'faible rétention en eau'); reco.push("Sol filtrant : paillage, apport de matière organique, irrigation d'appoint en période sèche."); }
+  if (/salinit/.test(ct)) { P(c.sal?2:8, 'salinité'); if(!c.sal) reco.push("Salinité : éviter les parcelles proches de la lagune ou de la mer, cultiver sur billons, ne pas irriguer avec une eau saumâtre."); }
+  if (/engorgement/.test(ct)) { P(c.drainI?0:(fam.includes('tubercule')?8:6), 'engorgement'); if(!c.drainI) reco.push("Risque d'engorgement : planter sur buttes ou billons hauts et ouvrir des drains."); }
+  if (/sécheresse|sèche|déficit hydrique/.test(ct)) { const k=/sévère|très|longue/.test(ct)?1.5:1; P(Math.round((c.sec===0?6:c.sec===1?3:0)*k), 'sécheresse'); }
+  if (/érosion|relief/.test(ct)) { P(c.per?1:3, 'érosion / relief'); reco.push("Lutter contre l'érosion : cultures en courbes de niveau, haies vives ou bandes enherbées, couverture permanente du sol."); }
+  if (/compaction/.test(ct)) { P(fam.includes('tubercule')?4:2, 'compaction'); reco.push("Compaction : travail du sol léger ou décompactage, plantes de couverture à racine pivotante."); }
+  if (/faible mo|pauvre en mo/.test(ct)) P(2, 'sol pauvre en MO');
+  if (/faible fertilit/.test(ct)) P(2, 'faible fertilité');
+  if (/pollution|anthropique/.test(ct)) { P(c.feuille||fam.includes('maraîch')?10:3, 'pollution possible'); reco.push("Zone périurbaine : faire analyser les métaux lourds avant toute culture maraîchère et ne pas irriguer avec des eaux usées."); }
+  facts.push(['Contraintes du sol', Math.max(0,20-pen), 20, pens.length?pens.join(' · '):'aucune contrainte pénalisante']);
+  let score=facts.reduce((s,f)=>s+f[1],0);
+  let cap=100, capWhy=null;
+  for (const [nm,pts,max] of facts.filter(f=>f[0]==='pH'||f[0]==='Pluie annuelle')){
+    if (pts===0 && cap>44){ cap=44; capWhy=`${nm} hors des limites de la culture`; }
+    else if (pts<max*0.5 && cap>64){ cap=64; capWhy=`${nm} très défavorable`; }
+  }
+  if (cal && !cal.irr && cal.ok===0 && cap>44){ cap=44; capWhy='aucune fenêtre de semis suffisamment arrosée'; }
+  if (c.per && c.sec===0){ const m=K.secs; if (m>=6 && cap>44){ cap=44; capWhy=`${m} mois secs : trop long pour cette pérenne`; } else if (m>=5 && cap>59){ cap=59; capWhy=`${m} mois secs : trop long pour cette pérenne sans irrigation`; } }
+  if (c.per && c.sec===2 && K.secs<=2 && cap>64){ cap=64; capWhy='pas de vraie saison sèche pour la floraison'; }
+  if (score>cap){ facts.push(['Facteur limitant', cap-score, 0, `score plafonné à ${cap} : ${capWhy}`]); score=cap; }
+  if (c.alt && loc.zone!=='Zone Montagneuse Ouest'){ score-=25; facts.push(['Altitude', -25, 0, `culture de climat frais (optimum ${fmt(c.ecoT[0])}–${fmt(c.ecoT[1])} °C) hors zone montagneuse`]); reco.push("Culture de climat frais : à réserver à la zone montagneuse de l'Ouest (Man, Biankouma, Danané)."); }
+  if (!S.over && !loc.perso) reco.push("Sol issu de la moyenne de zone : confirmer par une analyse de la parcelle (rubrique « Saisir mon analyse de sol »).");
+  return { score:Math.max(0,Math.min(100,Math.round(score))), facts, reco:[...new Set(reco)], cal, K };
+}
+
+/* ================= Navigation ================= */
+function show(v){
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.setAttribute('aria-selected', b.dataset.v===v));
+  document.querySelectorAll('section.view').forEach(s=>s.hidden = s.id!=='v-'+v);
+  pref.set('agrodiag.tab', v);
+  if (v==='cult') renderCult();
+}
+document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>show(b.dataset.v)));
+
+/* ================= Que planter ici ================= */
+const fams=[...new Set(ACTIVE.map(c=>c.fam))].sort((a,b)=>a.localeCompare(b,'fr'));
+$('#selFam').innerHTML='<option value="">Toutes familles</option>'+fams.map(f=>`<option>${esc(f)}</option>`).join('');
+const zonesList=Object.keys(D.zoneVals).sort((a,b)=>a.localeCompare(b,'fr'));
+$('#nlZone').innerHTML=zonesList.map(z=>`<option>${esc(z)}</option>`).join('');
+const CONTR=['Al échangeable','pH bas','Déficit P','lessivage','Faible rétention eau','Salinité','Engorgement','Sécheresse','Érosion','Compaction','Faible MO','Pollution'];
+$('#nlContr').innerHTML=CONTR.map((c,i)=>`<label class="chk pill p-neutral"><input type="checkbox" value="${esc(c)}" id="nlc${i}"> ${esc(c)}</label>`).join('');
+function refreshLocs(){
+  const regs=[...new Set(allLocs().map(l=>l.reg))].sort((a,b)=>a.localeCompare(b,'fr'));
+  const cur=$('#selReg').value;
+  $('#selReg').innerHTML='<option value="">Toutes les régions</option>'+regs.map(r=>`<option>${esc(r)}</option>`).join('');
+  if (regs.includes(cur)) $('#selReg').value=cur;
+  $('#regList').innerHTML=regs.map(r=>`<option value="${esc(r)}">`).join('');
+  if (S.loc) fillLocs();
+}
+function fillLocs(){
+  const r=$('#selReg').value;
+  const ls=allLocs().filter(l=>!r||l.reg===r).sort((a,b)=>a.nom.localeCompare(b.nom,'fr'));
+  $('#selLoc').innerHTML=ls.map(l=>`<option value="${esc(l.id)}">${esc(l.nom)}${l.perso?' (mon village)':''}${r?'':' — '+esc(l.reg)}</option>`).join('');
+  if (!ls.find(l=>String(l.id)===String(S.loc?.id))) setLoc(ls[0]?.id); else { $('#selLoc').value=S.loc.id; S.loc=findLoc(S.loc.id); renderLoc(); }
+}
+function setLoc(id){
+  const l=findLoc(id); if(!l) return;
+  S.loc=l; S.over=null; S.crop=null; $('#selLoc').value=l.id; pref.set('agrodiag.loc', l.id);
+  const nr=Object.keys(l.ref).length; $('#onlyRef').checked=nr>0; $('#onlyRef').disabled=!nr;
+  renderLoc();
+}
+$('#selReg').addEventListener('change', fillLocs);
+$('#selLoc').addEventListener('change', e=>setLoc(e.target.value));
+$('#onlyRef').addEventListener('change', renderCrops);
+$('#selFam').addEventListener('change', renderCrops);
+
+function monthBars(mens, hi, need, opts={}){
+  const W=600, H=opts.h||120, pad=22, bw=(W-pad*2)/12, max=Math.max(...mens, need||0, 50)*1.1;
+  const y=v=>H-18-(v/max)*(H-34);
+  const bars=mens.map((v,i)=>`<rect x="${pad+i*bw+3}" y="${y(v)}" width="${bw-6}" height="${Math.max(0,H-18-y(v))}" rx="2" fill="${hi&&hi.includes(i)?'var(--accent)':'var(--line)'}"/>
+    <text x="${pad+i*bw+bw/2}" y="${H-4}" font-size="11" text-anchor="middle" fill="var(--muted)">${MOIS[i]}</text>
+    <text x="${pad+i*bw+bw/2}" y="${y(v)-3}" font-size="10" text-anchor="middle" fill="var(--muted)" font-family="JetBrains Mono, monospace">${Math.round(v)}</text>`).join('');
+  const line = need ? `<line x1="${pad}" x2="${W-pad}" y1="${y(need)}" y2="${y(need)}" stroke="var(--warn)" stroke-dasharray="4 3"/><text x="${W-pad}" y="${y(need)-4}" font-size="10" text-anchor="end" fill="var(--warn)">${need} mm</text>` : '';
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Pluie mensuelle en mm" style="width:100%;height:auto;display:block">${bars}${line}</svg>`;
+}
+
+function renderLoc(){
+  const l=S.loc; if(!l) return;
+  const s=soilOf(l), o=S.over, K=climOf(l), rel=reliability(l);
+  const stNote = l.statut==='corrige' ? `<div class="notice ok" style="margin-top:12px">Ligne corrigée${l.orig&&l.orig!==l.nom?` (origine : « ${esc(l.orig)} »)`:''}. ${esc(l.note)}</div>`
+    : l.statut==='ajoutee' ? `<div class="notice warn" style="margin-top:12px">${esc(l.note)} Aucune liste de cultures pratiquées : toutes les cultures sont évaluées.</div>`
+    : l.perso ? `<div class="notice" style="margin-top:12px">${esc(l.note)} <button class="btn ghost danger" id="delPerso">Supprimer ce village</button></div>` : '';
+  $('#locInfo').innerHTML=`
+    <div class="soil">
+      <div><div class="lab">Zone agro-climatique</div><div>${esc(l.zone)}</div></div>
+      <div><div class="lab">Type de sol</div><div>${esc(l.sol)}</div></div>
+      <div><div class="lab">pH</div><div class="v ${o?.ph!=null?'edited':''}">${fmt(s.ph,1)}</div></div>
+      <div><div class="lab">MO %</div><div class="v ${o?.mo!=null?'edited':''}">${fmt(s.mo,1)}</div></div>
+      <div><div class="lab">Drainage</div><div class="v ${o?.drain!=null?'edited':''}" style="font-family:var(--font-body);font-size:15px">${esc(s.drain)}</div></div>
+      <div><div class="lab">Pluie annuelle</div><div class="v">${fmt(K.pluie)} <span class="small muted">mm</span></div></div>
+      <div><div class="lab">Mois &lt; 50 mm</div><div class="v">${K.secs}</div></div>
+    </div>
+    <div style="margin-top:12px">${monthBars(K.mens, null, null)}<div class="small muted">Pluie mensuelle (mm) · source : ${esc(K.src)}</div></div>
+    <div class="constr">${(l.contr||'').split(',').map(x=>x.trim()).filter(Boolean).map(x=>`<span class="pill p-neutral">${esc(x)}</span>`).join('')}
+      ${l.perso?'':`<span class="pill p-acc">${Object.keys(l.ref).length} cultures pratiquées dans la zone</span>`}<span class="pill ${rel.cls}">${rel.lab}</span></div>
+    <p class="small muted" style="margin:6px 0 0">${esc(rel.txt)}</p>
+    ${stNote}
+    <details class="override" ${o?'open':''}>
+      <summary style="cursor:pointer;font-weight:600">Saisir mon analyse de sol</summary>
+      <p class="small muted" style="margin:6px 0 10px">Saisissez les résultats de laboratoire de la parcelle pour recalculer tous les scores.</p>
+      <div class="row">
+        <div class="field"><label for="oPh">pH eau</label><input type="number" id="oPh" step="0.1" min="3" max="10" value="${o?.ph??''}" placeholder="${fmt(l.ph,1)}"></div>
+        <div class="field"><label for="oMo">MO (%)</label><input type="number" id="oMo" step="0.1" min="0" max="20" value="${o?.mo??''}" placeholder="${fmt(l.mo,1)}"></div>
+        <div class="field"><label for="oDr">Drainage</label><select id="oDr"><option value="">${esc(l.drain)} (actuel)</option>${['Bon','Moyen','Rapide','Variable'].map(d=>`<option ${o?.drain===d?'selected':''}>${d}</option>`).join('')}</select></div>
+      </div>
+      <div class="row" style="margin-top:10px"><button class="btn primary" id="oApply">Recalculer</button><button class="btn ghost" id="oReset">Revenir aux valeurs de départ</button></div>
+    </details>
+    <details class="override">
+      <summary style="cursor:pointer;font-weight:600">Données climatiques NASA POWER ou SODEXAM</summary>
+      <ol class="small" style="margin:8px 0 10px;padding-left:18px;max-width:70ch">
+        <li>Ouvrez <a href="https://power.larc.nasa.gov/data-access-viewer/" target="_blank" rel="noopener">NASA POWER Data Access Viewer</a> (connexion nécessaire pour cette étape seulement).</li>
+        <li>Choisissez « Agroclimatology » et « Single Point », puis cliquez sur la localité sur la carte.</li>
+        <li>Choisissez « Climatology », cochez « Precipitation Corrected » (PRECTOTCORR), format CSV, puis « Submit » et téléchargez le fichier.</li>
+        <li>Importez le fichier ici : l'app calcule la pluie de chaque mois, le total annuel et les mois secs.</li>
+      </ol>
+      <div class="field"><label for="powFile">Fichier NASA POWER (CSV ou JSON)</label><input type="file" id="powFile" accept=".csv,.json,.txt,text/csv,application/json"></div>
+      <p class="small muted" style="margin:12px 0 4px">Ou saisissez la pluie mensuelle d'une station SODEXAM (mm, de janvier à décembre, séparés par des espaces ou des points-virgules) :</p>
+      <div class="row" style="align-items:flex-end">
+        <div class="field" style="flex-basis:320px"><label for="mMens">12 valeurs mensuelles</label><input type="text" id="mMens" placeholder="ex. 15 40 85 125 150 160 110 90 170 140 50 20"></div>
+        <div class="field" style="flex:0 0 auto"><button class="btn" id="mSave">Enregistrer</button></div>
+      </div>
+      ${S.climat[l.id]?`<div class="row" style="margin-top:8px"><button class="btn ghost danger" id="climReset">Revenir aux valeurs de référence</button></div>`:''}
+      <p class="small" id="climMsg" style="margin:8px 0 0"></p>
+    </details>`;
+  $('#powFile').onchange=e=>importPower(e.target.files[0]);
+  $('#mSave').onclick=()=>{
+    const v=$('#mMens').value.trim().split(/[\s;,]+/).filter(Boolean).map(x=>Number(x.replace(',','.')));
+    if (v.length!==12 || v.some(x=>!isFinite(x)||x<0||x>1500)) return climMsg('Saisissez exactement 12 valeurs entre 0 et 1 500 mm.', true);
+    const pluie=Math.round(v.reduce((a,b)=>a+b,0));
+    if (pluie<100||pluie>6000) return climMsg(`Total annuel incohérent (${pluie} mm).`, true);
+    saveClimat({pluie, secs:v.filter(x=>x<50).length, mensuel:v.map(Math.round), source:'station SODEXAM (saisie)'});
+  };
+  if ($('#climReset')) $('#climReset').onclick=async()=>{ try{ await S.store.del('climat', String(l.id)); toast('Valeurs de référence rétablies'); }catch(e){ toast(storeErr(e)); } };
+  if ($('#delPerso')) $('#delPerso').onclick=()=>{
+    const b=$('#delPerso'); b.outerHTML=`<span class="inline-confirm">Supprimer ce village ? <button class="btn danger" id="dpYes">Oui</button><button class="btn ghost" id="dpNo">Non</button></span>`;
+    $('#dpNo').onclick=renderLoc;
+    $('#dpYes').onclick=async()=>{ try{ await S.store.del('localites', l.pid); S.loc=null; toast('Village supprimé'); refreshLocs(); fillLocs(); }catch(e){ toast(storeErr(e)); } };
+  };
+  $('#oApply').onclick=()=>{
+    const ph=parseFloat($('#oPh').value), mo=parseFloat($('#oMo').value), dr=$('#oDr').value;
+    if(!isNaN(ph)&&(ph<3||ph>10)){ toast('Le pH doit être compris entre 3 et 10'); $('#oPh').focus(); return; }
+    if(!isNaN(mo)&&(mo<0||mo>20)){ toast('La MO doit être comprise entre 0 et 20 %'); $('#oMo').focus(); return; }
+    S.over={ ph:isNaN(ph)?null:ph, mo:isNaN(mo)?null:mo, drain:dr||null };
+    if (S.over.ph==null && S.over.mo==null && !S.over.drain) S.over=null;
+    renderLoc(); toast(S.over?'Scores recalculés avec votre analyse':'Valeurs de départ rétablies');
+  };
+  $('#oReset').onclick=()=>{ S.over=null; renderLoc(); };
+  renderCrops();
+}
+function climMsg(m,bad){ const e=$('#climMsg'); if(e){ e.textContent=m; e.style.color=bad?'var(--bad)':'var(--good)'; } }
+const DAYS=[31,28.25,31,30,31,30,31,31,30,31,30,31], MKEYS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+function parsePower(text){
+  let vals=null, isSum=false, unit='';
+  const t=String(text||'').replace(/^﻿/,'').trim();
+  if (t.startsWith('{')){
+    const j=JSON.parse(t), p=j?.properties?.parameter||{};
+    const key=Object.keys(p).find(k=>/^PRECTOT/.test(k)); if(!key) throw new Error('Paramètre PRECTOTCORR absent du fichier.');
+    isSum=/_SUM$/.test(key); unit=String(j?.parameters?.[key]?.units||'');
+    vals=MKEYS.map(m=>Number(p[key][m]));
+  } else {
+    const lines=t.split(/\r?\n/), hi=lines.findIndex(x=>/(^|,)\s*JAN\s*(,|$)/i.test(x)&&/DEC/i.test(x));
+    if (hi<0) throw new Error("Format non reconnu : utilisez le fichier « Climatology » de NASA POWER.");
+    const hdr=lines[hi].split(',').map(x=>x.trim().toUpperCase());
+    const row=lines.slice(hi+1).map(x=>x.split(',')).find(c=>/^PRECTOT/i.test((c[0]||'').trim()));
+    if (!row) throw new Error('Ligne PRECTOTCORR absente du fichier.');
+    isSum=/_SUM$/i.test(row[0].trim());
+    unit=lines.slice(0,hi).find(x=>/PRECTOT/i.test(x))||'';
+    vals=MKEYS.map(m=>Number(row[hdr.indexOf(m)]));
+  }
+  if (vals.some(v=>!isFinite(v)||v<0)) throw new Error('Valeurs mensuelles manquantes ou négatives (−999 signifie donnée absente).');
+  const perDay=!isSum && !/mm\/month/i.test(unit);
+  const mens=vals.map((v,i)=>perDay? v*DAYS[i] : v);
+  const pluie=Math.round(mens.reduce((a,b)=>a+b,0));
+  if (pluie<100||pluie>6000) throw new Error(`Total annuel calculé incohérent (${pluie} mm) : vérifiez le fichier.`);
+  return { pluie, secs:mens.filter(v=>v<50).length, mensuel:mens.map(v=>Math.round(v)) };
+}
+async function importPower(file){
+  if(!file) return;
+  try{ const r=parsePower(await file.text()); saveClimat({...r, source:'NASA POWER (climatologie)'}); }
+  catch(e){ climMsg(e.message||'Lecture du fichier impossible.', true); }
+}
+async function saveClimat(rec){
+  const l=S.loc; rec.date=new Date().toISOString(); rec.localite=l.nom;
+  try{ if(S.user?.id) rec.auteur=await S.user.id(); }catch(_){}
+  try{ await S.store.set('climat', String(l.id), rec); toast(`Climat enregistré : ${fmt(rec.pluie)} mm, ${rec.secs} mois sous 50 mm`); }
+  catch(e){ climMsg(storeErr(e), true); }
+}
+$('#nlSave').onclick=async()=>{
+  const msg=(m,bad)=>{ $('#nlMsg').textContent=m; $('#nlMsg').style.color=bad?'var(--bad)':'var(--good)'; };
+  const nom=$('#nlNom').value.trim(), reg=$('#nlReg').value.trim()||'Mes villages', zone=$('#nlZone').value;
+  const ph=parseFloat($('#nlPh').value), mo=parseFloat($('#nlMo').value);
+  if (!nom) return msg('Indiquez le nom du village.', true);
+  if (!(ph>=3&&ph<=10)) return msg('Le pH doit être compris entre 3 et 10.', true);
+  if (!(mo>=0&&mo<=20)) return msg('La MO doit être comprise entre 0 et 20 %.', true);
+  const contr=[...document.querySelectorAll('#nlContr input:checked')].map(i=>i.value).join(', ');
+  const rec={nom, reg, zone, ph, mo, drain:$('#nlDr').value, sol:$('#nlSol').value.trim(), contr, date:new Date().toISOString()};
+  try{ const id=await S.store.add('localites', rec); msg('Village ajouté.'); ['#nlNom','#nlPh','#nlMo','#nlSol'].forEach(s=>$(s).value=''); document.querySelectorAll('#nlContr input').forEach(i=>i.checked=false);
+    setTimeout(()=>{ refreshLocs(); $('#selReg').value=reg; fillLocs(); setLoc('p_'+id); }, 50); }
+  catch(e){ msg(storeErr(e), true); }
+};
+
+function renderCrops(){
+  const l=S.loc, only=$('#onlyRef').checked&&!$('#onlyRef').disabled, fam=$('#selFam').value;
+  let items=ACTIVE.filter(c=>(!only||l.ref[c.nom]!=null)&&(!fam||c.fam===fam)).map(c=>({c, e:evaluate(l,c)}));
+  items.sort((a,b)=>(b.e.score??-1)-(a.e.score??-1));
+  if (!items.length){ $('#cropList').innerHTML='<li class="empty">Aucune culture pour ce filtre.</li>'; $('#detail').innerHTML=''; return; }
+  if (!S.crop || !items.find(i=>i.c.nom===S.crop)) S.crop=items[0].c.nom;
+  $('#cropList').innerHTML=items.map(({c,e})=>{ const d=decision(e.score);
+    const when = e.cal && !e.cal.irr && e.cal.ok>0 ? ` · semis ${MOIS[e.cal.start].toLowerCase()}${e.cal.second!=null?' et '+MOIS[e.cal.second].toLowerCase():''}` : e.cal?.irr ? ' · contre-saison' : '';
+    return `<li><button data-c="${esc(c.nom)}" aria-current="${c.nom===S.crop}">
+      <span class="cn">${esc(c.nom)}<small>${esc(c.fam)}${when}${!l.perso&&Object.keys(l.ref).length&&l.ref[c.nom]==null?' · non pratiquée ici':''}</small></span>
+      <span class="bar" aria-hidden="true"><i style="width:${e.score??0}%;background:${d.col}"></i></span>
+      <span style="display:flex;gap:8px;align-items:center;justify-content:flex-end"><span class="sc">${e.score??'—'}</span><span class="pill ${d.cls}">${d.lab}</span></span>
+    </button></li>`; }).join('');
+  $('#cropList').querySelectorAll('button').forEach(b=>b.onclick=()=>{ S.crop=b.dataset.c; renderCrops(); if (window.innerWidth<920) $('#detail').scrollIntoView({behavior:'smooth',block:'start'}); });
+  renderDetail();
+}
+function phSvg(c, ph){
+  const x=v=>20+(v-3.5)/(9-3.5)*560;
+  const ticks=[4,5,6,7,8,9].map(t=>`<line x1="${x(t)}" x2="${x(t)}" y1="38" y2="44" stroke="var(--muted)"/><text x="${x(t)}" y="58" font-size="12" text-anchor="middle" fill="var(--muted)" font-family="JetBrains Mono, monospace">${t}</text>`).join('');
+  const cx=v=>Math.min(9,Math.max(3.5,v));
+  return `<svg viewBox="0 0 600 66" role="img" aria-label="pH du sol ${fmt(ph,1)} par rapport à la plage de la culture" style="width:100%;height:auto;display:block">
+    <rect x="${x(3.5)}" y="22" width="${x(9)-x(3.5)}" height="14" rx="3" fill="var(--sunk)"/>
+    <rect x="${x(cx(c.ph[0]))}" y="22" width="${x(cx(c.ph[3]))-x(cx(c.ph[0]))}" height="14" fill="var(--warn-bg)"/>
+    <rect x="${x(cx(c.ph[1]))}" y="22" width="${x(cx(c.ph[2]))-x(cx(c.ph[1]))}" height="14" fill="var(--good-bg)" stroke="var(--good)" stroke-width="1"/>
+    ${ticks}
+    <line x1="${x(cx(ph))}" x2="${x(cx(ph))}" y1="14" y2="40" stroke="var(--fg)" stroke-width="2.5"/>
+    <text x="${Math.min(560,Math.max(40,x(cx(ph))))}" y="11" font-size="12" text-anchor="middle" fill="var(--fg)" font-weight="600" font-family="JetBrains Mono, monospace">sol ${fmt(ph,1)}</text>
+  </svg>`;
+}
+function engPlan(c, surf){
+  if (!c.engF || !c.engKg) return null;
+  const kg=c.engKg*(surf||1), sacs=kg/50;
+  return { txt:`${c.engF} à ${fmt(c.engKg)} kg/ha`, kg, sacs };
+}
+function renderDetail(){
+  const l=S.loc, c=CULT[S.crop]; if(!c) return;
+  const e=evaluate(l,c), d=decision(e.score), s=soilOf(l);
+  const nR=D.risques.filter(r=>r.cult===c.nom), nPb=nR.filter(r=>r.st!=='ok').length;
+  const old=l.ref[c.nom], ep=engPlan(c,1);
+  $('#detail').innerHTML=`
+    <div class="lab">${esc(l.nom)}</div>
+    <h2>${esc(c.nom)}</h2>
+    <div class="big"><span class="n">${e.score??'—'}</span><span class="muted">/ 100</span><span class="pill ${d.cls}">${d.lab}</span></div>
+    <div class="small muted">${old!=null?`Pratiquée dans la zone selon le fichier Excel (ancien score : ${old}).`:l.perso?'Village ajouté par vous.':'Non listée pour cette localité dans le fichier Excel.'}</div>
+    ${c.horsModele?'':`<div class="phscale">${phSvg(c, s.ph)}<div class="small muted">Vert : optimum Ecocrop · Ocre : tolérable · Trait : pH du sol</div></div>`}
+    ${e.cal?`<div class="sub"><h3>Calendrier de semis</h3>${monthBars(e.K.mens, e.cal.months, e.cal.irr?null:e.cal.need, {h:110})}<p class="small" style="margin:4px 0 0">${esc(e.cal.txt)}</p></div>`:''}
+    ${e.facts.length?`<table class="facts"><tbody>${e.facts.map(f=>`<tr><td>${f[0]}</td><td class="muted">${esc(f[3])}</td><td class="pts">${Math.round(f[1])}${f[2]?' / '+f[2]:''}</td></tr>`).join('')}</tbody></table>`:''}
+    <div class="sub"><h3>Amendements et pratiques recommandés</h3><ul class="reco">${e.reco.map(r=>`<li>${esc(r)}</li>`).join('')}</ul></div>
+    <div class="sub"><h3>Repères techniques</h3>
+      <dl class="kv">
+        <dt>Fumure de fond</dt><dd>${ep?`${esc(ep.txt)} soit ${fmt(ep.sacs,1)} sacs de 50 kg/ha`:esc(c.eng||'à renseigner')}</dd>
+        <dt>Rendement</dt><dd class="num">${c.rmoy!=null?`${fmt(c.rmoy,1)} t/ha (max ${fmt(c.rmax,1)})`:'à renseigner'}</dd>
+        <dt>Cycle</dt><dd>${c.per?'pérenne':`environ ${fmt(c.cycle)} jours`} · ${esc(c.saison)}</dd>
+        <dt>Débouché</dt><dd>${esc(c.com)}</dd>
+        <dt>Risques phyto</dt><dd>${nR.length?`${nR.length} documentés${nPb?` · <span style="color:var(--bad);font-weight:600">${nPb} produit(s) à revoir</span>`:''}`:'aucun documenté'}</dd>
+        ${c.eco?`<dt>Référence FAO</dt><dd class="small">Ecocrop : ${esc(c.eco)}</dd>`:''}
+      </dl>
+    </div>
+    <div class="row" style="margin-top:16px">
+      <button class="btn" id="goPhy">Où planter cette culture ?</button>
+      <button class="btn" id="goCalc">Calculer la rentabilité</button>
+    </div>
+    <div class="sub" id="saveBox"></div>`;
+  $('#goPhy').onclick=()=>{ $('#selCult').value=c.nom; show('cult'); };
+  $('#goCalc').onclick=()=>{ if (calcCults.find(x=>x.nom===c.nom)) { $('#cCult').value=c.nom; loadCalc(); } show('calc'); };
+  renderSaveBox(e,d);
+}
+function renderSaveBox(e,d){
+  const box=$('#saveBox'); if(!box) return;
+  box.innerHTML=`<h3>Enregistrer la fiche terrain</h3>
+    <div class="row"><div class="field"><label for="fProd">Producteur / OP</label><input type="text" id="fProd" maxlength="120" placeholder="Nom du producteur ou de l'OP"></div>
+    <div class="field"><label for="fParc">Parcelle</label><input type="text" id="fParc" maxlength="80" placeholder="Code ou nom de la parcelle"></div></div>
+    <div class="field" style="margin-top:8px"><label for="fNote">Observation</label><textarea id="fNote" rows="2" maxlength="1000" placeholder="Observation de terrain (facultatif)"></textarea></div>
+    <div class="row" style="margin-top:10px;align-items:center"><button class="btn primary" id="fSave">Enregistrer la fiche</button><span class="small muted">${S.over?'Avec votre analyse de sol.':'Avec les valeurs de sol actuelles.'}</span></div>`;
+  $('#fSave').onclick=async()=>{
+    const prod=$('#fProd').value.trim();
+    if(!prod){ toast("Indiquez le producteur ou l'OP"); $('#fProd').focus(); return; }
+    const s=soilOf(S.loc), K=climOf(S.loc);
+    const doc={ producteur:prod, parcelle:$('#fParc').value.trim(), note:$('#fNote').value.trim(), localite:S.loc.nom, localiteId:String(S.loc.id), region:S.loc.reg,
+      culture:S.crop, ph:s.ph, mo:s.mo, drainage:s.drain, analyse:!!S.over, pluie:K.pluie, sourceClimat:K.src, semis:e.cal&&!e.cal.irr&&e.cal.ok>0?MOIS_L[e.cal.start]:null,
+      score:e.score, decision:d.lab, fiabilite:reliability(S.loc).lab, date:new Date().toISOString() };
+    try{ if(S.user?.id) doc.auteur=await S.user.id(); }catch(_){}
+    $('#fSave').disabled=true;
+    try{ await S.store.add('fiches', doc); toast('Fiche enregistrée'); $('#fProd').value=''; $('#fParc').value=''; $('#fNote').value=''; }
+    catch(err){ toast(storeErr(err)); }
+    finally{ $('#fSave').disabled=false; }
+  };
+}
+
+/* ================= Où planter ================= */
+const phyCults=[...new Set([...ACTIVE.map(c=>c.nom), ...D.risques.map(r=>r.cult)])].sort((a,b)=>a.localeCompare(b,'fr'));
+$('#selCult').innerHTML=phyCults.map(n=>`<option>${esc(n)}</option>`).join('');
+['#selCult','#selPhyFilter','#selWhere'].forEach(s=>$(s).addEventListener('change', renderCult));
+function renderCult(){
+  const n=$('#selCult').value, c=CULT[n];
+  pref.set('agrodiag.cult', n);
+  if (c && !c.horsModele){
+    const saved=S.over; S.over=null;
+    const rows=allLocs().map(l=>({l, e:evaluate(l,c,{ph:l.ph,mo:l.mo,drain:l.drain})})).sort((a,b)=> b.e.score-a.e.score || (c.sec===2 ? b.e.K.secs-a.e.K.secs : c.sec===0 ? a.e.K.secs-b.e.K.secs : 0) || a.l.nom.localeCompare(b.l.nom,'fr'));
+    S.over=saved;
+    const fav=rows.filter(r=>r.e.score>=75).length;
+    const lim=$('#selWhere').value==='all'?rows.length:20;
+    $('#cultCard').innerHTML=`
+      <div class="lab">${esc(c.fam)}</div><h2 style="font-size:22px">${esc(c.nom)}</h2>
+      <dl class="kv" style="margin-top:10px">
+        <dt>Rendement moyen / max</dt><dd class="num">${c.rmoy!=null?`${fmt(c.rmoy,1)} / ${fmt(c.rmax,1)} t/ha`:'à renseigner'}</dd>
+        <dt>Cycle</dt><dd>${c.per?'pérenne':`environ ${fmt(c.cycle)} jours`} · ${esc(c.saison)}</dd>
+        <dt>pH (FAO Ecocrop)</dt><dd class="num">optimum ${fmt(c.ph[1],1)}–${fmt(c.ph[2],1)} · limites ${fmt(c.ph[0],1)}–${fmt(c.ph[3],1)}</dd>
+        <dt>Pluie annuelle</dt><dd class="num">optimum ${fmt(c.pl[1])}–${fmt(c.pl[2])} mm · limites ${fmt(c.pl[0])}–${fmt(c.pl[3])} mm${c.irr?' · conduite avec maîtrise de l\'eau':''}</dd>
+        <dt>Drainage toléré</dt><dd>bon${c.drainI?', imparfait':''}${c.drainE?', sol filtrant':''}</dd>
+        <dt>Salinité</dt><dd>${c.sal?'tolérance moyenne':'peu tolérante'}</dd>
+        <dt>Fumure de fond</dt><dd>${esc(c.eng||'à renseigner')}</dd>
+        <dt>Référence FAO</dt><dd class="small">${esc(c.eco||'')}</dd>
+        <dt>Bilan</dt><dd>Favorable (≥ 75) dans ${fav} localités sur ${rows.length}.</dd>
+      </dl>`;
+    $('#whereList').innerHTML=`<div class="tbl-wrap"><table class="t"><thead><tr><th>#</th><th>Localité</th><th>Région</th><th>Score</th><th>Semis conseillé</th><th>Facteur le plus faible</th><th></th></tr></thead><tbody>
+      ${rows.slice(0,lim).map((r,i)=>{ const d=decision(r.e.score); const weak=r.e.facts.filter(f=>f[2]>0).map(f=>[f[0],f[1]/f[2]]).sort((a,b)=>a[1]-b[1])[0];
+        const when=r.e.cal?(r.e.cal.irr?'contre-saison':r.e.cal.ok>0?MOIS_L[r.e.cal.start]+(r.e.cal.second!=null?' / '+MOIS_L[r.e.cal.second]:''):'aucun'):'—';
+        return `<tr><td class="num">${i+1}</td><td><b>${esc(r.l.nom)}</b>${r.l.perso?' <span class="pill p-acc">mon village</span>':''}</td><td>${esc(r.l.reg)}</td>
+        <td><span class="num">${r.e.score}</span> <span class="pill ${d.cls}">${d.lab}</span></td><td>${esc(when)}</td><td class="small">${weak?`${esc(weak[0])} (${Math.round(weak[1]*100)} %)`:''}</td>
+        <td><button class="btn ghost" data-go="${esc(r.l.id)}">Voir</button></td></tr>`; }).join('')}
+      </tbody></table></div>`;
+    $('#whereList').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{ const l=findLoc(b.dataset.go); $('#selReg').value=l.reg; fillLocs(); setLoc(l.id); S.crop=n; $('#onlyRef').checked=false; renderCrops(); show('diag'); });
+  } else {
+    $('#cultCard').innerHTML = c ? `<div class="lab">${esc(c.fam)}</div><h2 style="font-size:22px">${esc(c.nom)}</h2><p class="small muted">Activité hors du modèle sol/climat.</p>`
+      : `<div class="lab">Culture citée seulement dans Risques_Phyto</div><h2 style="font-size:22px">${esc(n)}</h2><p class="small muted">Absente de la feuille Cultures : pas de paramètres de score.</p>`;
+    $('#whereList').innerHTML='<p class="small muted">Pas de classement possible pour cette culture.</p>';
+  }
+  const pbOnly=$('#selPhyFilter').value==='pb';
+  const rs=D.risques.filter(r=>r.cult===n && (!pbOnly||r.st!=='ok'));
+  const niv=v=>/très/i.test(v)?'p-bad':/élevé/i.test(v)?'p-risk':/modéré/i.test(v)?'p-cond':'p-neutral';
+  $('#phyto').innerHTML = rs.length ? `<div class="tbl-wrap"><table class="t"><thead><tr><th>Problème</th><th>Risque</th><th>Produit / matière active</th><th>Période · stade</th><th>Pertes</th><th>Statut</th></tr></thead><tbody>
+    ${rs.map(r=>`<tr class="st-${r.st}"><td><b>${esc(r.pb)}</b><div class="small muted">${esc(r.type)}${r.cult0!==r.cult?' · '+esc(r.cult0):''}</div>${r.corr?`<div class="small" style="margin-top:4px;color:var(--warn)">${esc(r.corr)}</div>`:''}</td>
+      <td><span class="pill ${niv(r.niv)}">${esc(r.niv)}</span></td>
+      <td>${esc(r.prod)}<div class="small muted">${esc(r.ma)}</div></td><td>${esc(r.per)}<div class="small muted">${esc(r.stade)}</div></td><td class="small">${esc(r.pertes)}</td>
+      <td>${r.st==='ok'?'<span class="pill p-neutral">Pas d\'alerte</span>':`<span class="pill ${r.st==='interdit'?'p-bad':'p-cond'}">${r.st==='interdit'?'Interdit en CI':'À vérifier'}</span><div class="small" style="margin-top:4px;max-width:34ch">${esc(r.msg)}</div>${r.alt?`<div class="small" style="margin-top:6px;max-width:34ch"><b style="color:var(--good)">Alternative :</b> ${esc(r.alt)}</div>`:''}`}</td></tr>`).join('')}
+    </tbody></table></div>` : `<p class="small muted">${pbOnly?'Aucun produit à problème pour cette culture.':'Aucun risque phytosanitaire documenté pour cette culture dans le fichier.'}</p>`;
+}
+
+/* ================= Rentabilité ================= */
+const LINES=[['semences','Semences ou plants'],['engrais','Engrais'],['amendements','Amendements (chaux, compost)'],['phyto','Produits phytosanitaires'],['irrigation','Irrigation'],['mo',"Main-d'œuvre"],['autres','Autres (transport, sacs…)']];
+const calcCults=ACTIVE.filter(c=>!c.horsModele);
+$('#cCult').innerHTML=calcCults.map(c=>`<option>${esc(c.nom)}</option>`).join('');
+$('#costLines').innerHTML=LINES.map(([k,lab])=>`<label for="cl-${k}">${lab}</label><input type="number" id="cl-${k}" min="0" step="1000" placeholder="0">`).join('');
+function refreshCostMeta(){ const c=CULT[$('#cCult').value]; if(!c) return; const r=S.costs[slug(c.nom)]; $('#costMeta').textContent = r ? `Référence enregistrée le ${new Date(r.maj).toLocaleDateString('fr-FR')}` : 'Aucune référence enregistrée pour cette culture.'; }
+function loadCalc(){
+  const c=CULT[$('#cCult').value], ref=S.costs[slug(c.nom)];
+  $('#cRend').value = ref?.rendement ?? c.rmoy ?? '';
+  $('#cPrix').value = ref?.prix ?? '';
+  LINES.forEach(([k])=>$('#cl-'+k).value = ref?.charges?.[k] ?? '');
+  $('#cRendHint').textContent = c.rmoy!=null ? `Repère du fichier : ${fmt(c.rmoy,1)} t/ha en moyenne, ${fmt(c.rmax,1)} t/ha au maximum.` : 'Pas de rendement de référence dans le fichier.';
+  renderEng(ref?.prixSac);
+  refreshCostMeta(); calc();
+}
+function renderEng(prixSac){
+  const c=CULT[$('#cCult').value], surf=parseFloat($('#cSurf').value)||1, ep=engPlan(c, surf);
+  if(!ep){ $('#engBox').innerHTML='<span class="small muted">Pas de dose d\'engrais de fond chiffrée pour cette culture dans le fichier.</span>'; return; }
+  $('#engBox').innerHTML=`<div class="small"><b>Fumure de fond :</b> ${esc(ep.txt)}, soit <b>${fmt(ep.kg)} kg</b> (${fmt(ep.sacs,1)} sacs de 50 kg) pour ${fmt(surf,1)} ha.</div>
+    <div class="row" style="margin-top:8px;align-items:flex-end"><div class="field" style="max-width:240px"><label for="cSac">Prix du sac de 50 kg (FCFA)</label><input type="number" id="cSac" min="0" step="500" value="${prixSac??''}" placeholder="à saisir"></div>
+    <span class="small muted" style="flex:1 1 200px">Le prix du sac remplit la ligne Engrais (fumure de fond seulement ; ajoutez l'urée ou la couverture à la main).</span></div>`;
+  $('#cSac').oninput=()=>{ const p=parseFloat($('#cSac').value); if(p>=0){ $('#cl-engrais').value=Math.round(c.engKg/50*p); calc(); } };
+}
+function calc(){
+  const c=CULT[$('#cCult').value];
+  const ids=['cSurf','cRend','cPrix',...LINES.map(([k])=>'cl-'+k)];
+  const neg=ids.filter(id=>parseFloat($('#'+id).value)<0);
+  ids.forEach(id=>$('#'+id).style.borderColor = neg.includes(id)?'var(--bad)':'');
+  if (neg.length){ $('#calcRes').innerHTML='<p class="small" style="color:var(--bad);grid-column:1/-1;margin:0">Les valeurs négatives ne sont pas acceptées : corrigez les champs en rouge.</p>'; $('#calcNote').textContent=''; return; }
+  const surf=parseFloat($('#cSurf').value)||0, rend=parseFloat($('#cRend').value)||0, prix=parseFloat($('#cPrix').value)||0;
+  const ch=LINES.reduce((s,[k])=>s+(parseFloat($('#cl-'+k).value)||0),0);
+  const pb=rend*1000*prix, mb=pb-ch;
+  const cell=(k,v,cls='')=>`<div><div class="k">${k}</div><div class="v ${cls}">${v}</div></div>`;
+  $('#calcRes').innerHTML=cell('Production', `${fmt(rend*surf,1)} t`)+cell('Produit brut', prix?`${fmt(pb*surf)} F`:'prix à saisir')+
+    cell('Charges', `${fmt(ch*surf)} F`)+cell('Marge brute', prix?`${fmt(mb*surf)} F`:'—', prix?(mb<0?'neg':'pos'):'')+
+    cell('Marge par ha', prix?`${fmt(mb)} F`:'—', prix?(mb<0?'neg':'pos'):'')+cell('Rentabilité / charges', prix&&ch?`${fmt(mb/ch*100)} %`:'—')+
+    cell("Rendement d'équilibre", prix&&ch?`${fmt(ch/(prix*1000),2)} t/ha`:'—')+cell("Prix d'équilibre", rend&&ch?`${fmt(ch/(rend*1000))} F/kg`:'—');
+  const warn = c.rmax && rend>c.rmax*1.2 ? `Attention : ${fmt(rend,1)} t/ha dépasse le rendement maximal de référence (${fmt(c.rmax,1)} t/ha). ` : '';
+  $('#calcNote').textContent = warn + (c.per?"Culture pérenne : le calcul porte sur une année en pleine production, sans les frais d'installation. ":'') + (ch===0?'Saisissez les charges par hectare pour obtenir la marge.':'');
+}
+$('#cCult').addEventListener('change', loadCalc);
+$('#cSurf').addEventListener('input', ()=>{ renderEng($('#cSac')?.value||null); calc(); });
+['cRend','cPrix',...LINES.map(([k])=>'cl-'+k)].forEach(id=>$('#'+id).addEventListener('input', calc));
+$('#saveCost').onclick=async()=>{
+  const c=CULT[$('#cCult').value];
+  const doc={ culture:c.nom, rendement:parseFloat($('#cRend').value)||null, prix:parseFloat($('#cPrix').value)||null, prixSac:parseFloat($('#cSac')?.value)||null,
+    charges:Object.fromEntries(LINES.map(([k])=>[k, parseFloat($('#cl-'+k).value)||0])), maj:new Date().toISOString() };
+  doc.total=Object.values(doc.charges).reduce((a,b)=>a+b,0);
+  if (!doc.total){ toast('Saisissez au moins une charge'); return; }
+  if (Object.values(doc.charges).some(v=>v<0)||doc.prix<0||doc.rendement<0){ toast('Les valeurs négatives ne sont pas acceptées'); return; }
+  if (c.rmax && doc.rendement>c.rmax*2){ toast(`Rendement improbable : plus du double du maximum de référence (${fmt(c.rmax,1)} t/ha)`); return; }
+  try{ if(S.user?.id) doc.auteur=await S.user.id(); }catch(_){}
+  $('#saveCost').disabled=true;
+  try{ await S.store.set('couts', slug(c.nom), doc); toast('Référence enregistrée'); }
+  catch(err){ toast(storeErr(err)); }
+  finally{ $('#saveCost').disabled=false; }
+};
+function renderCostCount(){ const n=Object.keys(S.costs).length, t=calcCults.length; $('#costCount').textContent=`${n} / ${t} cultures`; $('#costBar').style.width=(n/t*100)+'%'; }
+
+/* ================= Fiches ================= */
+function renderFiches(){
+  const list=Object.entries(S.fiches).map(([id,f])=>({id,...f})).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  $('#nbFiches').textContent=list.length;
+  $('#fichHint').textContent = S.online ? "Fiches partagées avec les personnes qui ont accès à l'application." : "Fiches enregistrées sur cet appareil. Exportez-les depuis « Données et sauvegarde » pour les transférer.";
+  if (!list.length){ $('#fichList').innerHTML='<div class="card empty">Aucune fiche pour l\'instant. Dans « Que planter ici ? », choisissez une localité et une culture, puis « Enregistrer la fiche ».</div>'; return; }
+  $('#fichList').innerHTML=`<div class="tbl-wrap"><table class="t"><thead><tr><th>Date</th><th>Producteur / parcelle</th><th>Localité</th><th>Culture</th><th>Sol · climat</th><th>Score</th><th></th></tr></thead><tbody>
+    ${list.map(f=>{ const d=decision(f.score); return `<tr><td class="num small">${f.date?new Date(f.date).toLocaleDateString('fr-FR'):''}</td>
+      <td><b>${esc(f.producteur)}</b><div class="small muted">${esc(f.parcelle||'')}</div>${f.note?`<div class="small">${esc(f.note)}</div>`:''}</td>
+      <td>${esc(f.localite)}<div class="small muted">${esc(f.region)}</div></td><td>${esc(f.culture)}${f.semis?`<div class="small muted">semis ${esc(f.semis)}</div>`:''}</td>
+      <td class="small num">pH ${fmt(f.ph,1)} · MO ${fmt(f.mo,1)}<div class="muted">${f.analyse?'analyse parcelle':'valeurs de zone'} · ${fmt(f.pluie)} mm</div></td>
+      <td><span class="num">${f.score??'—'}</span> <span class="pill ${d.cls}">${esc(f.decision)}</span>${f.fiabilite?`<div class="small muted">${esc(f.fiabilite)}</div>`:''}</td>
+      <td><span><button class="btn ghost danger" data-ask="${esc(f.id)}">Supprimer</button></span></td></tr>`; }).join('')}
+    </tbody></table></div>`;
+  $('#fichList').querySelectorAll('[data-ask]').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.ask, wrap=b.parentElement;
+    wrap.innerHTML=`<span class="inline-confirm">Supprimer ? <button class="btn danger" data-yes>Oui</button><button class="btn ghost" data-no>Non</button></span>`;
+    wrap.querySelector('[data-no]').onclick=renderFiches;
+    wrap.querySelector('[data-yes]').onclick=async()=>{ try{ await S.store.del('fiches', id); toast('Fiche supprimée'); }catch(e){ toast(storeErr(e)); renderFiches(); } };
+  });
+}
+
+/* ================= Données, exports, sauvegarde ================= */
+function renderQual(){
+  const A=D.anomalies, cnt={}; A.forEach(a=>cnt[a.statut]=(cnt[a.statut]||0)+1);
+  const pcls={"Corrigé dans l'app":'p-fav','À valider':'p-cond','À compléter':'p-risk','À corriger':'p-bad','Limite signalée':'p-neutral'};
+  $('#nbAno').textContent=A.filter(a=>a.statut!=="Corrigé dans l'app").length;
+  $('#qSum').innerHTML=`<span class="pill p-acc">${D.locs.length} localités · ${ACTIVE.length} cultures · ${D.meta.lignesRef} lignes localité × culture</span>`+
+    Object.entries(cnt).map(([k,v])=>`<span class="pill ${pcls[k]||'p-neutral'}">${v} ${esc(k.toLowerCase())}</span>`).join('');
+  const cats=[...new Set(A.map(a=>a.cat))];
+  $('#qList').innerHTML=cats.map(cat=>`<div class="q-cat" style="margin-top:14px"><div class="lab">${esc(cat)}</div><div>
+    ${A.filter(a=>a.cat===cat).map(a=>`<div class="q-item"><b>${esc(a.objet)}</b><span class="pill ${pcls[a.statut]||'p-neutral'}">${esc(a.statut)}</span><p>${esc(a.detail)}</p></div>`).join('')}</div></div>`).join('');
+  $('#zTbl').innerHTML=`<thead><tr><th>District</th><th>Région</th><th>Chef-lieu</th><th>Constat après revue</th></tr></thead><tbody>`+
+    D.zones.map(z=>`<tr><td>${esc(z.district)}</td><td><b>${esc(z.region)}</b></td><td>${esc(z.chef)}</td><td>${esc(z.revu)}</td></tr>`).join('')+'</tbody>';
+}
+function renderSaveHint(){
+  $('#saveHint').innerHTML = S.online
+    ? "Vous utilisez la version en ligne : fiches, coûts, climats importés et villages ajoutés sont partagés avec les personnes qui ont accès à l'application. Importez ici la sauvegarde faite sur le terrain pour fusionner vos données hors connexion."
+    : IS_ANDROID ? "Application hors connexion : les données sont enregistrées sur ce téléphone. Exportez régulièrement une sauvegarde (elle s'enregistre où vous voulez : téléphone, Google Drive, WhatsApp…) pour la transférer vers la version en ligne ou un autre téléphone."
+    : (LocalStore.available() ? "Mode hors connexion : les données sont enregistrées dans le navigateur de cet appareil. Exportez régulièrement une sauvegarde, puis importez-la dans la version en ligne ou sur un autre appareil pour fusionner."
+       : "Attention : ce navigateur bloque l'enregistrement (navigation privée ?). Les données saisies seront perdues à la fermeture. Ouvrez le fichier dans un navigateur normal.");
+}
+function csv(rows){ return '﻿'+rows.map(r=>r.map(v=>{ v=v==null?'':String(v); return /[;"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }).join(';')).join('\r\n'); }
+document.querySelectorAll('[data-exp]').forEach(b=>b.onclick=async()=>{
+  const k=b.dataset.exp; let rows, name;
+  if (k==='loc'){ name='localites_agrodiag.csv'; rows=[['id','localite','ligne_origine','departement','region','region_origine','statut','zone','type_sol','ph','mo','drainage','contraintes','pluie_mm','mois_sous_50mm',...MOIS.map(m=>'pluie_'+m),'source_climat','note']]
+    .concat(allLocs().map(l=>{ const K=climOf(l); return [l.id,l.nom,l.orig,l.dep,l.reg,l.reg0,l.statut,l.zone,l.sol,l.ph,l.mo,l.drain,l.contr,K.pluie,K.secs,...K.mens,K.src,l.note]; })); }
+  else if (k==='score'){ name='scores_agrodiag.csv'; rows=[['localite','region','culture','pratiquee_zone','score_excel','score','decision','semis_conseille','fiabilite','detail_facteurs','amendements_pratiques']];
+    const saved=S.over; S.over=null;
+    allLocs().forEach(l=>ACTIVE.forEach(c=>{ if(c.horsModele) return; const e=evaluate(l,c,{ph:l.ph,mo:l.mo,drain:l.drain});
+      rows.push([l.nom,l.reg,c.nom,l.ref[c.nom]!=null?'oui':'non',l.ref[c.nom]??'',e.score,decision(e.score).lab,e.cal?(e.cal.irr?'contre-saison':e.cal.ok>0?MOIS_L[e.cal.start]:'aucun'):'pérenne',reliability(l).lab,e.facts.map(f=>`${f[0]} ${Math.round(f[1])}/${f[2]}`).join(' ; '),e.reco.join(' | ')]); }));
+    S.over=saved; }
+  else { name='couts_agrodiag.csv'; rows=[['culture','rendement_t_ha','prix_fcfa_kg','prix_sac_engrais',...LINES.map(l=>'cout_'+l[0]+'_fcfa_ha'),'cout_total_fcfa_ha','mise_a_jour']].concat(Object.values(S.costs).map(c=>[c.culture,c.rendement,c.prix,c.prixSac,...LINES.map(l=>c.charges?.[l[0]]??0),c.total,c.maj]));
+    if (rows.length===1){ $('#expNote').textContent="Aucun coût enregistré pour l'instant."; return; } }
+  const r=await saveFile(name, csv(rows), 'text/csv');
+  $('#expNote').textContent = r==='ok' ? `${name} : ${rows.length-1} lignes.` : r==='declined' ? 'Téléchargement annulé.' : 'Téléchargement impossible.';
+});
+$('#bkExport').onclick=async()=>{
+  const data={ app:'AgroDiag CI', version:3, date:new Date().toISOString(), fiches:S.fiches, couts:S.costs, climat:S.climat, localites:S.perso };
+  const n=COLS.reduce((s,c)=>s+Object.keys(data[c]||{}).length,0);
+  const r=await saveFile(`agrodiag_sauvegarde_${new Date().toISOString().slice(0,10)}.json`, JSON.stringify(data,null,1), 'application/json');
+  $('#bkMsg').textContent = r==='ok' ? `Sauvegarde exportée : ${n} enregistrements.` : r==='declined' ? 'Export annulé.' : 'Export impossible.';
+  $('#bkMsg').style.color = r==='ok' ? 'var(--good)' : 'var(--bad)';
+};
+$('#bkFile').onchange=async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const msg=(m,bad)=>{ $('#bkMsg').textContent=m; $('#bkMsg').style.color=bad?'var(--bad)':'var(--good)'; };
+  try{
+    const data=JSON.parse(await f.text());
+    if (data?.app!=='AgroDiag CI') return msg("Ce fichier n'est pas une sauvegarde AgroDiag CI.", true);
+    let n=0, skip=0;
+    for (const c of COLS){
+      for (const [id,doc] of Object.entries(data[c]||{})){
+        if (!doc || typeof doc!=='object'){ skip++; continue; }
+        const cur=({fiches:S.fiches,couts:S.costs,climat:S.climat,localites:S.perso})[c][id];
+        const newer=!cur || String(doc.maj||doc.date||'')>String(cur.maj||cur.date||'');
+        if (!newer){ skip++; continue; }
+        await S.store.set(c, id, doc); n++;
+      }
+    }
+    msg(`${n} enregistrement(s) importé(s)${skip?`, ${skip} ignoré(s) (déjà à jour)`:''}.`);
+  }catch(err){ msg(err?.code ? storeErr(err) : 'Fichier illisible : choisissez un fichier .json exporté par AgroDiag CI.', true); }
+  e.target.value='';
+};
+
+/* ================= Démarrage ================= */
+renderQual();
+bindStore(LocalStore);
+refreshLocs();
+const savedLoc=pref.get('agrodiag.loc');
+const start=findLoc(savedLoc) || D.locs.find(l=>/Tiassalé/.test(l.nom)) || D.locs[0];
+$('#selReg').value=start.reg; fillLocs(); setLoc(start.id);
+$('#selCult').value = phyCults.includes(pref.get('agrodiag.cult')) ? pref.get('agrodiag.cult') : 'Cacao';
+$('#cCult').value='Cacao'; loadCalc();
+renderSaveHint(); renderFiches();
+if (IS_ANDROID){ $('#modeBadge').textContent='Application · données sur ce téléphone'; }
+const savedTab=pref.get('agrodiag.tab'); show(savedTab && $('#v-'+savedTab) ? savedTab : 'diag');
+
+(async()=>{
+  if (!window.claude?.use) return;
+  claude.use('downloads').then(d=>{ S.dl=d; }).catch(()=>{});
+  claude.use('user').then(u=>{ S.user=u; }).catch(()=>{});
+  const db=await claude.use('db').catch(()=>null);
+  if (!db) return;
+  S.online=true;
+  $('#modeBadge').textContent='En ligne · données partagées'; $('#modeBadge').className='pill p-fav';
+  bindStore(DbStore(db));
+  renderSaveHint(); renderFiches();
+})();
+
+</script>
+</body></html>

@@ -1,0 +1,57 @@
+plugins {
+    id 'com.android.application'
+}
+
+// Signature : variables d'environnement (GitHub Actions) ou fichier keystore.properties (ordinateur)
+def ksProps = new Properties()
+def ksFile = rootProject.file('keystore.properties')
+if (ksFile.exists()) { ksFile.withInputStream { ksProps.load(it) } }
+def sig = { String envKey, String propKey -> System.getenv(envKey) ?: ksProps.getProperty(propKey) }
+
+android {
+    namespace 'com.agrodiag.ci'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId 'com.agrodiag.ci'
+        minSdk 24
+        targetSdk 36
+        versionCode 1
+        versionName '1.0.0'
+    }
+
+    signingConfigs {
+        release {
+            def storePath = sig('AGRODIAG_KEYSTORE_PATH', 'storeFile')
+            if (storePath) {
+                storeFile file(storePath)
+                storePassword sig('AGRODIAG_KEYSTORE_PASSWORD', 'storePassword')
+                keyAlias sig('AGRODIAG_KEY_ALIAS', 'keyAlias')
+                keyPassword sig('AGRODIAG_KEY_PASSWORD', 'keyPassword')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            if (signingConfigs.release.storeFile != null) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.webkit:webkit:1.12.1'
+}
