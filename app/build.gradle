@@ -21,6 +21,13 @@ android {
     }
 
     signingConfigs {
+        // Clé fixe pour les APK de test : les mises à jour s'installent par-dessus sans perdre les données
+        debug {
+            storeFile file('test-signing.jks')
+            storePassword 'agrodiagtest'
+            keyAlias 'test'
+            keyPassword 'agrodiagtest'
+        }
         release {
             def storePath = sig('AGRODIAG_KEYSTORE_PATH', 'storeFile')
             if (storePath) {
