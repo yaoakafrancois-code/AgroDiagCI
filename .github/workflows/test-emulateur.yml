@@ -50,4 +50,4 @@ jobs:
         run: |
           gh release delete test-rapport -R ${{ github.repository }} -y --cleanup-tag || true
           touch ecran.png activite.txt logcat_filtre.txt
-          touch ecran_30s.png; gh release create test-rapport ecran.png ecran_30s.png activite.txt logcat_filtre.txt -R ${{ github.repository }} --prerelease --title "Rapport de test sur téléphone virtuel" --notes "Capture d'écran et journal de l'application sur Android 14."
+          touch ecran_30s.png logcat.txt; gh release create test-rapport ecran.png ecran_30s.png activite.txt logcat_filtre.txt logcat.txt -R ${{ github.repository }} --prerelease --title "Rapport de test sur téléphone virtuel" --notes "Capture d'écran et journal de l'application sur Android 14."
