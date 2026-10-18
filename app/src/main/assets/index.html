@@ -161,7 +161,7 @@ tr.st-verifier td:first-child{box-shadow:inset 3px 0 var(--warn)}
 table.cal{border-collapse:separate;border-spacing:2px;width:100%;min-width:560px;font-size:12px}
 table.cal th{font-weight:600;color:var(--muted);padding:2px}
 table.cal td{height:24px;border-radius:4px;background:var(--sunk)}
-table.cal td.lab{background:none;font-weight:600;white-space:nowrap;padding-right:8px;font-size:12.5px;color:var(--fg)}
+table.cal td.rl{background:none;font-weight:600;white-space:nowrap;padding-right:8px;font-size:12.5px;color:var(--fg)}
 table.cal td.c-pep{background:#B9D7C7}
 table.cal td.c-prep{background:#E6D3B3}
 table.cal td.c-sem{background:var(--accent)}
@@ -1349,7 +1349,7 @@ function ficheTech(loc, c, surf){
 
 function calTable(rows){
   return `<div class="cal-wrap"><table class="cal"><thead><tr><th></th>${MOIS.map(m=>`<th>${m}</th>`).join('')}</tr></thead><tbody>
-    ${rows.filter(r=>r[1].length).map(([lab, ms, cls])=>`<tr><td class="lab">${esc(lab)}</td>${MOIS.map((_,i)=>`<td class="${ms.includes(i)?cls:''}"></td>`).join('')}</tr>`).join('')}
+    ${rows.filter(r=>r[1].length).map(([lab, ms, cls])=>`<tr><td class="rl">${esc(lab)}</td>${MOIS.map((_,i)=>`<td class="${ms.includes(i)?cls:''}"></td>`).join('')}</tr>`).join('')}
   </tbody></table></div>`;
 }
 function ficheHTML(F, forFile){
@@ -1421,7 +1421,7 @@ function renderTech(){
 async function downloadTech(){
   const loc = findLoc(TECH.loc) || D.locs[0], c=CULT[TECH.crop], surf=Math.max(0.01, parseFloat($('#ftSurf').value)||1);
   const F = ficheTech(loc, c, surf);
-  const css = `body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:#18231C;max-width:860px;margin:0 auto;padding:20px}h2{font-size:24px;margin:0 0 6px;color:#1D6A4A}h3{font-size:17px;margin:22px 0 8px;padding-top:12px;border-top:1px solid #D3DACF}ul{padding-left:20px}li{margin:4px 0}.muted{color:#5B6A60}.small{font-size:13px}.big{display:flex;gap:10px;align-items:center;margin:10px 0}.big .n{font-size:34px;font-weight:700}.pill{border-radius:99px;padding:2px 10px;font-size:12px;font-weight:600;background:#E8ECE5}.p-fav{background:#DDF1E5;color:#1E7B4C}.p-cond{background:#FBEBC9;color:#9A6400}.p-risk{background:#FADFCF;color:#B4501A}.p-bad{background:#F8DADE;color:#B42335}.zone-note{border-left:3px solid #1D6A4A;background:#DCEDE3;padding:8px 12px;margin-top:8px;border-radius:0 8px 8px 0}.notice{background:#FBEBC9;padding:8px 12px;border-radius:8px}table.cal{border-collapse:separate;border-spacing:2px;width:100%;font-size:12px}table.cal td{height:22px;border-radius:4px;background:#E8ECE5}table.cal td.lab{background:none;font-weight:600;white-space:nowrap;padding-right:8px}.c-pep{background:#B9D7C7!important}.c-prep{background:#E6D3B3!important}.c-sem{background:#1D6A4A!important}.c-ent{background:#DDF1E5!important}.c-rec{background:#9A6400!important}.c-sec{background:#FADFCF!important}.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:#5B6A60}.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px}:root{--accent:#1D6A4A;--good-bg:#DDF1E5;--warn:#9A6400;--risk-bg:#FADFCF;--risk:#B4501A;--bad:#B42335}`;
+  const css = `body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:#18231C;max-width:860px;margin:0 auto;padding:20px}h2{font-size:24px;margin:0 0 6px;color:#1D6A4A}h3{font-size:17px;margin:22px 0 8px;padding-top:12px;border-top:1px solid #D3DACF}ul{padding-left:20px}li{margin:4px 0}.muted{color:#5B6A60}.small{font-size:13px}.big{display:flex;gap:10px;align-items:center;margin:10px 0}.big .n{font-size:34px;font-weight:700}.pill{border-radius:99px;padding:2px 10px;font-size:12px;font-weight:600;background:#E8ECE5}.p-fav{background:#DDF1E5;color:#1E7B4C}.p-cond{background:#FBEBC9;color:#9A6400}.p-risk{background:#FADFCF;color:#B4501A}.p-bad{background:#F8DADE;color:#B42335}.zone-note{border-left:3px solid #1D6A4A;background:#DCEDE3;padding:8px 12px;margin-top:8px;border-radius:0 8px 8px 0}.notice{background:#FBEBC9;padding:8px 12px;border-radius:8px}table.cal{border-collapse:separate;border-spacing:2px;width:100%;font-size:12px}table.cal td{height:22px;border-radius:4px;background:#E8ECE5}table.cal td.rl{background:none;font-weight:600;white-space:nowrap;padding-right:8px}.c-pep{background:#B9D7C7!important}.c-prep{background:#E6D3B3!important}.c-sem{background:#1D6A4A!important}.c-ent{background:#DDF1E5!important}.c-rec{background:#9A6400!important}.c-sec{background:#FADFCF!important}.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:#5B6A60}.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px}:root{--accent:#1D6A4A;--good-bg:#DDF1E5;--warn:#9A6400;--risk-bg:#FADFCF;--risk:#B4501A;--bad:#B42335}`;
   const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fiche technique ${esc(c.nom)} – ${esc(loc.nom)}</title><style>${css}</style></head><body><p class="small muted">AgroDiag CI · Outil de décision agricole</p>${ficheHTML(F, true)}</body></html>`;
   const name = `Fiche_${slug(c.nom)}_${slug(loc.nom)}.html`;
   const r = await saveFile(name, html, 'text/html');
