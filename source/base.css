@@ -182,3 +182,4 @@ table.cal td.c-sec{background:var(--risk-bg)}
 .ed-form textarea{min-height:70px;resize:vertical}
 .ed-form .quad{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
 .ed-form .chkrow{display:flex;flex-wrap:wrap;gap:14px}
+.login-card .field{flex:none}
