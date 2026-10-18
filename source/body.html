@@ -1,0 +1,267 @@
+<div id="login" class="login" hidden>
+  <form class="login-card" id="loginForm" novalidate>
+    <h1>Agro<span>Diag</span> CI</h1>
+    <p class="muted">Outil de décision agricole pour la Côte d'Ivoire. Identifiez-vous pour commencer : aucun mot de passe n'est demandé.</p>
+    <div class="field"><label for="lgNom">Nom</label><input type="text" id="lgNom" autocomplete="family-name" maxlength="60" required></div>
+    <div class="field"><label for="lgPrenoms">Prénoms</label><input type="text" id="lgPrenoms" autocomplete="given-name" maxlength="80" required></div>
+    <div class="field"><label for="lgContact">Contact (téléphone ou e-mail)</label><input type="text" id="lgContact" autocomplete="tel" maxlength="80" required placeholder="ex. 07 00 00 00 00"></div>
+    <div class="field"><label for="lgProfil">Vous êtes</label>
+      <select id="lgProfil"><option value="">— facultatif —</option><option>Producteur / productrice</option><option>Conseiller agricole</option><option>Coopérative / OP</option><option>Technicien de projet</option><option>Étudiant / chercheur</option><option>Autre</option></select></div>
+    <p class="small" id="lgMsg" style="color:var(--bad);margin:0"></p>
+    <button class="btn primary" type="submit" id="lgGo">Se connecter</button>
+    <p class="small muted" style="margin:0">Vos informations restent sur cet appareil.</p>
+  </form>
+</div>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <h1>Agro<span>Diag</span> CI</h1>
+      <p>Outil de décision agro-pédologique · Côte d'Ivoire</p>
+      <span class="pill p-neutral" id="modeBadge">Hors connexion · données sur cet appareil</span>
+      <button class="user-chip" id="userChip" type="button" aria-label="Mon compte"></button>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button role="tab" id="tab-diag" aria-selected="true" data-v="diag">Que planter ici ?</button>
+      <button role="tab" id="tab-cult" aria-selected="false" data-v="cult">Où planter ?</button>
+      <button role="tab" id="tab-tech" aria-selected="false" data-v="tech">Fiches techniques</button>
+      <button role="tab" id="tab-calc" aria-selected="false" data-v="calc">Rentabilité</button>
+      <button role="tab" id="tab-fich" aria-selected="false" data-v="fich">Fiches terrain<span class="badge" id="nbFiches">0</span></button>
+      <button role="tab" id="tab-compte" aria-selected="false" data-v="compte">Mon compte</button>
+      <button role="tab" id="tab-qual" aria-selected="false" data-v="qual" hidden>Administration<span class="badge" id="nbAno">0</span></button>
+    </nav>
+  </div>
+</header>
+
+<main>
+<!-- QUE PLANTER ICI -->
+<section class="view" id="v-diag">
+  <div class="card">
+    <div class="row">
+      <div class="field"><label for="selReg">Région</label><select id="selReg"></select></div>
+      <div class="field" style="flex-basis:260px"><label for="selLoc">Localité</label><select id="selLoc"></select></div>
+    </div>
+    <div id="locInfo"></div>
+    <details class="override" id="addLocBox">
+      <summary style="cursor:pointer;font-weight:600">Ajouter mon village ou ma parcelle</summary>
+      <p class="small muted" style="margin:6px 0 10px">Le village s'ajoute à la liste avec vos données de sol. La pluie mensuelle est reprise de la station de référence de la zone ; vous pourrez ensuite importer ses données NASA POWER.</p>
+      <div class="row">
+        <div class="field"><label for="nlNom">Nom du village</label><input type="text" id="nlNom" maxlength="80"></div>
+        <div class="field"><label for="nlReg">Région</label><input type="text" id="nlReg" list="regList" maxlength="60"><datalist id="regList"></datalist></div>
+        <div class="field"><label for="nlZone">Zone agro-climatique</label><select id="nlZone"></select></div>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <div class="field"><label for="nlPh">pH eau</label><input type="number" id="nlPh" step="0.1" min="3" max="10"></div>
+        <div class="field"><label for="nlMo">MO (%)</label><input type="number" id="nlMo" step="0.1" min="0" max="20"></div>
+        <div class="field"><label for="nlDr">Drainage</label><select id="nlDr"><option>Bon</option><option>Moyen</option><option>Rapide</option><option>Variable</option></select></div>
+        <div class="field"><label for="nlSol">Type de sol</label><input type="text" id="nlSol" maxlength="60" placeholder="ex. Ferralsol"></div>
+      </div>
+      <fieldset class="chips" style="margin-top:10px"><legend class="small muted">Contraintes observées</legend><div id="nlContr" class="constr"></div></fieldset>
+      <div class="row" style="margin-top:10px;align-items:center"><button class="btn primary" id="nlSave">Ajouter le village</button><span class="small" id="nlMsg"></span></div>
+    </details>
+  </div>
+  <div class="diag-grid">
+    <div class="card">
+      <div class="list-head">
+        <h2 style="font-size:17px">Cultures classées pour cette localité</h2>
+        <div class="filters">
+          <label class="chk"><input type="checkbox" id="onlyRef" checked> Pratiquées dans la zone</label>
+          <select id="selFam" aria-label="Famille de culture" style="width:auto"></select>
+        </div>
+      </div>
+      <ul class="crops" id="cropList"></ul>
+    </div>
+    <div class="detail-wrap"><div class="card detail" id="detail"></div></div>
+  </div>
+</section>
+
+<!-- OÙ PLANTER -->
+<section class="view" id="v-cult" hidden>
+  <div class="card">
+    <div class="row">
+      <div class="field"><label for="selCult">Culture</label><select id="selCult"></select></div>
+      <div class="field"><label for="selWhere">Afficher</label>
+        <select id="selWhere"><option value="20">Les 20 meilleures localités</option><option value="all">Toutes les localités</option></select></div>
+    </div>
+  </div>
+  <div id="cultCard" class="card"></div>
+  <div class="card"><h3 style="font-size:16px">Meilleures localités pour cette culture</h3><p class="small muted" style="margin:4px 0 10px">Classement avec le sol de zone ou celui que vous avez saisi pour vos villages, et le climat de référence ou importé.</p><div id="whereList"></div></div>
+  <div class="card"><h3 style="font-size:16px">Risques phytosanitaires</h3>
+    <div class="row" style="margin:8px 0 10px"><div class="field" style="max-width:320px"><label for="selPhyFilter">Afficher</label>
+      <select id="selPhyFilter"><option value="all">Toutes les recommandations</option><option value="pb">Seulement les produits à problème</option></select></div></div>
+    <div id="phyto"></div></div>
+</section>
+
+<!-- FICHES TECHNIQUES -->
+<section class="view" id="v-tech" hidden>
+  <div class="card">
+    <div class="row">
+      <div class="field" style="flex-basis:220px"><label for="ftCult">Culture</label><select id="ftCult"></select></div>
+      <div class="field" style="flex-basis:260px"><label for="ftLoc">Localité ou village</label><select id="ftLoc"></select></div>
+      <div class="field" style="flex:0 1 140px"><label for="ftSurf">Surface (ha)</label><input type="number" id="ftSurf" min="0.01" step="0.25" value="1"></div>
+    </div>
+    <div class="row" style="margin-top:12px;align-items:center">
+      <button class="btn primary" id="ftDl">Télécharger la fiche</button>
+      <span class="small muted">La fiche s'adapte au sol, à la pluie de chaque mois, à la saison sèche, aux contraintes et aux ravageurs de la localité.</span>
+    </div>
+  </div>
+  <article class="card fiche" id="ftOut"></article>
+</section>
+
+<!-- RENTABILITÉ -->
+<section class="view" id="v-calc" hidden>
+  <div class="card">
+    <div class="list-head"><h2 style="font-size:17px">Coûts de référence saisis</h2><span class="small muted" id="costCount"></span></div>
+    <div class="progress"><i id="costBar" style="width:0"></i></div>
+    <p class="small muted" style="margin:8px 0 0">Chaque culture enregistrée devient la référence de coûts et peut être exportée.</p>
+  </div>
+  <div class="calc-grid">
+    <div class="card">
+      <div class="row">
+        <div class="field" style="flex-basis:220px"><label for="cCult">Culture</label><select id="cCult"></select></div>
+        <div class="field"><label for="cSurf">Surface (ha)</label><input type="number" id="cSurf" min="0" step="0.1" value="1"></div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <div class="field"><label for="cRend">Rendement attendu (t/ha)</label><input type="number" id="cRend" min="0" step="0.1"></div>
+        <div class="field"><label for="cPrix">Prix bord champ (FCFA/kg)</label><input type="number" id="cPrix" min="0" step="5" placeholder="à saisir"></div>
+      </div>
+      <p class="small muted" id="cRendHint" style="margin:6px 0 0"></p>
+      <div class="notice" id="engBox" style="margin-top:14px"></div>
+      <h3 style="font-size:15px;margin-top:18px">Charges par hectare (FCFA/ha)</h3>
+      <div class="costs" id="costLines"></div>
+      <div class="row" style="margin-top:16px;align-items:center">
+        <button class="btn primary" id="saveCost">Enregistrer comme référence</button>
+        <span class="small muted" id="costMeta"></span>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="font-size:15px">Résultat</h3>
+      <div class="res" id="calcRes" style="margin-top:12px"></div>
+      <p class="small muted" id="calcNote" style="margin:14px 0 0"></p>
+    </div>
+  </div>
+</section>
+
+<!-- FICHES -->
+<section class="view" id="v-fich" hidden>
+  <div class="card">
+    <h2 style="font-size:17px">Fiches de diagnostic enregistrées</h2>
+    <p class="small muted" style="margin:4px 0 0" id="fichHint"></p>
+  </div>
+  <div id="fichList"></div>
+</section>
+
+<!-- DONNÉES -->
+<!-- MON COMPTE -->
+<section class="view" id="v-compte" hidden>
+  <div class="card">
+    <h2 style="font-size:17px">Mon profil</h2>
+    <dl class="kv" id="profilView" style="margin-top:10px"></dl>
+    <div class="row" style="margin-top:14px">
+      <button class="btn" id="profilEdit">Modifier mes informations</button>
+      <button class="btn ghost danger" id="logout">Se déconnecter</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2 style="font-size:17px">Sauvegarde et transfert</h2>
+    <p class="small" style="margin:6px 0 0;max-width:72ch" id="saveHint"></p>
+    <div class="row" style="margin-top:12px">
+      <button class="btn primary" id="bkExport">Exporter mes données (.json)</button>
+      <label class="btn" for="bkFile" style="display:inline-flex;align-items:center">Importer une sauvegarde</label>
+      <input type="file" id="bkFile" accept=".json,application/json" hidden>
+    </div>
+    <p class="small" id="bkMsg" style="margin:8px 0 0"></p>
+  </div>
+  <div class="card">
+    <h2 style="font-size:17px">À propos</h2>
+    <p class="small" style="margin:6px 0 0;max-width:72ch">AgroDiag CI croise les exigences des cultures (FAO Ecocrop), la pluie mois par mois des stations météo et les sols de chaque zone pour conseiller quoi planter, où et quand. Les fiches techniques sont des repères à adapter avec votre conseiller ANADER ou votre structure d'encadrement.</p>
+    <p class="small muted" id="dataVersion" style="margin:8px 0 0"></p>
+  </div>
+  <details class="card" id="adminLogin">
+    <summary style="cursor:pointer;font-weight:600">Accès administrateur</summary>
+    <div class="row" style="margin-top:12px;align-items:flex-end">
+      <div class="field" style="max-width:240px"><label for="admCode">Code administrateur</label><input type="password" id="admCode" autocomplete="off" inputmode="numeric"></div>
+      <div class="field" style="flex:0 0 auto"><button class="btn" id="admGo">Ouvrir l'administration</button></div>
+    </div>
+    <p class="small" id="admMsg" style="margin:8px 0 0"></p>
+  </details>
+</section>
+
+<!-- ADMINISTRATION (données) -->
+<section class="view" id="v-qual" hidden>
+  <div class="card admin-head">
+    <div class="list-head"><h2 style="font-size:17px">Administration des données</h2><button class="btn ghost danger" id="admQuit">Quitter le mode administrateur</button></div>
+    <p class="small" style="margin:6px 0 0;max-width:75ch">Cet espace n'est visible que par l'administrateur. Les modifications s'appliquent d'abord sur cet appareil ; publiez-les pour que tous les utilisateurs les reçoivent à leur prochaine connexion.</p>
+    <div class="q-sum" id="draftState" style="margin-top:10px"></div>
+  </div>
+  <div class="card">
+    <h3 style="font-size:16px">Modifier les données</h3>
+    <div class="row" style="margin-top:10px">
+      <div class="field" style="flex-basis:220px"><label for="edSet">Jeu de données</label>
+        <select id="edSet"><option value="itin">Fiches techniques (itinéraires)</option><option value="cults">Cultures (exigences, rendements)</option><option value="locs">Localités (sols, pluie)</option><option value="risques">Ravageurs et maladies</option></select></div>
+      <div class="field" style="flex-basis:220px"><label for="edSearch">Rechercher</label><input type="search" id="edSearch" placeholder="Nom, région…"></div>
+      <div class="field" style="flex:0 0 auto;justify-content:flex-end"><button class="btn" id="edAdd">Ajouter</button></div>
+    </div>
+    <div class="ed-grid">
+      <ul class="ed-list" id="edList"></ul>
+      <form class="ed-form" id="edForm" novalidate></form>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="font-size:16px">Publier pour tous les utilisateurs</h3>
+    <ol class="small" style="margin:8px 0 10px;padding-left:18px;max-width:75ch">
+      <li>Cliquez sur « Télécharger le fichier à publier » : le fichier <b>agrodiag-data.json</b> est créé.</li>
+      <li>Ouvrez <a href="https://github.com/yaoakafrancois-code/AgroDiagCI/upload/main/docs/data" target="_blank" rel="noopener">la page d'envoi GitHub</a>, glissez-y le fichier sans changer son nom, puis cliquez sur « Commit changes ».</li>
+      <li>Les téléphones et ordinateurs connectés reçoivent les nouvelles données à leur prochaine ouverture de l'application.</li>
+    </ol>
+    <div class="row">
+      <button class="btn primary" id="pubDl">Télécharger le fichier à publier</button>
+      <label class="btn" for="pubImport" style="display:inline-flex;align-items:center">Importer un fichier de données</label>
+      <input type="file" id="pubImport" accept=".json,application/json" hidden>
+      <button class="btn ghost danger" id="draftReset">Annuler mes modifications non publiées</button>
+    </div>
+    <p class="small" id="pubMsg" style="margin:8px 0 0"></p>
+  </div>
+  <div class="card">
+    <h3 style="font-size:16px">Changer le code administrateur</h3>
+    <div class="row" style="margin-top:10px;align-items:flex-end">
+      <div class="field" style="max-width:240px"><label for="admNew">Nouveau code (6 caractères minimum)</label><input type="password" id="admNew" autocomplete="new-password"></div>
+      <div class="field" style="flex:0 0 auto"><button class="btn" id="admSet">Enregistrer le code</button></div>
+    </div>
+    <p class="small muted" style="margin:6px 0 0">Le nouveau code s'applique partout après publication.</p>
+    <p class="small" id="admSetMsg" style="margin:6px 0 0"></p>
+  </div>
+  <div class="card">
+    <h2 style="font-size:17px">État du référentiel</h2>
+    <div class="q-sum" id="qSum" style="margin-top:10px"></div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn" data-exp="loc">Exporter les localités (CSV)</button>
+      <button class="btn" data-exp="score">Exporter les scores (CSV)</button>
+      <button class="btn" data-exp="cout">Exporter les coûts (CSV)</button>
+    </div>
+    <p class="small muted" id="expNote" style="margin:8px 0 0"></p>
+  </div>
+  <div class="card"><h3 style="font-size:16px">Sources des données</h3>
+    <dl class="kv small" style="margin-top:10px;max-width:80ch">
+      <dt>Exigences des cultures</dt><dd>FAO Ecocrop (base officielle de 1 710 espèces, diffusée avec le paquet R Recocrop) : pH, pluie annuelle, drainage et salinité tolérés.</dd>
+      <dt>Pluie mensuelle</dt><dd>Normales 1961-1990 de 11 stations (Odienné, Bouaké, Man, Bondoukou, Abidjan, Yamoussoukro, Gagnoa, Sassandra, Dimbokro, Adiaké, Séguéla), plus Korhogo (total annuel publié, profil mensuel d'Odienné). Chaque localité suit la station de sa zone, ajustée à sa pluie annuelle.</dd>
+      <dt>Climat local</dt><dd>Fichiers NASA POWER (climatologie) ou valeurs de station SODEXAM, importés localité par localité.</dd>
+      <dt>Sols</dt><dd>Fichier Excel d'origine : 12 profils de zone. Votre analyse de laboratoire ou vos villages ajoutés les remplacent.</dd>
+      <dt>Réglementation phyto</dt><dd>Arrêté MINAGRI n°159 du 21/06/2004 ; circulaire n°1743 du 20/11/2015 (arrêté n°030 MINAGRI 2015).</dd>
+    </dl>
+  </div>
+  <div class="card"><h3 style="font-size:16px">Anomalies du fichier d'origine</h3><div id="qList"></div></div>
+  <div class="card"><h3 style="font-size:16px">Régions signalées « non couvertes » dans le fichier</h3>
+    <div class="tbl-wrap" style="margin-top:10px"><table class="t" id="zTbl"></table></div></div>
+  <div class="card"><h3 style="font-size:16px">Comment le score est calculé</h3>
+    <div class="small" style="margin-top:6px;max-width:72ch">
+      <p>Le score sur 100 additionne six facteurs : <b>pH</b> (25 pts), <b>matière organique</b> (10), <b>drainage</b> (10), <b>pluie annuelle</b> (25), <b>calendrier</b> (10) et <b>contraintes du sol</b> (20). Le pH, la pluie, le drainage et la salinité tolérés viennent de FAO Ecocrop.</p>
+      <p>Pour une culture annuelle pluviale, le <b>calendrier</b> cherche le mois de semis qui donne le plus de mois assez arrosés pendant le cycle (100 mm/mois pour une culture exigeante, 75 pour une culture moyenne, 50 pour une culture tolérante à la sécheresse). Pour une pérenne, il compte les mois de moins de 50 mm. Pour une culture irriguée, il indique la période de contre-saison.</p>
+      <p>Un facteur majeur très défavorable (pH ou pluie) plafonne le score à 64, un facteur hors des limites Ecocrop à 44. Une culture d'altitude hors de la zone montagneuse perd 25 points.</p>
+      <p><b>75 et plus</b> : favorable · <b>60 à 74</b> : faisable sous conditions · <b>45 à 59</b> : risqué · <b>moins de 45</b> : déconseillé.</p>
+      <p>L'indicateur de fiabilité dit d'où viennent les données : <b>élevée</b> quand le sol est analysé et le climat local (station ou NASA POWER), <b>moyenne</b> quand l'un des deux l'est, <b>indicative</b> quand tout vient de moyennes de zone.</p>
+    </div>
+  </div>
+</section>
+</main>
+<div class="toast" id="toast" hidden></div>

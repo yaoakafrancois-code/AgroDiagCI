@@ -34,6 +34,7 @@ import java.io.OutputStream;
 public class MainActivity extends Activity {
 
     private static final String HOST = "appassets.androidplatform.net";
+    private static final String DATA_HOST = "yaoakafrancois-code.github.io";
     private static final String START_URL = "https://" + HOST + "/assets/index.html";
     private static final int REQ_FILE_CHOOSER = 1;
     private static final int REQ_CREATE_FILE = 2;
@@ -74,7 +75,9 @@ public class MainActivity extends Activity {
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                 Uri url = request.getUrl();
                 if (HOST.equals(url.getHost())) return assetLoader.shouldInterceptRequest(url);
-                // Hors connexion : aucune ressource externe n'est chargée dans l'app
+                // Seule exception : le fichier de données publié par l'administrateur (mise à jour des données)
+                if (DATA_HOST.equals(url.getHost()) && url.getPath() != null && url.getPath().startsWith("/AgroDiagCI/data/")) return null;
+                // Aucune autre ressource externe n'est chargée dans l'app
                 return new WebResourceResponse("text/plain", "utf-8", null);
             }
 
