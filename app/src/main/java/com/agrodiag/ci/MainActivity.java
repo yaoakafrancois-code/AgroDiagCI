@@ -136,8 +136,8 @@ public class MainActivity extends Activity {
 
         webView.addJavascriptInterface(new Bridge(), "AgroDiagAndroid");
 
-        if (savedInstanceState != null) webView.restoreState(savedInstanceState);
-        else webView.loadUrl(START_URL);
+        // Toujours recharger la page : les données sont dans le stockage local, rien n'est perdu
+        webView.loadUrl(START_URL);
     }
 
     /** Pont appelé par la page pour enregistrer un export (CSV, sauvegarde JSON). */
@@ -252,14 +252,11 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        webView.saveState(outState);
-    }
-
-    @Override
     protected void onDestroy() {
-        if (webView != null) webView.destroy();
+        if (webView != null) {
+            if (webView.getParent() instanceof android.view.ViewGroup) ((android.view.ViewGroup) webView.getParent()).removeView(webView);
+            webView.destroy();
+        }
         super.onDestroy();
     }
 }
