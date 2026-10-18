@@ -25,6 +25,7 @@
       <button role="tab" id="tab-diag" aria-selected="true" data-v="diag">Que planter ici ?</button>
       <button role="tab" id="tab-cult" aria-selected="false" data-v="cult">Où planter ?</button>
       <button role="tab" id="tab-tech" aria-selected="false" data-v="tech">Fiches techniques</button>
+      <button role="tab" id="tab-parc" aria-selected="false" data-v="parc">Parcelles</button>
       <button role="tab" id="tab-calc" aria-selected="false" data-v="calc">Rentabilité</button>
       <button role="tab" id="tab-fich" aria-selected="false" data-v="fich">Fiches terrain<span class="badge" id="nbFiches">0</span></button>
       <button role="tab" id="tab-compte" aria-selected="false" data-v="compte">Mon compte</button>
@@ -99,13 +100,54 @@
       <div class="field" style="flex-basis:220px"><label for="ftCult">Culture</label><select id="ftCult"></select></div>
       <div class="field" style="flex-basis:260px"><label for="ftLoc">Localité ou village</label><select id="ftLoc"></select></div>
       <div class="field" style="flex:0 1 140px"><label for="ftSurf">Surface (ha)</label><input type="number" id="ftSurf" min="0.01" step="0.25" value="1"></div>
+      <div class="field" style="flex-basis:220px"><label for="ftParc">Parcelle délimitée (facultatif)</label><select id="ftParc"><option value="">— aucune —</option></select></div>
     </div>
     <div class="row" style="margin-top:12px;align-items:center">
-      <button class="btn primary" id="ftDl">Télécharger la fiche</button>
+      <button class="btn primary" id="ftPrint">Imprimer / PDF</button>
+      <button class="btn" id="ftDl">Télécharger la fiche</button>
       <span class="small muted">La fiche s'adapte au sol, à la pluie de chaque mois, à la saison sèche, aux contraintes et aux ravageurs de la localité.</span>
     </div>
   </div>
   <article class="card fiche" id="ftOut"></article>
+</section>
+
+<!-- PARCELLES -->
+<section class="view" id="v-parc" hidden>
+  <div class="card">
+    <h2 style="font-size:17px">Délimiter une parcelle</h2>
+    <p class="small muted" style="margin:4px 0 0;max-width:75ch">Activez la localisation du téléphone et placez-vous à un angle de la parcelle. Soit vous faites le tour en marchant (points enregistrés automatiquement), soit vous ajoutez un point à chaque angle. La surface se calcule au fur et à mesure.</p>
+    <div class="row" style="margin-top:12px">
+      <div class="field"><label for="pcNom">Nom de la parcelle</label><input type="text" id="pcNom" maxlength="80" placeholder="ex. Parcelle cacao Kouassi 1"></div>
+      <div class="field"><label for="pcProd">Producteur / OP</label><input type="text" id="pcProd" maxlength="120"></div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <div class="field" style="flex-basis:240px"><label for="pcLoc">Localité</label><select id="pcLoc"></select></div>
+      <div class="field" style="flex-basis:200px"><label for="pcCult">Culture prévue</label><select id="pcCult"></select></div>
+    </div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn primary" id="pcWalk">Commencer le tour en marchant</button>
+      <button class="btn" id="pcPoint">Ajouter ma position actuelle</button>
+      <button class="btn ghost" id="pcUndo">Annuler le dernier point</button>
+      <button class="btn ghost danger" id="pcClear">Tout effacer</button>
+    </div>
+    <p class="small" id="pcGps" style="margin:8px 0 0"></p>
+    <details class="override">
+      <summary style="cursor:pointer;font-weight:600">Saisir des coordonnées à la main (GPS de terrain)</summary>
+      <div class="row" style="margin-top:10px;align-items:flex-end">
+        <div class="field"><label for="pcLat">Latitude (ex. 5.9312)</label><input type="text" id="pcLat" inputmode="decimal"></div>
+        <div class="field"><label for="pcLon">Longitude (ex. -4.8215)</label><input type="text" id="pcLon" inputmode="decimal"></div>
+        <div class="field" style="flex:0 0 auto"><button class="btn" id="pcAddManual">Ajouter le point</button></div>
+      </div>
+      <p class="small muted" style="margin:6px 0 0">Degrés décimaux (WGS84). En Côte d'Ivoire, la longitude est négative (ouest).</p>
+    </details>
+    <div class="pc-stats" id="pcStats"></div>
+    <div id="pcPlan" class="pc-plan"></div>
+    <div class="row" style="margin-top:12px;align-items:center">
+      <button class="btn primary" id="pcSave">Enregistrer la parcelle</button>
+      <span class="small" id="pcMsg"></span>
+    </div>
+  </div>
+  <div class="card"><h2 style="font-size:17px">Mes parcelles</h2><div id="pcList" style="margin-top:8px"></div></div>
 </section>
 
 <!-- RENTABILITÉ -->

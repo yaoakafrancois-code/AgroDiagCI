@@ -183,3 +183,14 @@ table.cal td.c-sec{background:var(--risk-bg)}
 .ed-form .quad{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
 .ed-form .chkrow{display:flex;flex-wrap:wrap;gap:14px}
 .login-card .field{flex:none}
+
+/* ---- Parcelles ---- */
+.pc-stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.pc-plan{margin-top:10px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.pc-plan svg{display:block;width:100%;height:auto}
+.pc-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.pc-item:last-child{border-bottom:0}
+.pc-item .row{gap:6px}
+table.coords{border-collapse:collapse;font-size:12.5px;margin-top:8px}
+table.coords td,table.coords th{border:1px solid #D3DACF;padding:3px 8px;text-align:right;font-family:"JetBrains Mono",ui-monospace,monospace}
+table.coords th{background:#E8ECE5;font-family:inherit}

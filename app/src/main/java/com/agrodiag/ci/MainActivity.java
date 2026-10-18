@@ -3,7 +3,12 @@ package com.agrodiag.ci;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.print.PrintAttributes;
+import android.print.PrintManager;
+import android.webkit.GeolocationPermissions;
 import android.graphics.Insets;
 import android.net.Uri;
 import android.os.Build;
@@ -38,6 +43,10 @@ public class MainActivity extends Activity {
     private static final String START_URL = "https://" + HOST + "/assets/index.html";
     private static final int REQ_FILE_CHOOSER = 1;
     private static final int REQ_CREATE_FILE = 2;
+    private static final int REQ_LOCATION = 3;
+    private String geoOrigin;
+    private GeolocationPermissions.Callback geoCallback;
+    private WebView printView;
 
     private WebView webView;
     private ValueCallback<Uri[]> filePathCallback;
@@ -64,6 +73,7 @@ public class MainActivity extends Activity {
         s.setAllowContentAccess(false);
         s.setSupportMultipleWindows(false);
         s.setTextZoom(100);
+        s.setGeolocationEnabled(true);   // délimitation des parcelles au GPS
 
         final WebViewAssetLoader assetLoader = new WebViewAssetLoader.Builder()
                 .setDomain(HOST)
@@ -96,6 +106,17 @@ public class MainActivity extends Activity {
         });
 
         webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
+                if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    callback.invoke(origin, true, false);
+                } else {
+                    geoOrigin = origin;
+                    geoCallback = callback;
+                    requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQ_LOCATION);
+                }
+            }
+
             @Override
             public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback, FileChooserParams params) {
                 if (filePathCallback != null) filePathCallback.onReceiveValue(null);
@@ -143,6 +164,23 @@ public class MainActivity extends Activity {
             });
         }
 
+        /** Impression ou enregistrement en PDF d'une fiche (HTML complet). */
+        @JavascriptInterface
+        public void printHtml(final String html, final String jobName) {
+            runOnUiThread(() -> {
+                printView = new WebView(MainActivity.this);
+                printView.setWebViewClient(new WebViewClient() {
+                    @Override
+                    public void onPageFinished(WebView view, String url) {
+                        PrintManager pm = (PrintManager) getSystemService(PRINT_SERVICE);
+                        String name = (jobName == null || jobName.isEmpty()) ? "AgroDiag CI" : jobName;
+                        pm.print(name, view.createPrintDocumentAdapter(name), new PrintAttributes.Builder().build());
+                    }
+                });
+                printView.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
+            });
+        }
+
         @JavascriptInterface
         public String platform() {
             return "android";
@@ -182,6 +220,18 @@ public class MainActivity extends Activity {
             } finally {
                 pendingBytes = null;
             }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQ_LOCATION && geoCallback != null) {
+            boolean ok = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+            if (!ok && grantResults.length > 1) ok = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+            geoCallback.invoke(geoOrigin, ok, false);
+            geoCallback = null;
+            geoOrigin = null;
         }
     }
 

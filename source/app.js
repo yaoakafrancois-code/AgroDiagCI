@@ -45,13 +45,14 @@ function DbStore(db){ return {
   add:async(c,data)=>(await db.collection(c).add(data)).id,
   del:(c,id)=>db.collection(c).doc(String(id)).delete()
 }; }
-const COLS = ['fiches','couts','climat','localites'];
+const COLS = ['fiches','couts','climat','localites','parcelles'];
 function bindStore(store){
   S.store = store;
   store.subscribe('fiches', o=>{ S.fiches=o; renderFiches(); });
   store.subscribe('couts', o=>{ S.costs=o; renderCostCount(); refreshCostMeta(); });
   store.subscribe('climat', o=>{ S.climat=o; if(S.loc){ renderLoc(); } });
   store.subscribe('localites', o=>{ S.perso=o; refreshLocs(); });
+  store.subscribe('parcelles', o=>{ S.parcelles=o; if (typeof renderParcelles==='function') renderParcelles(); });
 }
 function storeErr(e){ return e?.code==='not_granted' ? "Vous n'avez pas le droit d'enregistrer ici" : e?.code==='storage' ? e.message : 'Enregistrement impossible, réessayez'; }
 const IS_ANDROID = !!window.AgroDiagAndroid;
@@ -234,6 +235,7 @@ function show(v){
   pref.set('agrodiag.tab', v);
   if (v==='cult') renderCult();
   if (v==='tech') renderTech();
+  if (v==='parc') renderParcelles();
   if (v==='compte') renderCompte();
   if (v==='qual') renderAdmin();
   window.scrollTo(0,0);
@@ -665,7 +667,7 @@ document.querySelectorAll('[data-exp]').forEach(b=>b.onclick=async()=>{
   $('#expNote').textContent = r==='ok' ? `${name} : ${rows.length-1} lignes.` : r==='declined' ? 'Téléchargement annulé.' : 'Téléchargement impossible.';
 });
 $('#bkExport').onclick=async()=>{
-  const data={ app:'AgroDiag CI', version:3, date:new Date().toISOString(), fiches:S.fiches, couts:S.costs, climat:S.climat, localites:S.perso };
+  const data={ app:'AgroDiag CI', version:3, date:new Date().toISOString(), fiches:S.fiches, couts:S.costs, climat:S.climat, localites:S.perso, parcelles:S.parcelles||{} };
   const n=COLS.reduce((s,c)=>s+Object.keys(data[c]||{}).length,0);
   const r=await saveFile(`agrodiag_sauvegarde_${new Date().toISOString().slice(0,10)}.json`, JSON.stringify(data,null,1), 'application/json');
   $('#bkMsg').textContent = r==='ok' ? `Sauvegarde exportée : ${n} enregistrements.` : r==='declined' ? 'Export annulé.' : 'Export impossible.';
@@ -681,7 +683,7 @@ $('#bkFile').onchange=async e=>{
     for (const c of COLS){
       for (const [id,doc] of Object.entries(data[c]||{})){
         if (!doc || typeof doc!=='object'){ skip++; continue; }
-        const cur=({fiches:S.fiches,couts:S.costs,climat:S.climat,localites:S.perso})[c][id];
+        const cur=({fiches:S.fiches,couts:S.costs,climat:S.climat,localites:S.perso,parcelles:S.parcelles||{}})[c][id];
         const newer=!cur || String(doc.maj||doc.date||'')>String(cur.maj||cur.date||'');
         if (!newer){ skip++; continue; }
         await S.store.set(c, id, doc); n++;
@@ -703,7 +705,7 @@ $('#selCult').value = phyCults.includes(pref.get('agrodiag.cult')) ? pref.get('a
 $('#cCult').value='Cacao'; loadCalc();
 renderSaveHint(); renderFiches();
 if (IS_ANDROID){ $('#modeBadge').textContent='Application · données sur ce téléphone'; }
-initTech(); initAdmin(); initLogin();
+initTech(); initParcelles(); initAdmin(); initLogin();
 const savedTab=pref.get('agrodiag.tab'); show(savedTab && $('#v-'+savedTab) ? savedTab : 'diag');
 checkRemoteData();
 

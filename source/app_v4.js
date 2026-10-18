@@ -72,13 +72,15 @@ async function checkRemoteData(){
 }
 
 /* ================= Fiches techniques adaptées à la zone ================= */
-const TECH = { loc:null, crop:null };
+const TECH = { loc:null, crop:null, parc:'' };
 const TECH_CULTS = ACTIVE.filter(c=>!c.horsModele);
 function initTech(){
   $('#ftCult').innerHTML=TECH_CULTS.map(c=>`<option>${esc(c.nom)}</option>`).join('');
   const regs={}; allLocs().forEach(l=>(regs[l.reg]=regs[l.reg]||[]).push(l));
   $('#ftLoc').innerHTML=Object.keys(regs).sort((a,b)=>a.localeCompare(b,'fr')).map(r=>`<optgroup label="${esc(r)}">${regs[r].sort((a,b)=>a.nom.localeCompare(b.nom,'fr')).map(l=>`<option value="${esc(l.id)}">${esc(l.nom)}${l.perso?' (mon village)':''}</option>`).join('')}</optgroup>`).join('');
   ['#ftCult','#ftLoc','#ftSurf'].forEach(s=>$(s).addEventListener('change',()=>{ TECH.crop=$('#ftCult').value; TECH.loc=$('#ftLoc').value; renderTech(); }));
+  $('#ftParc').addEventListener('change',()=>{ TECH.parc=$('#ftParc').value; const p=S.parcelles[TECH.parc]; if (p){ if (p.localiteId && findLoc(p.localiteId)) TECH.loc=p.localiteId; if (CULT[p.culture]) TECH.crop=p.culture; } renderTech(); });
+  $('#ftPrint').onclick=printTech;
   $('#ftSurf').addEventListener('input',()=>renderTech());
   $('#ftDl').onclick=downloadTech;
 }
@@ -195,7 +197,7 @@ function ficheTech(loc, c, surf){
     rend = s>=75 ? `${fmt(c.rmoy,1)} à ${fmt((c.rmoy+c.rmax)/2,1)} t/ha avec un bon itinéraire (max ${fmt(c.rmax,1)} t/ha)` : s>=60 ? `environ ${fmt(c.rmoy,1)} t/ha si les corrections du sol sont faites` : s>=45 ? `${fmt(c.rmoy*0.5,1)} à ${fmt(c.rmoy*0.8,1)} t/ha : zone à risque pour cette culture` : `rendement faible et incertain : culture déconseillée dans cette zone`;
     rend += ` · soit pour ${fmt(surf,2)} ha : ${s>=45?fmt(c.rmoy*surf*(s>=75?1:s>=60?0.9:0.65),1)+' t':'—'}`;
   }
-  return { loc, c, it, e, d, K, cal, zoneVar, prep, fert, eau, rs, aleas, rend, surf };
+  return { loc, c, it, e, d, K, cal, zoneVar, prep, fert, eau, rs, aleas, rend, surf, parcel: TECH.parc ? S.parcelles[TECH.parc] : null };
 }
 
 function calTable(rows){
@@ -217,6 +219,7 @@ function ficheHTML(F, forFile){
   ${forFile?`<p><b>Localité :</b> ${esc(loc.nom)} (${esc(loc.reg)}) · <b>Surface :</b> ${fmt(surf,2)} ha</p>`:''}
   <div class="big"><span class="n">${e.score??'—'}</span><span class="muted">/ 100</span><span class="pill ${d.cls}">${d.lab}</span><span class="pill ${reliability(loc).cls}">${reliability(loc).lab}</span></div>
   <p class="small muted" style="margin:4px 0 0">Zone : ${esc(loc.zone)} · Sol : ${esc(loc.sol)}, pH ${fmt(loc.ph,1)}, MO ${fmt(loc.mo,1)} %, drainage ${esc((loc.drain||'').toLowerCase())} · Pluie : ${fmt(K.pluie)} mm/an, ${K.secs} mois sous 50 mm${loc.contr?` · Contraintes : ${esc(loc.contr)}`:''}.</p>
+  ${F.parcel ? parcelSection(F.parcel) : ''}
   ${d.lab==='Déconseillé'?`<div class="notice warn" style="margin-top:10px">Cette culture est déconseillée dans cette zone. Consultez l'onglet « Où planter ? » pour trouver une zone plus favorable.</div>`:''}
 
   <h3>1. Calendrier cultural pour ${esc(loc.nom)}</h3>
@@ -265,15 +268,23 @@ function renderTech(){
   if (!TECH_CULTS.find(c=>c.nom===TECH.crop)) TECH.crop=TECH_CULTS[0].nom;
   const loc = findLoc(TECH.loc) || D.locs[0];
   $('#ftCult').value=TECH.crop; $('#ftLoc').value=String(loc.id);
+  const P = TECH.parc ? S.parcelles[TECH.parc] : null;
+  if (TECH.parc && !P) TECH.parc='';
+  $('#ftParc').value = TECH.parc || '';
+  if (P) $('#ftSurf').value = Math.max(0.01, +(P.surfaceM2/10000).toFixed(2));
   const surf = Math.max(0.01, parseFloat($('#ftSurf').value)||1);
   const F = ficheTech(loc, CULT[TECH.crop], surf);
   $('#ftOut').innerHTML = ficheHTML(F, false);
 }
-async function downloadTech(){
+function techFileHTML(){
   const loc = findLoc(TECH.loc) || D.locs[0], c=CULT[TECH.crop], surf=Math.max(0.01, parseFloat($('#ftSurf').value)||1);
   const F = ficheTech(loc, c, surf);
-  const css = `body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:#18231C;max-width:860px;margin:0 auto;padding:20px}h2{font-size:24px;margin:0 0 6px;color:#1D6A4A}h3{font-size:17px;margin:22px 0 8px;padding-top:12px;border-top:1px solid #D3DACF}ul{padding-left:20px}li{margin:4px 0}.muted{color:#5B6A60}.small{font-size:13px}.big{display:flex;gap:10px;align-items:center;margin:10px 0}.big .n{font-size:34px;font-weight:700}.pill{border-radius:99px;padding:2px 10px;font-size:12px;font-weight:600;background:#E8ECE5}.p-fav{background:#DDF1E5;color:#1E7B4C}.p-cond{background:#FBEBC9;color:#9A6400}.p-risk{background:#FADFCF;color:#B4501A}.p-bad{background:#F8DADE;color:#B42335}.zone-note{border-left:3px solid #1D6A4A;background:#DCEDE3;padding:8px 12px;margin-top:8px;border-radius:0 8px 8px 0}.notice{background:#FBEBC9;padding:8px 12px;border-radius:8px}table.cal{border-collapse:separate;border-spacing:2px;width:100%;font-size:12px}table.cal td{height:22px;border-radius:4px;background:#E8ECE5}table.cal td.rl{background:none;font-weight:600;white-space:nowrap;padding-right:8px}.c-pep{background:#B9D7C7!important}.c-prep{background:#E6D3B3!important}.c-sem{background:#1D6A4A!important}.c-ent{background:#DDF1E5!important}.c-rec{background:#9A6400!important}.c-sec{background:#FADFCF!important}.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:#5B6A60}.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px}:root{--accent:#1D6A4A;--good-bg:#DDF1E5;--warn:#9A6400;--risk-bg:#FADFCF;--risk:#B4501A;--bad:#B42335}`;
-  const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fiche technique ${esc(c.nom)} – ${esc(loc.nom)}</title><style>${css}</style></head><body><p class="small muted">AgroDiag CI · Outil de décision agricole</p>${ficheHTML(F, true)}</body></html>`;
+  const css = `body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:#18231C;max-width:860px;margin:0 auto;padding:20px}h2{font-size:24px;margin:0 0 6px;color:#1D6A4A}h3{font-size:17px;margin:22px 0 8px;padding-top:12px;border-top:1px solid #D3DACF}ul{padding-left:20px}li{margin:4px 0}.muted{color:#5B6A60}.small{font-size:13px}.big{display:flex;gap:10px;align-items:center;margin:10px 0}.big .n{font-size:34px;font-weight:700}.pill{border-radius:99px;padding:2px 10px;font-size:12px;font-weight:600;background:#E8ECE5}.p-fav{background:#DDF1E5;color:#1E7B4C}.p-cond{background:#FBEBC9;color:#9A6400}.p-risk{background:#FADFCF;color:#B4501A}.p-bad{background:#F8DADE;color:#B42335}.zone-note{border-left:3px solid #1D6A4A;background:#DCEDE3;padding:8px 12px;margin-top:8px;border-radius:0 8px 8px 0}.notice{background:#FBEBC9;padding:8px 12px;border-radius:8px}table.coords{border-collapse:collapse;font-size:12px;margin-top:6px}table.coords td,table.coords th{border:1px solid #D3DACF;padding:3px 8px;text-align:right}table.coords th{background:#E8ECE5}svg{max-width:100%;height:auto}@media print{body{padding:0}h3{break-after:avoid}.pc-plan,table{break-inside:avoid}}table.cal{border-collapse:separate;border-spacing:2px;width:100%;font-size:12px}table.cal td{height:22px;border-radius:4px;background:#E8ECE5}table.cal td.rl{background:none;font-weight:600;white-space:nowrap;padding-right:8px}.c-pep{background:#B9D7C7!important}.c-prep{background:#E6D3B3!important}.c-sem{background:#1D6A4A!important}.c-ent{background:#DDF1E5!important}.c-rec{background:#9A6400!important}.c-sec{background:#FADFCF!important}.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:#5B6A60}.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px}:root{--accent:#1D6A4A;--good-bg:#DDF1E5;--warn:#9A6400;--risk-bg:#FADFCF;--risk:#B4501A;--bad:#B42335}`;
+  return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fiche technique ${esc(c.nom)} – ${esc(loc.nom)}</title><style>${css}</style></head><body><p class="small muted">AgroDiag CI · Outil de décision agricole</p>${ficheHTML(F, true)}</body></html>`;
+}
+async function downloadTech(){
+  const loc = findLoc(TECH.loc) || D.locs[0], c=CULT[TECH.crop];
+  const html = techFileHTML();
   const name = `Fiche_${slug(c.nom)}_${slug(loc.nom)}.html`;
   const r = await saveFile(name, html, 'text/html');
   toast(r==='ok' ? `Fiche enregistrée : ${name}` : r==='declined' ? 'Enregistrement annulé' : 'Enregistrement impossible');

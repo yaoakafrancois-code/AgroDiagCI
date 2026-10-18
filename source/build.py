@@ -20,7 +20,7 @@ if missing:
 css = open(os.path.join(SRC, 'base.css')).read()
 body = open(os.path.join(SRC, 'body.html')).read()
 app = open(os.path.join(SRC, 'app.js')).read()
-mod = open(os.path.join(SRC, 'app_v4.js')).read()
+mod = open(os.path.join(SRC, 'app_v4.js')).read() + '\n' + open(os.path.join(SRC, 'app_parcel.js')).read()
 marker = '/* ================= Démarrage ================= */'
 assert marker in app
 app = app.replace(marker, mod + '\n' + marker, 1)
