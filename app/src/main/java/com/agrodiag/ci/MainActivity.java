@@ -40,6 +40,8 @@ public class MainActivity extends Activity {
 
     private static final String HOST = "appassets.androidplatform.net";
     private static final String DATA_HOST = "yaoakafrancois-code.github.io";
+    /** Base de l'éditeur : reçoit uniquement l'inscription acceptée par l'utilisateur (nom, contact, profil). */
+    private static final String INSCRIPTION_HOST = "uxgwwwdtvrocuqnxuzzn.supabase.co";
     private static final String START_URL = "https://" + HOST + "/assets/index.html";
     private static final int REQ_FILE_CHOOSER = 1;
     private static final int REQ_CREATE_FILE = 2;
@@ -87,6 +89,9 @@ public class MainActivity extends Activity {
                 if (HOST.equals(url.getHost())) return assetLoader.shouldInterceptRequest(url);
                 // Seule exception : le fichier de données publié par l'administrateur (mise à jour des données)
                 if (DATA_HOST.equals(url.getHost()) && url.getPath() != null && url.getPath().startsWith("/AgroDiagCI/data/")) return null;
+                // Inscription (avec accord de l'utilisateur) : seuls les points d'accès inscrits / rpc sont autorisés
+                if (INSCRIPTION_HOST.equals(url.getHost()) && url.getPath() != null
+                        && (url.getPath().equals("/rest/v1/inscrits") || url.getPath().startsWith("/rest/v1/rpc/"))) return null;
                 // Aucune autre ressource externe n'est chargée dans l'app
                 return new WebResourceResponse("text/plain", "utf-8", null);
             }
