@@ -15,7 +15,8 @@
 .pm-res summary::-webkit-details-marker{display:none}
 .pm-name{font-weight:700;font-size:16px;font-family:var(--font-display);flex:1 1 200px}
 .pm-sub{margin-top:10px;font-size:14px}
-.pm-sub ul{margin:4px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px}
+.pm-sub ul,.pm-sub ol{margin:4px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:3px}
+.pm-plan{background:var(--accent-soft);border-radius:8px;padding:10px 12px}
 </style></head><body><div class="shell-bar"><a class="shell-back" href="../index.html" aria-label="Retour à l'accueil">&#8592; Accueil · AKA AgroDiag CI</a></div><title>AgroDiag CI</title>
 <style>
 /* Layout : barre d'onglets fixe en haut, une colonne sur téléphone, liste + fiche côte à côte sur grand écran */
@@ -526,12 +527,13 @@ table.coords th{background:#E8ECE5;font-family:inherit}
 <section class="view" id="v-sante" hidden>
   <div class="card">
     <h2 style="font-size:17px">Plante malade ? Trouver la cause</h2>
-    <p class="small muted" style="margin:4px 0 12px">Choisissez la culture, puis cochez tout ce que vous voyez au champ. L'application propose les maladies et ravageurs les plus probables et ce qu'il faut faire.</p>
+    <p class="small muted" style="margin:4px 0 12px">37 cultures de Côte d'Ivoire. Choisissez la culture, puis cochez tout ce que vous voyez au champ : l'application propose les maladies et ravageurs les plus probables, ce qu'il faut faire et, pour les cultures de rente, un plan d'action.</p>
     <div class="row">
       <div class="field" style="flex-basis:220px"><label for="pmCrop">Culture</label><select id="pmCrop"></select></div>
       <div class="field" style="flex-basis:200px"><label for="pmProd">Producteur (facultatif)</label><input type="text" id="pmProd" maxlength="80"></div>
       <div class="field" style="flex-basis:200px"><label for="pmLieu">Lieu ou parcelle (facultatif)</label><input type="text" id="pmLieu" maxlength="80"></div>
     </div>
+    <p id="pmInfo" style="margin:10px 0 0;display:flex;flex-wrap:wrap;gap:6px;align-items:center"></p>
     <div class="pm-groups" id="pmSigns"></div>
     <div class="row" style="margin-top:14px;align-items:center">
       <button class="btn" id="pmReset" type="button">Tout décocher</button>

@@ -8,7 +8,7 @@
   var URL_API = 'https://uxgwwwdtvrocuqnxuzzn.supabase.co';
   var CLE = 'sb_publishable_J47WwSHCMHxPtIzne5ShhA_HApNZf2t';
   var K_PROFIL = 'agrodiag.profil', K_ID = 'agrodiag.inscrit_id', K_SYNC = 'agrodiag.inscrit_sync', K_VU = 'agrodiag.inscrit_vu';
-  var APPAREIL = 'Android · AKA AgroDiag CI 1.4';
+  var APPAREIL = 'Android · AKA AgroDiag CI 1.5';
   var TEXTE = "J'accepte que mes nom, prénoms, contact et profil soient transmis à l'éditeur de l'application (YAO Aka François) pour suivre son utilisation et me contacter à son sujet. Ils ne sont ni vendus ni partagés.";
 
   function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
