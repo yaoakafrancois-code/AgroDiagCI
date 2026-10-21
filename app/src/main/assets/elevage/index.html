@@ -2,7 +2,29 @@
 .shell-bar{position:relative;z-index:1000;background:#17694A;padding:6px 12px}
 .shell-back{display:inline-flex;align-items:center;gap:6px;min-height:36px;font:600 15px system-ui,sans-serif;text-decoration:none;color:#fff}
 @media print{.shell-bar{display:none}}
-</style></head><body><div class="shell-bar"><a class="shell-back" href="../index.html" aria-label="Retour à l'accueil">&#8592; Accueil · AKA AgroDiag CI</a></div>
+</style><style id="se-login-css">
+.se-login{position:fixed;inset:0;z-index:900;background:var(--bg);overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:72px 16px 24px}
+.se-login-card{width:100%;max-width:440px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:12px}
+.se-login-card h1{font-size:1.8rem;margin:0}
+.se-login-card p{margin:0}
+.se-login-eyebrow{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);font-weight:700}
+.se-login-muted{color:var(--muted)}
+.se-login-err{color:var(--crit);font-size:.9rem}
+.se-who{float:right;color:#fff;font:600 13px system-ui,sans-serif;opacity:.9;margin-top:9px}
+</style></head><body><div class="shell-bar"><a class="shell-back" href="../index.html" aria-label="Retour à l'accueil">&#8592; Accueil · AKA AgroDiag CI</a></div><div id="se-login" class="se-login" hidden>
+  <form class="se-login-card" id="seLoginForm" novalidate>
+    <p class="se-login-eyebrow">AKA AgroDiag CI · Élevage</p>
+    <h1>Santé Élevage CI</h1>
+    <p class="se-login-muted">Identifiez-vous pour commencer : aucun mot de passe n'est demandé. Cette identification vaut aussi pour le module Cultures.</p>
+    <label for="seNom">Nom<input type="text" id="seNom" autocomplete="family-name" maxlength="60" required></label>
+    <label for="sePrenoms">Prénoms<input type="text" id="sePrenoms" autocomplete="given-name" maxlength="80" required></label>
+    <label for="seContact">Contact (téléphone ou e-mail)<input type="text" id="seContact" autocomplete="tel" maxlength="80" required placeholder="ex. 07 00 00 00 00"></label>
+    <label for="seProfil">Vous êtes<select id="seProfil"><option value="">— facultatif —</option><option>Éleveur / éleveuse</option><option>Producteur / productrice</option><option>Technicien d'élevage</option><option>Vétérinaire</option><option>Conseiller agricole</option><option>Coopérative / OP</option><option>Technicien de projet</option><option>Étudiant / chercheur</option><option>Autre</option></select></label>
+    <p class="se-login-err" id="seMsg"></p>
+    <button class="b" type="submit">Se connecter</button>
+    <p class="se-login-muted" style="font-size:.85rem">Vos informations restent sur cet appareil.</p>
+  </form>
+</div>
 <title>Santé Élevage CI</title>
 <link rel="stylesheet" href="../assets/fonts.css">
 <style>
@@ -441,7 +463,7 @@ Marge par animal     = prix de vente − coût de production</pre>
       <div class="panel">
         <h3>Sauvegarde et partage des données</h3>
         <p class="note">Exportez les prix de référence pour les charger dans une autre copie de l'application (version fichier hors ligne, autre téléphone).</p>
-        <div class="btns"><button class="b ghost" id="maj-export">Exporter les données</button><label class="b ghost" for="maj-import" style="display:inline-block;cursor:pointer">Importer un fichier<input id="maj-import" type="file" accept=".json,application/json" hidden></label></div>
+        <div class="btns"><button class="b ghost" id="maj-export">Exporter les données</button><label class="b ghost" for="maj-import" data-admin-only style="display:inline-block;cursor:pointer">Importer un fichier<input id="maj-import" type="file" accept=".json,application/json" hidden></label></div>
         <p class="note" id="maj-io-msg"></p>
       </div>
     </div>
@@ -3277,7 +3299,7 @@ const RL_PROD = [
 ];
 
 let REFV = {...REF_DEF, ...load('se-ref',{})};
-let SH = {mode:'local', db:null, user:null, canEdit:true, me:null, hist:[], releves:load('se-releves',[]), buyers:null};
+let SH = {mode:'local', db:null, user:null, canEdit:(function(){try{return localStorage.getItem('agrodiag.admin')==='1'}catch(e){return false}})(), me:null, hist:[], releves:load('se-releves',[]), buyers:null};
 
 function applyRef(){
   REF.forEach(r=>{ const v = REFV[r.id] && REFV[r.id].v; if(!Number.isFinite(v)) return; r.t.forEach(([tt,k])=>{ ECO[tt].d[k]=v; }); });
@@ -3722,4 +3744,24 @@ $('al-prod').addEventListener('change', ()=>{ alSetDefaults(); croissance(); });
 dgSignsUI(); drawMap(); renderFarms(); analyse(); dgAnalyse(); dgHistory(); shInit(); evPresets(); evHypUI(); devis(); mkInit(); marche(); cbRender(); renderReleves(); prophylaxie(); alInit(); croissance(); catRender(); sampleInit(); densite(); ponte(); incubation(); gestation(); ratio(); consang();
 </script>
 
-</body></html>
+<script>
+(function(){
+  var K='agrodiag.profil';
+  function get(){ try{ return JSON.parse(localStorage.getItem(K)||'null'); }catch(e){ return null; } }
+  var box=document.getElementById('se-login'), f=document.getElementById('seLoginForm'), msg=document.getElementById('seMsg');
+  function who(p){ var bar=document.querySelector('.shell-bar'); if(!bar||!p) return; var s=bar.querySelector('.se-who'); if(!s){ s=document.createElement('span'); s.className='se-who'; bar.insertBefore(s, bar.firstChild); } s.textContent=(p.prenoms||'').split(' ')[0]+' '+(p.nom||'').charAt(0)+'.'; }
+  function apply(){ var p=get(), ok=!!(p&&p.nom&&p.contact); box.hidden=ok; document.body.style.overflow=ok?'':'hidden'; if(ok) who(p); else setTimeout(function(){ var n=document.getElementById('seNom'); if(n) n.focus(); },50); }
+  f.addEventListener('submit', function(e){
+    e.preventDefault();
+    var nom=document.getElementById('seNom').value.trim(), prenoms=document.getElementById('sePrenoms').value.trim(), contact=document.getElementById('seContact').value.trim();
+    if(!nom||!prenoms){ msg.textContent='Indiquez votre nom et vos prénoms.'; return; }
+    var digits=contact.replace(/\D/g,'');
+    if(!(digits.length>=8 || /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(contact))){ msg.textContent='Indiquez un numéro de téléphone (8 chiffres au moins) ou une adresse e-mail valide.'; return; }
+    var old=get(), now=new Date().toISOString();
+    var p={ nom:nom, prenoms:prenoms, contact:contact, profil:document.getElementById('seProfil').value, date:(old&&old.date)||now, maj:now };
+    try{ localStorage.setItem(K, JSON.stringify(p)); }catch(err){ msg.textContent="Impossible d'enregistrer sur cet appareil."; return; }
+    msg.textContent=''; apply();
+  });
+  apply();
+})();
+</script><script>(function(){ if(!(function(){try{return localStorage.getItem('agrodiag.admin')==='1'}catch(e){return false}})()){ document.querySelectorAll('[data-admin-only]').forEach(function(el){ el.hidden=true; }); } })();</script></body></html>
