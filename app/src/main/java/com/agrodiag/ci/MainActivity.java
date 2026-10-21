@@ -32,7 +32,7 @@ import androidx.webkit.WebViewAssetLoader;
 import java.io.OutputStream;
 
 /**
- * AgroDiag CI : l'application tourne entièrement hors connexion.
+ * AKA AgroDiag CI (cultures + élevage) : l'application tourne entièrement hors connexion.
  * La page (assets/index.html) est servie depuis l'APK via WebViewAssetLoader,
  * les données sont gardées dans le stockage local de la WebView (sur le téléphone).
  */
@@ -249,6 +249,16 @@ public class MainActivity extends Activity {
             view.setPadding(l, t, r, b);
             return insets;
         });
+    }
+
+    /** Bouton retour du téléphone : revient à la page précédente (module -> accueil) avant de quitter. */
+    @Override
+    public void onBackPressed() {
+        if (webView != null && webView.canGoBack()) {
+            webView.goBack();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override

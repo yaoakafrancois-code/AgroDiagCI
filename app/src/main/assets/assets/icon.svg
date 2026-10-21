@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#17694A"/>
+  <!-- field furrows -->
+  <path d="M96 392c56-30 120-44 160-44s104 14 160 44" fill="none" stroke="#B9E3CB" stroke-width="18" stroke-linecap="round"/>
+  <path d="M136 436c40-18 82-26 120-26s80 8 120 26" fill="none" stroke="#B9E3CB" stroke-width="18" stroke-linecap="round" opacity=".7"/>
+  <!-- leaf -->
+  <path d="M256 330c-70-24-104-84-96-176 86-6 140 30 160 92 8 26 4 56-12 84" fill="#F4C24E"/>
+  <path d="M256 330c-6-66-30-118-74-156" fill="none" stroke="#17694A" stroke-width="14" stroke-linecap="round"/>
+  <!-- second leaf -->
+  <path d="M262 330c30-64 82-98 150-96-4 70-48 112-118 118" fill="#FFFFFF"/>
+  <path d="M266 328c32-34 70-58 112-70" fill="none" stroke="#17694A" stroke-width="12" stroke-linecap="round"/>
+</svg>
