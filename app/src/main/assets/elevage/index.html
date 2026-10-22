@@ -3185,8 +3185,8 @@ const ECO = {
 };
 
 ECO.porc = {n:"Porcs à l'engraissement", kind:"band", poultry:false, unit:"porc", units:"porcs",
-  f:[{k:"achat",l:"Prix d'un porcelet sevré (environ 20 kg)",u:"FCFA"},{k:"mort",l:"Mortalité",u:"%"},{k:"jour",l:"Aliment",u:"FCFA/jour/tête"},{k:"sante",l:"Déparasitage, vaccins, soins",u:"FCFA/tête"},{k:"autres",l:"Transport, désinfection, divers",u:"FCFA/tête"},{k:"prix",l:"Prix de vente d'un porc charcutier (environ 95 kg vif)",u:"FCFA/tête"},{k:"cycle",l:"Durée d'engraissement",u:"jours"},{k:"vide",l:"Vide sanitaire entre deux bandes",u:"jours"},{k:"m2tete",l:"Surface de porcherie",u:"m²/tête"},{k:"equip",l:"Mangeoires, abreuvoirs (pipettes), cloisons",u:"FCFA/tête"}],
-  d:{achat:30000,mort:4,jour:480,sante:3500,autres:1500,prix:130000,prixTab:130000,cycle:140,vide:14,m2tete:1.0,equip:6000,m2:20000,install:200000,salaire:75000,parOuv:150,eau:15000,amortB:10,amortE:5,impr:5}};
+  f:[{k:"achat",l:"Prix d'un porcelet sevré (environ 20 kg)",u:"FCFA"},{k:"mort",l:"Mortalité",u:"%"},{k:"jour",l:"Aliment",u:"FCFA/jour/tête"},{k:"sante",l:"Déparasitage, vaccins, soins",u:"FCFA/tête"},{k:"autres",l:"Transport, désinfection, divers",u:"FCFA/tête"},{k:"prix",l:"Prix de vente d'un porc charcutier (environ 95 kg vif, à 2 000 à 2 500 FCFA le kg)",u:"FCFA/tête"},{k:"cycle",l:"Durée d'engraissement",u:"jours"},{k:"vide",l:"Vide sanitaire entre deux bandes",u:"jours"},{k:"m2tete",l:"Surface de porcherie",u:"m²/tête"},{k:"equip",l:"Mangeoires, abreuvoirs (pipettes), cloisons",u:"FCFA/tête"}],
+  d:{achat:30000,mort:4,jour:480,sante:3500,autres:1500,prix:214000,prixTab:214000,cycle:140,vide:14,m2tete:1.0,equip:6000,m2:20000,install:200000,salaire:75000,parOuv:150,eau:15000,amortB:10,amortE:5,impr:5}};
 let HYP = {}, HYP_OVR = load('se-hyp2', {});
 function rebuildHYP(){ Object.keys(ECO).forEach(t=>{ HYP[t] = {...ECO[t].d, ...(HYP_OVR[t]||{})}; }); }
 rebuildHYP();
@@ -3633,7 +3633,7 @@ const RL_PROD = [
 
 RL_PROD.push(
   {id:"porc", l:"Porc charcutier vif", u:"FCFA/tête", ref:"vente_porc", f:1},
-  {id:"porc_kg", l:"Porc vif au kilo", u:"FCFA/kg", ref:null},
+  {id:"porc_kg", l:"Porc vif au kilo (converti pour un porc de 95 kg)", u:"FCFA/kg", ref:"vente_porc", f:95},
   {id:"porcelet", l:"Porcelet sevré", u:"FCFA/tête", ref:"achat_porcelet", f:1});
 let REFV = {...REF_DEF, ...load('se-ref',{})};
 let SH = {mode:'local', db:null, user:null, canEdit:(function(){try{return localStorage.getItem('agrodiag.admin')==='1'}catch(e){return false}})(), me:null, hist:[], releves:load('se-releves',[]), buyers:null};
