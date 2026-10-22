@@ -210,7 +210,7 @@ details.envax[open]>summary{border-bottom:1px solid var(--line)}
 <header class="app">
   <div class="brand">
     <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="9" fill="var(--accent)"/><path d="M20 8c-5 0-9 4-9 9 0 7 9 15 9 15s9-8 9-15c0-5-4-9-9-9z" fill="none" stroke="var(--accent-ink)" stroke-width="2.4"/><path d="M16 17h8M20 13v8" stroke="var(--accent-ink)" stroke-width="2.4" stroke-linecap="round"/></svg>
-    <div><h1>Santé Élevage CI</h1><p class="tag">Volailles · petits ruminants · gros ruminants — Côte d'Ivoire</p></div>
+    <div><h1>Santé Élevage CI</h1><p class="tag">Volailles · porcs · petits ruminants · gros ruminants — Côte d'Ivoire</p></div>
   </div>
   <span class="proto">Version 1 · normes indicatives à faire valider</span>
 </header>
@@ -234,11 +234,12 @@ details.envax[open]>summary{border-bottom:1px solid var(--line)}
 <!-- ============ DIAGNOSTIC ============ -->
 <section class="mod" id="m-diag" role="tabpanel" aria-labelledby="t-diag" hidden>
   <div class="mod-head"><h2>Diagnostic et fiche à remettre à l'éleveur</h2>
-  <p>Volailles, petits ruminants (moutons, chèvres) et gros ruminants (bovins). Renseignez le lot ou le troupeau, l'état de la ferme et de son environnement, puis les signes observés : l'application classe les maladies possibles en tenant compte des conditions d'élevage, évalue l'urgence, propose des solutions durables et prépare la fiche imprimable.</p></div>
+  <p>Volailles, porcs, petits ruminants (moutons, chèvres) et gros ruminants (bovins). Renseignez le lot ou le troupeau, l'état de la ferme et de son environnement, puis les signes observés : l'application classe les maladies possibles en tenant compte des conditions d'élevage, évalue l'urgence, propose des solutions durables et prépare la fiche imprimable.</p></div>
   <div class="esp-switch" role="radiogroup" aria-label="Espèce">
     <button class="esp" data-esp="vol" aria-pressed="true">Volailles</button>
     <button class="esp" data-esp="pr" aria-pressed="false">Petits ruminants</button>
     <button class="esp" data-esp="bv" aria-pressed="false">Bovins</button>
+    <button class="esp" data-esp="pc" aria-pressed="false">Porcs</button>
   </div>
   <div class="grid">
     <div class="stack">
@@ -353,6 +354,9 @@ details.envax[open]>summary{border-bottom:1px solid var(--line)}
             <option value="ovin">Moutons à l'embouche (engraissement)</option>
             <option value="caprin">Chèvres et boucs à l'embouche</option>
           </optgroup>
+          <optgroup label="Porcs">
+            <option value="porc">Porcs à l'engraissement</option>
+          </optgroup>
         </select></label>
         <div><div class="lab-s">Effectif de départ</div>
           <div class="chips" id="ev-presets"></div></div>
@@ -398,7 +402,7 @@ Marge par animal     = prix de vente − coût de production</pre>
     <div class="stack">
       <div class="panel">
         <label for="mk-from">Lieu de l'élevage<select id="mk-from"></select></label>
-        <label for="mk-sp">Production<select id="mk-sp"><option value="vol">Volailles (poulets, œufs)</option><option value="pr">Petits ruminants (moutons, chèvres)</option></select></label>
+        <label for="mk-sp">Production<select id="mk-sp"><option value="vol">Volailles (poulets, œufs)</option><option value="pr">Petits ruminants (moutons, chèvres)</option><option value="pc">Porcs</option></select></label>
         <div id="mk-key"></div>
       </div>
       <div class="panel" id="mk-axis"></div>
@@ -490,6 +494,7 @@ Marge par animal     = prix de vente − coût de production</pre>
         <label for="pp-prod">Production<select id="pp-prod">
           <optgroup label="Volailles"><option value="chair">Poulets de chair</option><option value="pond">Poules pondeuses</option><option value="locale">Poulets locaux ou améliorés</option><option value="pintade">Pintades</option></optgroup>
           <optgroup label="Ruminants"><option value="pr">Moutons et chèvres</option><option value="bv">Bovins</option></optgroup>
+          <optgroup label="Porcs"><option value="pc">Porcs (porcelets à la vente, truies)</option></optgroup>
         </select></label>
         <label for="pp-date" id="pp-date-l">Date d'éclosion ou d'arrivée des poussins<input id="pp-date" type="date"></label>
         <label for="pp-mb" id="pp-mb-l" hidden>Date prévue de la prochaine mise-bas <span class="hint">facultatif</span><input id="pp-mb" type="date"></label>
@@ -551,7 +556,7 @@ Marge par animal     = prix de vente − coût de production</pre>
       <div class="panel">
         <h3>Catalogue des aliments, fourrages et plantes</h3>
         <div class="two"><label for="cat-q">Rechercher<input id="cat-q" placeholder="ex. leucaena, manioc, lantana"></label>
-        <label for="cat-sp">Pour<select id="cat-sp"><option value="all">Toutes les espèces</option><option value="pr">Moutons et chèvres</option><option value="bv">Bovins</option><option value="vol">Volailles</option></select></label></div>
+        <label for="cat-sp">Pour<select id="cat-sp"><option value="all">Toutes les espèces</option><option value="pr">Moutons et chèvres</option><option value="bv">Bovins</option><option value="vol">Volailles</option><option value="pc">Porcs</option></select></label></div>
         <div class="tbl" id="cat-tbl"></div>
       </div>
       <div class="panel"><h3>Rations types avec les ressources locales</h3><div class="tbl" id="al-rations"></div></div>
@@ -715,6 +720,7 @@ Marge par animal     = prix de vente − coût de production</pre>
         <li>Acheter le nouveau mâle dans un autre troupeau, sans lien de parenté avec le vôtre.</li>
         <li>Identifier chaque animal (boucle, bague, registre) et noter le père et la mère de chaque petit.</li>
         <li>En volaille, renouveler les coqs à chaque cycle de reproduction avec des coqs d'une autre origine.</li>
+        <li>En porc, garder les cochettes de renouvellement d'une autre lignée que le verrat, ou changer de verrat tous les 18 à 24 mois.</li>
       </ul></div>
     </div>
   </div>
@@ -965,6 +971,12 @@ const DENS = [
   {g:'Gros ruminants', id:'bv-veau', n:'Veau de 0 à 6 mois', mode:'head', lo:1.5, hi:2.5, def:2, u:'m²/tête'},
   {g:'Gros ruminants', id:'bv-eng', n:'Taurillon ou génisse à l\'embouche', mode:'head', lo:3.5, hi:5, def:4, u:'m²/tête'},
   {g:'Gros ruminants', id:'bv-taureau', n:'Taureau reproducteur', mode:'head', lo:9, hi:12, def:10, u:'m²/tête'},
+  {g:'Porcs', id:'pc-sevre', n:'Porcelets sevrés (8 à 25 kg)', mode:'head', lo:0.3, hi:0.4, def:0.35, u:'m²/tête'},
+  {g:'Porcs', id:'pc-croiss', n:'Porcs de 25 à 60 kg', mode:'head', lo:0.55, hi:0.7, def:0.6, u:'m²/tête'},
+  {g:'Porcs', id:'pc-fin', n:'Porcs de 60 à 110 kg', mode:'head', lo:0.8, hi:1.0, def:0.9, u:'m²/tête'},
+  {g:'Porcs', id:'pc-truie', n:'Truie gestante en groupe', mode:'head', lo:2.0, hi:2.5, def:2.25, u:'m²/tête'},
+  {g:'Porcs', id:'pc-mb', n:'Truie avec sa portée (case de mise-bas)', mode:'head', lo:5, hi:7, def:6, u:'m²/tête'},
+  {g:'Porcs', id:'pc-verrat', n:'Verrat', mode:'head', lo:6, hi:8, def:7, u:'m²/tête'},
 ];
 (function(){
   const sel = $('d-cat'); let g=null, og=null;
@@ -1004,6 +1016,7 @@ function densite(){
     <p class="note">Norme appliquée : ${r.perLabel}${hot?' (valeur prudente, forte chaleur)':''}. Fourchette admise pour ${fmt(S,1)} m² : ${fmt(r.capMin)} à ${fmt(r.capMax)} ${d.mode==='m2'?'sujets':'têtes'}.</p>
     <pre class="formula">${formula}</pre>
     ${d.g==='Petits ruminants'?'<p class="note">Prévoir en plus une aire d\'exercice extérieure d\'environ 2 à 3 m² par tête.</p>':''}
+    ${d.g==='Porcs'?'<p class="note">Porcs : séparer l\'aire de couchage (sèche, à l\'ombre) de l\'aire de déjection, et prévoir un abreuvoir à pipette pour 10 porcs. Par forte chaleur, prendre la valeur haute.</p>':''}
     ${d.g==='Gros ruminants'?'<p class="note">Au pâturage, la charge dépend de la production d\'herbe de la parcelle ; ce calcul sera relié aux indices de végétation satellitaires dans la version serveur.</p>':''}`;
 }
 $('d-L').addEventListener('input',()=>{ const L=+$('d-L').value, l=+$('d-l').value; if(L>0&&l>0) $('d-S').value=(L*l).toFixed(1).replace(/\.0$/,''); densite(); });
@@ -1182,6 +1195,8 @@ const RATIO = [
   {id:'bouc', n:'Bouc (monte naturelle)', per:25},
   {id:'taureau', n:'Taureau (monte naturelle)', per:30},
 ];
+GEST.push({id:"truie", n:"Truie", d:114, lo:112, hi:116, cyc:21, tar:null, back:40});
+RATIO.push({id:"verrat", n:"Verrat (monte naturelle)", per:20});
 const REL = [
   {n:'Aucun lien connu', f:0},
   {n:'Cousins germains', f:6.25},
@@ -1198,6 +1213,9 @@ const CROSS = [
   ['Volailles','Coq amélioré × poule locale','Poussins plus lourds qui gardent une bonne rusticité','Toutes zones','Vacciner les reproducteurs ; renouveler le coq à chaque cycle'],
   ['Volailles','Pintade améliorée × pintade locale','Meilleure croissance des pintadeaux','Toutes zones, surtout centre et nord','Fertilité souvent plus faible : prévoir assez de mâles'],
 ];
+CROSS.push(
+  ["Porcins","Large White ou Landrace × porc local","Croissance plus rapide, carcasse plus maigre","Toutes zones, en porcherie fermée","Les porcs améliorés demandent un aliment équilibré et supportent mal la chaleur : ombre et eau à volonté"],
+  ["Porcins","Truie croisée Large White × Landrace, verrat Piétrain ou Duroc","Truies plus prolifiques, porcs charcutiers de qualité","Élevages semi-intensifs","Reproducteurs achetés chez un sélectionneur sérieux, avec suivi sanitaire"]);
 (function(){
   $('g-sp').innerHTML = GEST.map(g=>`<option value="${g.id}">${esc(g.n)}</option>`).join('');
   $('g-date').value = isoOf(addDays(todayUTC(), -40));
@@ -1220,6 +1238,7 @@ function gestation(){
   if(g.tar) ev.push({ms:addDays(due,-g.tar), t:'Tarissement', s:`${g.tar} jours avant la mise-bas pour une vache traite`});
   ev.push({ms:addDays(due,-15), t:'Préparation de la mise-bas', s:'Isoler la femelle dans un box propre et sec, renforcer l\'alimentation, préparer désinfectant pour le cordon'});
   ev.push({ms:due, lo:addDays(d0,g.lo), hi:addDays(d0,g.hi), t:'Mise-bas prévue', s:`Fenêtre normale : ${fdate(addDays(d0,g.lo),false)} au ${fdate(addDays(d0,g.hi),false)}`});
+  if(g.id==='truie'){ ev.push({ms:addDays(due,3), t:'Fer aux porcelets', s:'Injection de fer entre le 2e et le 4e jour'}); ev.push({ms:addDays(due,35), t:'Sevrage des porcelets', s:'Vers 4 à 6 semaines ; la truie revient en chaleur 4 à 7 jours après'}); }
   ev.push({ms:addDays(due,g.back), t:'Remise à la reproduction possible', s:`Environ ${g.back} jours après la mise-bas, si la femelle a repris de l'état`});
   out.innerHTML = `
     <div class="btns" style="justify-content:space-between;align-items:center"><h3>${esc(g.n)} : gestation d'environ ${g.d} jours</h3>${dayN>=0&&dayN<=g.hi?`<span class="pill ok">Jour ${dayN} de gestation</span>`:''}</div>
@@ -1641,6 +1660,204 @@ const SP = {
     sample:{age:30, eff:60, sick:6, dead:0, days:20, signs:['amaigr','pales','fievre']}},
 };
 const QMAP = {q_fiente:null, q_litiere:'litiere', q_odeur:'odeur', q_moustiques:'moustiques', q_aliment:'aliment', q_contagion:'contagion', q_jeunes:'jeunes', q_gest:'gest', q_deparas:'deparas', q_basfond:'basfond'};
+
+/* ---------- porcs ---------- */
+const P_SIGNS = [
+  {g:"État général", id:"fievre", l:"Fièvre (porc chaud, frissons, porcs couchés en tas)"},
+  {g:"État général", id:"prostr", l:"Abattement, se lève difficilement"},
+  {g:"État général", id:"appetit", l:"Ne mange plus"},
+  {g:"État général", id:"amaigr", l:"Amaigrissement, retard de croissance"},
+  {g:"État général", id:"mort_subite", l:"Morts subites, sans signes avant"},
+  {g:"État général", id:"couche", l:"Porc couché, ne peut plus se lever"},
+  {g:"Peau", id:"peau_rouge", l:"Rougeurs ou taches violacées : oreilles, ventre, pattes, queue"},
+  {g:"Peau", id:"losanges", l:"Plaques rouges en losange ou en carré sur la peau"},
+  {g:"Peau", id:"croutes_peau", l:"Croûtes, peau épaissie, perte de poils"},
+  {g:"Peau", id:"demang", l:"Démangeaisons : se frotte contre les murs"},
+  {g:"Peau", id:"pales", l:"Peau et muqueuses pâles (anémie)"},
+  {g:"Peau", id:"oedeme", l:"Paupières ou tête gonflées"},
+  {g:"Digestif", id:"diarrhee", l:"Diarrhée"},
+  {g:"Digestif", id:"diarrhee_jaune", l:"Diarrhée jaune, blanche ou pâteuse chez les porcelets"},
+  {g:"Digestif", id:"diarrhee_sang", l:"Diarrhée avec du sang, ou crottes noires"},
+  {g:"Digestif", id:"vomit", l:"Vomissements"},
+  {g:"Digestif", id:"constip", l:"Constipation (crottes dures en billes)"},
+  {g:"Respiratoire", id:"toux", l:"Toux"},
+  {g:"Respiratoire", id:"resp", l:"Respiration difficile ou rapide, souffle du ventre"},
+  {g:"Respiratoire", id:"jetage", l:"Écoulement par le nez"},
+  {g:"Respiratoire", id:"eternu", l:"Éternuements, groin tordu ou raccourci"},
+  {g:"Groin et pieds", id:"bouche_lesions", l:"Cloques ou plaies sur le groin ou la langue"},
+  {g:"Groin et pieds", id:"pieds", l:"Cloques ou plaies aux pieds, onglons qui se décollent"},
+  {g:"Groin et pieds", id:"boiterie", l:"Boiterie, articulations gonflées"},
+  {g:"Nerveux", id:"nerv", l:"Tremblements, convulsions, pédale, tourne en rond, paralysie"},
+  {g:"Reproduction", id:"avort", l:"Avortements"},
+  {g:"Reproduction", id:"momies", l:"Porcelets momifiés ou mort-nés, petites portées"},
+  {g:"Reproduction", id:"retour", l:"Truies qui reviennent en chaleur, truies vides"},
+  {g:"Reproduction", id:"dystocie", l:"Mise-bas difficile, longue, porcelet bloqué"},
+  {g:"Reproduction", id:"mamelle", l:"Mamelle dure et chaude, truie sans lait après la mise-bas"},
+  {g:"Reproduction", id:"vulve", l:"Écoulement blanc ou sale de la vulve après la mise-bas"},
+  {g:"Reproduction", id:"ecrasement", l:"Porcelets écrasés par la truie"},
+  {g:"Parasites visibles", id:"vers", l:"Vers dans les crottes"},
+  {g:"Parasites visibles", id:"poux", l:"Poux ou acariens visibles"},
+];
+const P_QUESTIONS = [
+  {id:"q_jeunes", show:s=>s.diarrhee||s.diarrhee_jaune||s.pales||s.nerv, type:"check", l:"Ce sont surtout les porcelets sous la mère qui sont malades"},
+  {id:"q_fer", show:s=>s.pales||s.amaigr||s.diarrhee||s.diarrhee_jaune, type:"check", l:"Les porcelets n'ont pas reçu d'injection de fer dans leur première semaine"},
+  {id:"q_sevrage", show:s=>s.diarrhee||s.nerv||s.oedeme||s.amaigr, type:"check", l:"Les problèmes ont commencé dans les 2 semaines après le sevrage"},
+  {id:"q_aliment", show:s=>s.diarrhee||s.vomit||s.nerv||s.mort_subite||s.amaigr, type:"check", l:"Aliment changé récemment, aliment moisi, ou fabriqué sur place"},
+  {id:"q_deparas", show:s=>s.amaigr||s.vers||s.toux||s.demang||s.croutes_peau, type:"check", l:"Pas de déparasitage depuis plus de 3 mois"},
+  {id:"q_chaleur", show:s=>s.resp||s.mort_subite||s.prostr||s.couche, type:"check", l:"Forte chaleur dans la porcherie, porcs qui halètent"},
+  {id:"q_sol", show:s=>s.boiterie||s.pieds, type:"check", l:"Sol rugueux, cassé ou glissant"},
+];
+const P_LES = [
+  {id:"les_rate_ppa", l:"Rate très grosse, noire et friable"},
+  {id:"les_ganglions_h", l:"Ganglions rouge foncé, comme des caillots de sang"},
+  {id:"les_reins_points", l:"Petits points rouges sur les reins"},
+  {id:"les_poumons", l:"Poumons rouges, durs, avec des zones violacées ou du pus"},
+  {id:"les_intestin", l:"Intestin épaissi, rouge, contenu sanglant"},
+  {id:"les_estomac", l:"Ulcère de l'estomac, sang dans l'estomac"},
+  {id:"les_vers", l:"Gros vers ronds dans l'intestin, taches blanches sur le foie"},
+];
+const P_CTX = [
+  {id:"eg", l:"Porcs nourris avec des restes de cuisine, de restaurant ou d'abattoir (eaux grasses)", f:"eaux_grasses"},
+  {id:"contact_p", l:"Contact avec des porcs en divagation, achetés au marché ou venant d'un autre élevage", f:"contact"},
+  {id:"post_mb", l:"Truies qui ont mis bas il y a moins de 3 semaines"},
+];
+const P_GENERAL = ["Isoler les porcs malades dans une case propre, avec de l'eau propre","Ne vendre, n'abattre et ne déplacer aucun porc malade ou mort : c'est ainsi que la peste porcine africaine se propage","Ne jamais consommer ni vendre la viande d'un porc mort de maladie","Enterrer profondément les cadavres avec de la chaux, loin des points d'eau, ou les brûler","Bottes et tenue réservées à la porcherie, lavage des mains, aucune visite"];
+const DIS_PC = [
+ {id:"ppa", n:"Peste porcine africaine (PPA)", agent:"Virus très résistant (asfivirus), transmis par les porcs malades, la viande et les restes de porc, le matériel et les personnes", regl:true, zoon:false,
+  rules:[["peau_rouge",4,"rougeurs ou taches violacées de la peau"],["fievre",3,"fièvre"],["mort_haute",4,"mortalité élevée"],["mort_moy",1,"mortalité notable"],["mort_subite",2,"morts subites"],["evo_brutale",2,"apparition brutale"],["evo_jours",1,"évolution sur quelques jours"],["prostr",1,"abattement"],["appetit",1,"ne mange plus"],["avort",2,"avortements"],["diarrhee_sang",2,"diarrhée sanglante"],["vomit",1,"vomissements"],["resp",1,"respiration difficile"],["eaux_grasses",3,"restes de cuisine ou d'abattoir donnés aux porcs"],["contact",2,"contact avec d'autres porcs"],["intro",2,"porcs introduits récemment"],["vois_morts",2,"mortalités chez les voisins"],["vois_porcs",1,"porcs voisins"],["divagation",1,"porcs en divagation"],["les_rate_ppa",5,"rate énorme et noire"],["les_ganglions_h",4,"ganglions hémorragiques"],["les_reins_points",2,"points rouges sur les reins"],["evo_chron",-3,"évolution lente"],["mort_faible",-3,"mortalité faible"]],
+  confirm:"Prélèvements uniquement par les services vétérinaires (sang, rate, ganglions), analysés au laboratoire (LANADA). La peste porcine classique donne des signes proches : seul le laboratoire les distingue.",
+  immediat:["Déclarer immédiatement la suspicion aux services vétérinaires : maladie à déclaration obligatoire","Aucun porc, aucune viande, aucun reste ni matériel ne sort ni n'entre","Ne pas abattre ni vendre en urgence les porcs malades : la viande propage le virus","Interdire toute visite ; désinfecter bottes, matériel et véhicules"],
+  traitement:["Il n'existe ni traitement ni vaccin","Les mesures (abattage, désinfection, vide sanitaire) sont décidées par les services vétérinaires","La maladie ne se transmet pas à l'homme, mais le virus survit des mois dans la viande et les produits de porc"],
+  prevention:["Ne jamais donner de restes de cuisine, de restaurant ou d'abattoir sans les faire bouillir 30 minutes ; jamais de restes de porc","Porcherie clôturée, porcs toujours enfermés","Pédiluve, bottes réservées, aucune visite d'un autre élevage le même jour","Quarantaine de 3 semaines pour tout porc acheté ; acheter dans des élevages sains","Signaler sans attendre toute mortalité anormale"]},
+ {id:"rouget", n:"Rouget du porc", agent:"Bactérie (Erysipelothrix rhusiopathiae), présente dans le sol et les déjections", regl:false, zoon:true,
+  rules:[["losanges",7,"plaques rouges en losange"],["fievre",2,"fièvre"],["peau_rouge",1,"rougeurs de la peau"],["boiterie",2,"boiterie, articulations gonflées"],["mort_subite",1,"morts subites"],["appetit",1,"ne mange plus"],["avort",1,"avortements"],["age_engr",1,"porcs en croissance"],["age_adult",1,"porcs adultes"],["vrouget_non",2,"pas de vaccin rouget"],["vrouget_oui",-3,"vaccinés contre le rouget"],["chaleur",1,"forte chaleur"],["evo_brutale",1,"apparition rapide"],["age_lait",-2,"porcelets sous la mère (peu touchés)"]],
+  confirm:"Aspect de la peau très évocateur ; culture bactérienne au laboratoire si besoin.",
+  immediat:["Isoler les malades, à l'ombre, eau fraîche à volonté","Porter des gants : la bactérie peut infecter les plaies des mains de l'homme"],
+  traitement:["Pénicilline, très efficace, sur prescription du vétérinaire ou du technicien","Traiter tôt : les formes anciennes laissent des arthrites et des lésions du cœur","Respecter le délai d'attente avant de vendre la viande"],
+  prevention:["Vaccin contre le rouget : truies et verrats deux fois par an, porcs à l'engraissement selon la zone","Nettoyage et désinfection des cases, fumier évacué"]},
+ {id:"pneumo", n:"Pneumonie (pasteurellose, mycoplasme, pleuropneumonie)", agent:"Bactéries (Mycoplasma, Pasteurella, Actinobacillus), favorisées par l'ammoniac, le surpeuplement et les courants d'air", regl:false, zoon:false,
+  rules:[["toux",4,"toux"],["resp",3,"respiration difficile"],["fievre",1,"fièvre"],["jetage",1,"écoulement nasal"],["age_engr",2,"porcs en croissance"],["age_sevr",1,"porcelets sevrés"],["ammoniac",2,"air chargé d'ammoniac"],["surpeuple",2,"porcherie surpeuplée"],["courant_air",1,"courants d'air"],["humidite",1,"humidité"],["ages_meles",1,"âges mélangés"],["vpast_oui",-2,"vaccinés contre la pneumonie"],["les_poumons",4,"poumons atteints"],["evo_jours",1,"évolution sur quelques jours"],["evo_chron",1,"évolution lente"],["bouche_lesions",-2,"cloques sur le groin (plutôt fièvre aphteuse)"],["peau_rouge",-1,"taches violacées (penser à la PPA)"]],
+  confirm:"Examen clinique ; autopsie (poumons) et analyse au laboratoire si les morts se répètent.",
+  immediat:["Aérer sans courant d'air froid, retirer le fumier et les litières mouillées","Réduire le nombre de porcs par case"],
+  traitement:["Antibiotique choisi par le vétérinaire, dans l'eau ou l'aliment, ou injectable pour les plus atteints","Respecter le délai d'attente avant la vente"],
+  prevention:["Bonne aération, porcherie sèche, densité respectée (onglet Densité)","Conduite en bandes : tout plein, tout vide, nettoyage et vide sanitaire entre deux bandes","Ne pas mélanger des porcs d'origines et d'âges différents"]},
+ {id:"rhinite", n:"Rhinite atrophique", agent:"Bactéries (Pasteurella multocida toxinogène, Bordetella), favorisées par l'ammoniac et la poussière", regl:false, zoon:false,
+  rules:[["eternu",6,"éternuements, groin déformé"],["jetage",1,"écoulement nasal"],["amaigr",1,"retard de croissance"],["age_sevr",2,"porcelets sevrés"],["age_lait",1,"porcelets"],["ammoniac",1,"ammoniac"],["surpeuple",1,"surpeuplement"],["evo_chron",1,"évolution lente"]],
+  confirm:"Examen du groin à l'abattoir (cornets du nez) ; prélèvements au laboratoire.",
+  immediat:["Aérer et réduire la poussière et l'ammoniac"],
+  traitement:["Antibiotique aux porcelets sur prescription","Vaccination des truies avant la mise-bas si le problème est confirmé"],
+  prevention:["Ambiance saine, densité respectée","Acheter des reproducteurs d'élevages indemnes"]},
+ {id:"colib", n:"Diarrhée des porcelets (colibacillose)", agent:"Bactérie (Escherichia coli), favorisée par le froid, la saleté de la maternité et le manque de colostrum", regl:false, zoon:false,
+  rules:[["diarrhee_jaune",6,"diarrhée jaune ou blanche des porcelets"],["diarrhee",2,"diarrhée"],["age_lait",4,"porcelets sous la mère"],["age_sevr",1,"porcelets sevrés"],["jeunes",2,"surtout les porcelets touchés"],["post_sevrage",2,"début après le sevrage"],["maternite",2,"maternité mal aménagée"],["humidite",1,"humidité"],["courant_air",1,"froid, courants d'air"],["mort_moy",1,"morts de porcelets"],["prostr",1,"porcelets abattus"],["fievre",-1,"fièvre (peu typique)"],["age_adult",-3,"adultes"]],
+  confirm:"Examen par le technicien ; analyse des crottes au laboratoire si les pertes sont importantes.",
+  immediat:["Garder les porcelets au chaud et au sec (lampe, caisse, paille sèche)","Nettoyer la case de mise-bas, retirer les crottes plusieurs fois par jour"],
+  traitement:["Réhydratation : sels de réhydratation dans l'eau, porcelets faibles nourris à la cuillère","Antibiotique par la bouche sur prescription du vétérinaire"],
+  prevention:["Chaque porcelet tète le colostrum dans les 6 premières heures","Maternité lavée, désinfectée et vide quelques jours avant chaque mise-bas","Coin chauffé pour les porcelets ; vaccin des truies avant la mise-bas si le problème revient"]},
+ {id:"oedeme", n:"Maladie de l'œdème (après le sevrage)", agent:"Toxine d'Escherichia coli, chez les porcelets sevrés les plus vigoureux, favorisée par un aliment trop riche", regl:false, zoon:false,
+  rules:[["oedeme",5,"paupières ou tête gonflées"],["nerv",4,"signes nerveux"],["post_sevrage",4,"début après le sevrage"],["age_sevr",3,"porcelets sevrés"],["mort_subite",2,"morts subites"],["aliment",1,"changement d'aliment"],["fievre",-2,"fièvre (peu typique)"],["age_adult",-4,"adultes"]],
+  confirm:"Examen par le vétérinaire ; autopsie (œdème de l'estomac et du gros intestin).",
+  immediat:["Réduire l'aliment de moitié pendant quelques jours, ajouter du son (fibres)","Eau propre à volonté"],
+  traitement:["Antibiotique dans l'eau pour les porcelets du même lot, sur prescription","Les porcelets avec des signes nerveux guérissent rarement"],
+  prevention:["Sevrage progressif : même aliment avant et après le sevrage, changement sur une semaine","Rationner les premiers jours après le sevrage, aliment riche en fibres"]},
+ {id:"strep", n:"Méningite et arthrites à streptocoques", agent:"Bactérie (Streptococcus suis), transmissible à l'homme par les plaies et la viande crue", regl:false, zoon:true,
+  rules:[["nerv",5,"signes nerveux"],["fievre",3,"fièvre"],["age_sevr",3,"porcelets sevrés"],["age_lait",1,"porcelets"],["boiterie",2,"articulations gonflées"],["mort_subite",1,"morts subites"],["surpeuple",1,"surpeuplement"],["post_sevrage",1,"après le sevrage"],["oedeme",-2,"paupières gonflées (plutôt maladie de l'œdème)"]],
+  confirm:"Examen par le vétérinaire ; analyse au laboratoire.",
+  immediat:["Isoler les malades dans une case calme et sombre, sur une litière épaisse","Gants obligatoires : la bactérie peut provoquer une méningite chez l'homme"],
+  traitement:["Pénicilline ou autre antibiotique par injection, au plus tôt, sur prescription","Anti-inflammatoire sur prescription"],
+  prevention:["Densité respectée, ambiance saine, pas de mélange de portées au sevrage","Ne jamais manger de viande de porc mal cuite ; se protéger les mains en manipulant les carcasses"]},
+ {id:"cocci", n:"Coccidiose des porcelets", agent:"Parasite de l'intestin (Cystoisospora suis), chez les porcelets de 1 à 3 semaines", regl:false, zoon:false,
+  rules:[["diarrhee_jaune",3,"diarrhée jaune pâteuse"],["diarrhee",1,"diarrhée"],["age_lait",3,"porcelets sous la mère"],["jeunes",2,"surtout les porcelets touchés"],["amaigr",1,"porcelets qui maigrissent"],["mort_faible",1,"peu de morts"],["fievre",-1,"fièvre (peu typique)"],["age_adult",-3,"adultes"]],
+  confirm:"Examen des crottes des porcelets au laboratoire.",
+  immediat:["Nettoyer et sécher la case de mise-bas"],
+  traitement:["Anticoccidien (toltrazuril) par la bouche, sur prescription, à toute la portée"],
+  prevention:["Toltrazuril préventif vers le 3e ou 4e jour si le problème revient","Hygiène stricte de la maternité"]},
+ {id:"dysent", n:"Dysenterie porcine et iléite", agent:"Bactéries de l'intestin (Brachyspira, Lawsonia)", regl:false, zoon:false,
+  rules:[["diarrhee_sang",6,"diarrhée avec du sang"],["diarrhee",1,"diarrhée"],["age_engr",3,"porcs à l'engraissement"],["amaigr",1,"amaigrissement"],["pales",1,"porcs pâles"],["les_intestin",3,"intestin épaissi et sanglant"],["intro",1,"porcs introduits récemment"],["nuisibles",1,"rats"],["age_lait",-2,"porcelets sous la mère"],["peau_rouge",-1,"taches violacées (penser à la PPA)"]],
+  confirm:"Analyse des crottes ou de l'intestin au laboratoire.",
+  immediat:["Isoler les malades, nettoyer les cases plusieurs fois par jour"],
+  traitement:["Antibiotique adapté dans l'eau ou l'aliment, sur prescription","Respecter le délai d'attente"],
+  prevention:["Lutte contre les rats","Quarantaine des porcs achetés","Nettoyage, désinfection et vide sanitaire entre deux bandes"]},
+ {id:"vers", n:"Vers intestinaux (ascaris) et ladrerie", agent:"Vers ronds (Ascaris suum) ; ladrerie : larves du ténia de l'homme (Taenia solium) chez les porcs en divagation", regl:false, zoon:true,
+  rules:[["vers",5,"vers dans les crottes"],["amaigr",3,"amaigrissement"],["toux",1,"toux (larves dans les poumons)"],["deparas",3,"pas de déparasitage récent"],["evo_chron",2,"évolution lente"],["divagation",2,"porcs en divagation"],["age_engr",1,"porcs en croissance"],["les_vers",5,"vers dans l'intestin, taches blanches sur le foie"],["fievre",-2,"fièvre (peu typique)"],["mort_subite",-2,"morts subites (peu typiques)"]],
+  confirm:"Examen des crottes au laboratoire ; ladrerie : inspection de la viande à l'abattoir (petites boules blanches dans les muscles).",
+  immediat:["Nettoyer les cases chaque jour, évacuer le fumier"],
+  traitement:["Vermifuge (ivermectine, lévamisole, fenbendazole…) sur conseil du technicien, à tout le lot","Recommencer 2 à 3 semaines plus tard si l'infestation est forte"],
+  prevention:["Déparasiter tous les 3 mois, et les truies avant la mise-bas","Porcs enfermés : la divagation et l'accès aux excréments humains donnent la ladrerie, transmissible à l'homme","Latrines dans les villages, viande de porc toujours bien cuite"]},
+ {id:"gale", n:"Gale du porc", agent:"Acarien (Sarcoptes scabiei var. suis)", regl:false, zoon:false,
+  rules:[["demang",5,"démangeaisons"],["croutes_peau",4,"croûtes, peau épaissie"],["poux",2,"acariens ou poux visibles"],["amaigr",1,"croissance ralentie"],["surpeuple",1,"surpeuplement"],["nett_rare",1,"nettoyage peu fréquent"],["deparas",1,"pas de traitement antiparasitaire"],["fievre",-2,"fièvre (peu typique)"]],
+  confirm:"Raclage de peau (intérieur de l'oreille) examiné au laboratoire.",
+  immediat:["Nettoyer et désinfecter les cases et les murs"],
+  traitement:["Ivermectine injectable ou dans l'aliment, ou pulvérisation d'un acaricide, sur conseil du technicien","Traiter tous les porcs de l'élevage en même temps, puis recommencer 10 à 14 jours après"],
+  prevention:["Traiter les truies 2 semaines avant la mise-bas et les verrats 2 fois par an","Traiter tout porc acheté pendant la quarantaine"]},
+ {id:"anemie", n:"Anémie des porcelets (manque de fer)", agent:"Le lait de la truie ne contient pas assez de fer pour les porcelets élevés sur sol cimenté", regl:false, zoon:false,
+  rules:[["pales",6,"porcelets pâles"],["age_lait",4,"porcelets sous la mère"],["sans_fer",5,"pas d'injection de fer"],["amaigr",1,"croissance lente"],["diarrhee",1,"diarrhée"],["resp",1,"souffle rapide"],["type_porcelet",1,"porcelets"],["fievre",-2,"fièvre (peu typique)"],["age_adult",-4,"adultes"]],
+  confirm:"Couleur de la peau et des muqueuses ; prise de sang si besoin.",
+  immediat:["Injection de fer aux porcelets atteints, sur conseil du technicien"],
+  traitement:["Fer injectable (fer dextran, environ 200 mg par porcelet) dans le muscle du cou"],
+  prevention:["Injection de fer à tous les porcelets entre le 2e et le 4e jour de vie","Si possible, un peu de terre propre (non souillée) dans la case des porcelets"]},
+ {id:"chaleur", n:"Coup de chaleur", agent:"Chaleur excessive : le porc ne transpire presque pas", regl:false, zoon:false,
+  rules:[["chaleur",4,"forte chaleur"],["resp",3,"respiration rapide"],["mort_subite",2,"morts subites"],["prostr",1,"abattement"],["couche",1,"porcs couchés"],["evo_brutale",1,"apparition brutale"],["fievre",1,"corps très chaud"],["age_adult",1,"gros porcs et truies"],["type_truie",1,"truies"],["manque_eau",2,"manque d'eau"],["surpeuple",1,"surpeuplement"],["evo_chron",-3,"évolution lente"],["diarrhee",-1,"diarrhée (non liée)"]],
+  confirm:"Contexte : heures chaudes, porcherie mal aérée, eau insuffisante.",
+  immediat:["Mettre les porcs à l'ombre, arroser le sol et les pattes avec de l'eau fraîche (pas d'eau glacée sur le dos)","Eau fraîche à volonté ; ne pas déplacer les porcs aux heures chaudes"],
+  traitement:["Porc couché qui ne se relève pas : appeler le vétérinaire"],
+  prevention:["Ombre, toit isolé (paille, palmes), ouvertures en haut des murs","Eau à volonté (une pipette pour 10 porcs), bain de boue ou aspersion","Transport et manipulations le matin tôt ou le soir"]},
+ {id:"mma", n:"Mammite et manque de lait après la mise-bas (syndrome MMA)", agent:"Infection de la mamelle ou de l'utérus, souvent liée à la constipation et à l'hygiène de la maternité", regl:false, zoon:false,
+  rules:[["mamelle",6,"mamelle dure, pas de lait"],["vulve",3,"écoulement de la vulve"],["post_mb",4,"mise-bas récente"],["fievre",2,"fièvre"],["appetit",1,"truie qui ne mange plus"],["type_truie",2,"truie"],["constip",1,"constipation"],["maternite",1,"maternité mal aménagée"],["age_lait",-2,"porcelets"]],
+  confirm:"Examen de la truie par le vétérinaire (température, mamelle, vulve).",
+  immediat:["Appeler le vétérinaire dans la journée : les porcelets risquent de mourir de faim","Donner aux porcelets du colostrum d'une autre truie ou un lait de remplacement"],
+  traitement:["Antibiotique, anti-inflammatoire et ocytocine sur prescription du vétérinaire"],
+  prevention:["Maternité propre et désinfectée","Son ou fibres dans la ration les jours avant la mise-bas contre la constipation","Eau à volonté pour la truie"]},
+ {id:"repro", n:"Avortements et portées anormales (parvovirose, leptospirose)", agent:"Virus (parvovirus porcin) ou bactérie (Leptospira, transmise par l'urine des rats)", regl:false, zoon:true,
+  rules:[["momies",6,"porcelets momifiés ou mort-nés"],["avort",4,"avortements"],["retour",2,"retours en chaleur"],["type_truie",2,"truies"],["fievre",1,"fièvre"],["nuisibles",2,"rats dans la porcherie"],["intro",1,"reproducteurs introduits"],["partage",1,"verrat prêté ou partagé"]],
+  confirm:"Prises de sang et analyse des avortons au laboratoire.",
+  immediat:["Gants pour toucher les avortons et placentas, puis les enterrer avec de la chaux","Se laver les mains : la leptospirose passe à l'homme"],
+  traitement:["Leptospirose : antibiotique sur prescription","Parvovirose : pas de traitement ; réformer les truies qui avortent plusieurs fois"],
+  prevention:["Vaccin parvovirose (et rouget) des cochettes et des truies avant la saillie","Lutte contre les rats, aliment stocké fermé","Mettre les jeunes truies au contact des truies adultes avant leur première saillie"]},
+ {id:"mbpc", n:"Mise-bas difficile et écrasement des porcelets", agent:"Porcelet trop gros ou mal placé, truie trop grasse ou épuisée, case de mise-bas sans protection", regl:false, zoon:false,
+  rules:[["dystocie",7,"mise-bas difficile"],["ecrasement",5,"porcelets écrasés"],["post_mb",2,"mise-bas récente"],["type_truie",2,"truie"],["maternite",2,"maternité mal aménagée"],["couche",1,"truie couchée"]],
+  confirm:"Examen par le vétérinaire.",
+  immediat:["Plus de 45 minutes d'efforts sans porcelet : appeler le technicien ou le vétérinaire","Ne jamais introduire la main sans gant propre et lubrifiant"],
+  traitement:["Intervention du vétérinaire (ocytocine, aide à l'extraction) selon le cas"],
+  prevention:["Case de mise-bas avec barres anti-écrasement et coin chauffé pour les porcelets","Truie en état moyen (ni maigre ni grasse) à la mise-bas","Surveillance pendant toute la mise-bas"]},
+ {id:"fa", n:"Fièvre aphteuse", agent:"Virus (aphtovirus), commun aux porcs, bovins, moutons et chèvres", regl:true, zoon:false,
+  rules:[["pieds",5,"cloques aux pieds"],["bouche_lesions",4,"cloques sur le groin ou la langue"],["boiterie",2,"boiterie"],["fievre",2,"fièvre"],["appetit",1,"ne mange plus"],["vois_bv",2,"bovins à proximité"],["contact",1,"contact avec d'autres animaux"],["evo_jours",1,"évolution sur quelques jours"],["peau_rouge",-1,"taches violacées (plutôt PPA)"]],
+  confirm:"Prélèvements par les services vétérinaires (liquide des cloques) analysés au laboratoire.",
+  immediat:["Déclarer la suspicion aux services vétérinaires : maladie à déclaration obligatoire","Aucun animal ni produit ne sort de l'élevage"],
+  traitement:["Pas de traitement du virus ; soins des plaies et litière souple","Mesures décidées par les services vétérinaires"],
+  prevention:["Pas de contact avec les bovins et les petits ruminants","Biosécurité stricte à l'entrée de la porcherie"]},
+ {id:"arthrite", n:"Boiteries et blessures des pieds", agent:"Sol abîmé ou glissant, blessures infectées, carences minérales", regl:false, zoon:false,
+  rules:[["boiterie",4,"boiterie"],["sol_abime",3,"sol rugueux, cassé ou glissant"],["pieds",1,"plaies aux pieds"],["entretien_mauvais",1,"porcherie mal entretenue"],["sans_mineraux",1,"pas de minéraux"],["fievre",-1,"fièvre (plutôt infectieuse)"],["bouche_lesions",-3,"cloques sur le groin (plutôt fièvre aphteuse)"]],
+  confirm:"Examen des pieds et du sol par le technicien.",
+  immediat:["Mettre le porc boiteux dans une case au sol sec et souple (paille)","Nettoyer et désinfecter les plaies"],
+  traitement:["Antibiotique et anti-inflammatoire sur prescription si l'articulation est infectée"],
+  prevention:["Sol cimenté lisse mais non glissant, réparé régulièrement","Ration avec minéraux (calcium, phosphore)"]},
+ {id:"ulcere", n:"Ulcère de l'estomac", agent:"Aliment trop finement moulu, stress, surpeuplement, jeûnes répétés", regl:false, zoon:false,
+  rules:[["les_estomac",6,"ulcère de l'estomac"],["pales",2,"porc pâle"],["diarrhee_sang",2,"crottes noires"],["mort_subite",2,"mort subite d'un porc en bon état"],["vomit",1,"vomissements"],["age_engr",1,"porcs à l'engraissement"],["surpeuple",1,"surpeuplement"],["fievre",-2,"fièvre (peu typique)"]],
+  confirm:"Autopsie : ulcère et sang dans l'estomac.",
+  immediat:["Réduire le stress, donner un aliment moins finement moulu et des fibres"],
+  traitement:["Pas de traitement efficace une fois l'ulcère formé ; réformer les porcs très anémiés"],
+  prevention:["Mouture grossière de l'aliment, repas réguliers, pas de surpeuplement"]},
+ {id:"intox", n:"Intoxication (aliment moisi, manioc frais, plante toxique, sel)", agent:"Aflatoxines des aliments moisis, acide cyanhydrique du manioc frais, plantes toxiques, excès de sel avec manque d'eau", regl:false, zoon:false,
+  rules:[["plante_toxique",8,"aliment ou plante toxique consommé"],["aliment",2,"changement d'aliment"],["nerv",2,"signes nerveux"],["vomit",2,"vomissements"],["mort_subite",1,"morts rapides"],["evo_brutale",1,"apparition brutale"],["manque_eau",1,"manque d'eau"],["fievre",-2,"fièvre (plutôt infectieuse)"]],
+  confirm:"Recherche de l'aliment ou de la plante en cause ; analyse de l'aliment si besoin.",
+  immediat:["Supprimer l'aliment suspect, donner un aliment sain et de l'eau propre à volonté","Retirer les porcs de l'endroit où pousse la plante toxique"],
+  traitement:["Appeler le vétérinaire : certains poisons ont un traitement spécifique","Charbon végétal activé par la bouche, sur conseil du vétérinaire"],
+  prevention:["Jamais d'aliment moisi ; stocker au sec sur palettes","Manioc toujours séché, cuit ou fermenté avant d'être donné","Eau propre toujours disponible"]},
+ {id:"malnut", n:"Sous-alimentation et carences", agent:"Ration insuffisante ou déséquilibrée (manque de protéines, de minéraux ou de vitamines)", regl:false, zoon:false,
+  rules:[["ration_deseq",4,"ration déséquilibrée"],["sous_alim",3,"quantité d'aliment insuffisante"],["sans_mineraux",2,"pas de minéraux"],["amaigr",3,"amaigrissement"],["evo_chron",2,"évolution lente"],["croutes_peau",1,"peau en mauvais état"],["fievre",-2,"fièvre (plutôt infectieuse)"],["mort_subite",-2,"morts subites (peu typiques)"]],
+  confirm:"Bilan de la ration et pesée de quelques porcs.",
+  immediat:["Augmenter la ration, ajouter une source de protéines (tourteau de soja, farine de poisson) et un complément minéral et vitaminé"],
+  traitement:["Complément minéral et vitaminé ; vermifuger si les vers sont en cause"],
+  prevention:["Aliment adapté à chaque stade (porcelet, croissance, finition, truie)","Peser les porcs une fois par mois pour vérifier la croissance"]},
+];
+SP.pc = {label:"Porcs", lot:"La bande ou la porcherie", unitAge:"semaines", ageDef:12,
+  types:[["engr","Porcs à l'engraissement"],["truie","Truies et verrats"],["porcelet","Porcelets sous la mère ou sevrés"],["local","Porcs locaux, en divagation ou semi-liberté"]], typeDef:"engr",
+  vacc:[["rouget","Vaccin rouget","non"],["past","Vaccin pneumonie (pasteurellose)","non"]],
+  ctx:P_CTX, ageBands:a=> a<4?"age_lait":a<10?"age_sevr":a<28?"age_engr":"age_adult", mort:[5,1],
+  signs:P_SIGNS, questions:P_QUESTIONS, les:P_LES, dis:DIS_PC, general:P_GENERAL,
+  alert:[], vet:["dystocie","couche"], lesWarn:"Ne pas ouvrir de cadavre si plusieurs porcs meurent en quelques jours avec des taches rouges ou violacées : suspicion de peste porcine africaine, alerter les services vétérinaires. Sinon, autopsie seulement par un technicien ou un vétérinaire, avec des gants, loin de la porcherie.",
+  sample:{age:2, eff:40, sick:10, dead:1, days:3, signs:["diarrhee","diarrhee_jaune"]}};
+Object.assign(QMAP, {q_fer:"sans_fer", q_sevrage:"post_sevrage", q_chaleur:"chaleur", q_sol:"sol_abime"});
 let ESP = load('se-esp','vol'); if(!SP[ESP]) ESP='vol';
 /* =====================================================================
    ÉVALUATION DE LA FERME : hygiène, vide sanitaire, eau, bâtiment,
@@ -1942,6 +2159,44 @@ const ENV_NOTES = {
   chiens:'Chiens ou chats errants : risque de rage pour l\'homme et les animaux ; faire vacciner les chiens de la ferme.',
 };
 
+
+/* porcs : questions et facteurs de la ferme */
+(function(){
+  ENV_Q.forEach(q=>{ if(q.sp && ["vide","dejec","qte"].includes(q.id)) q.sp = [...q.sp, "pc"]; });
+  ENV_Q.forEach(q=>q.o.forEach(o=>{ if(o.v==="caill" && o.sp) o.sp = [...o.sp, "pc"]; }));
+  const elev = ENV_Q.find(q=>q.id==="elev"); if(elev){ const o = elev.o.find(x=>x.v==="porc"); if(o) o.r = {vol:1, pr:1, bv:1, pc:3}; }
+  const at = (id, q) => { const i = ENV_Q.findIndex(x=>x.id===id); ENV_Q.splice(i+1, 0, q); };
+  at("constr", {ax:"bat", id:"mode_pc", sp:["pc"], t:"sel", l:"Mode d'élevage des porcs", o:[
+    O("ferme","Porcherie fermée : porcs toujours enfermés"),
+    O("semi","Enfermés la nuit, en liberté le jour",2,["divagation","contact"],["a_porcherie"]),
+    O("libre","En divagation dans le village",3,["divagation","contact"],["a_porcherie","a_cloture"])]});
+  at("place", {ax:"bat", id:"mater", sp:["pc"], t:"sel", l:"Maternité (mise-bas des truies)", o:[
+    O("case","Case de mise-bas propre, barres contre l'écrasement, coin chauffé pour les porcelets"),
+    O("simple","Case simple, sans protection des porcelets",2,["maternite"],["a_maternite"]),
+    O("aucune","Les truies mettent bas avec les autres porcs",3,["maternite","ages_meles"],["a_maternite"]),
+    O("na","Pas de truies (engraissement seulement)")]});
+  at("quar", {ax:"bio", id:"eg", sp:["pc"], t:"sel", l:"Restes de cuisine, de restaurant ou d'abattoir (eaux grasses)", o:[
+    O("non","Jamais donnés aux porcs"),
+    O("cuit","Donnés après 30 minutes d'ébullition, sans restes de porc",1,[],["a_eaux_grasses"]),
+    O("cru","Donnés sans cuisson",3,["eaux_grasses"],["a_eaux_grasses"])]});
+  Object.assign(ACT, {
+    a_eaux_grasses:{w:"now",c:"G",t:"Ne plus donner de restes de cuisine, de restaurant ou d'abattoir sans les faire bouillir au moins 30 minutes, et jamais de restes contenant du porc : c'est la première porte d'entrée de la peste porcine africaine."},
+    a_porcherie:{w:"dur",c:"I",t:"Garder les porcs enfermés en permanence dans une porcherie clôturée : la divagation propage la peste porcine africaine, les vers et la ladrerie (transmissible à l'homme)."},
+    a_maternite:{w:"dur",c:"F",t:"Aménager une case de mise-bas propre et sèche, avec des barres contre l'écrasement et un coin chauffé (lampe ou caisse en bois) pour les porcelets."}});
+  Object.assign(FL, {eaux_grasses:"eaux grasses données sans cuisson", maternite:"maternité mal aménagée"});
+  const PCZ = {
+    vide_non:[["colib",2],["pneumo",1],["dysent",1]], vide_court:[["colib",1]], nett_rare:[["colib",2],["gale",1],["vers",1],["dysent",1]],
+    sans_desinf:[["colib",1],["ppa",1]], fumier_pres:[["vers",1]], eau_douteuse:[["colib",1]], eau_sale:[["colib",1]], manque_eau:[["chaleur",2],["intox",1]],
+    abri_precaire:[["pneumo",1],["chaleur",1]], divagation:[["ppa",3],["vers",2],["intox",1]], boue:[["vers",1],["arthrite",1]],
+    humidite:[["pneumo",2],["colib",1]], ammoniac:[["pneumo",3],["rhinite",2]], chaleur:[["chaleur",3],["rouget",1]], courant_air:[["pneumo",2],["colib",1]],
+    surpeuple:[["pneumo",2],["strep",1],["gale",1],["ulcere",1]], entretien_mauvais:[["arthrite",1]], contact_ext:[["ppa",2]], sans_pediluve:[["ppa",1]],
+    visiteurs:[["ppa",2]], sans_quarantaine:[["ppa",2],["gale",1],["pneumo",1],["repro",1]], cadavres:[["ppa",2]], cad_conso:[["ppa",2]],
+    ages_meles:[["pneumo",2],["colib",1]], especes_melees:[["fa",1]], nuisibles:[["repro",2],["dysent",1]], negligence:[["malnut",1],["vers",1]],
+    deparas:[["vers",3],["gale",1]], sans_vacc:[["rouget",2],["pneumo",1]], basfond:[["vers",1]], ordures:[["intox",2],["ppa",1]],
+    vois_porcs:[["ppa",2]], vois_morts:[["ppa",3]], voisin_proche:[["ppa",1]], partage:[["ppa",1],["repro",1]], marche:[["ppa",2]],
+    vois_bv:[["fa",1]], eaux_grasses:[["ppa",4]], maternite:[["mbpc",2],["colib",2],["anemie",1]]};
+  Object.entries(PCZ).forEach(([k,v])=>{ ENV_DZ[k] = ENV_DZ[k] || {}; ENV_DZ[k].pc = v; });
+})();
 function envItems(esp){ return ENV_Q.filter(q=>!q.sp||q.sp.includes(esp)); }
 function envOpts(q, esp){ return q.o.filter(o=>!o.sp||o.sp.includes(esp)); }
 function envR(o, esp){ return typeof o.r==='object' ? (o.r[esp]||0) : (o.r||0); }
@@ -2117,6 +2372,8 @@ const PH_ZONES = [
     ['intestin','Intestins, caecums'], ['estomac','Estomacs : panse, caillette, gésier, ventricule succenturié'],
     ['bourse','Bourse de Fabricius',VOL], ['muscle','Muscles'], ['ganglions','Ganglions'], ['organe','Autre organe']]],
 ];
+
+PH_ZONES[0][1].forEach(z=>{ if(z[2]===RUM) z[2] = [...RUM, "pc"]; });
 const PH_CAD = new Set(PH_ZONES[1][1].map(z=>z[0]));
 let DG_PH = [], PH_PENDING = [];
 const PH_PROB = {forte:['Forte','ok',4], moyenne:['Moyenne','warn',2], faible:['Faible','neutral',1]};
@@ -2258,8 +2515,8 @@ function dgSignsUI(keep){
   $('dg-lot-t').textContent = S.lot;
   const sel = (id,lab,opts,def) => `<label for="${id}">${esc(lab)}<select id="${id}">${opts.map(o=>`<option value="${o[0]}"${o[0]===def?' selected':''}>${esc(o[1])}</option>`).join('')}</select></label>`;
   const VO = [['oui','Oui, à jour'],['non','Non'],['nsp','Ne sait pas']];
-  let h = `<div class="two">${sel('dg-type', ESP==='vol'?'Type de volaille':'Espèce ou race', S.types, S.typeDef)}<label for="dg-age">Âge moyen des malades (${S.unitAge})<input id="dg-age" type="number" min="0" step="1" inputmode="numeric" value="${S.sample.age}"></label></div>
-    <div class="two"><label for="dg-eff">Effectif ${ESP==='vol'?'du lot':'du troupeau'}<input id="dg-eff" type="number" min="0" inputmode="numeric" value="${S.sample.eff}"></label><label for="dg-days">Malades depuis (jours)<input id="dg-days" type="number" min="0" inputmode="numeric" value="${S.sample.days}"></label></div>
+  let h = `<div class="two">${sel('dg-type', ESP==='vol'?'Type de volaille':ESP==='pc'?'Catégorie de porcs':'Espèce ou race', S.types, S.typeDef)}<label for="dg-age">Âge moyen des malades (${S.unitAge})<input id="dg-age" type="number" min="0" step="1" inputmode="numeric" value="${S.sample.age}"></label></div>
+    <div class="two"><label for="dg-eff">Effectif ${ESP==='vol'?'du lot':ESP==='pc'?'de la porcherie':'du troupeau'}<input id="dg-eff" type="number" min="0" inputmode="numeric" value="${S.sample.eff}"></label><label for="dg-days">Malades depuis (jours)<input id="dg-days" type="number" min="0" inputmode="numeric" value="${S.sample.days}"></label></div>
     <div class="two"><label for="dg-sick">Animaux malades<input id="dg-sick" type="number" min="0" inputmode="numeric" value="${S.sample.sick}"></label><label for="dg-dead">Animaux morts<input id="dg-dead" type="number" min="0" inputmode="numeric" value="${S.sample.dead}"></label></div>
     <div class="two">${S.vacc.map(v=>sel('dg-v-'+v[0], v[1], VO, v[2])).join('')}${sel('dg-saison','Saison',[['pluies','Saison des pluies'],['seche','Saison sèche']],'pluies')}</div>
     <label class="ck"><input type="checkbox" id="dg-intro"> Nouveaux animaux introduits dans les 3 dernières semaines</label>
@@ -2525,6 +2782,34 @@ const ST_LAB = {b:['Bon','ok'], l:['À limiter ou préparer','warn'], t:['Toxiqu
 const FEED_UNIT = {vol:'g par oiseau et par jour', pr:'kg par animal et par jour', bv:'kg par animal et par jour'};
 const CONC_IDS = new Set(['aliment_complet','conc_rum','mais','brisures','sonble','sonriz','soja','coton','palmiste','poisson','dreches','manioc_sec','manioc_frais','restes']);
 const FORAGE_GROUPS = new Set(['Herbes et fourrages','Légumineuses','Feuilles d\'arbres et d\'arbustes']);
+
+/* statut des aliments pour le porc */
+(function(){
+  const ST = {aliment_complet:"b",conc_rum:"n",mais:"b",brisures:"b",sonble:"l",sonriz:"l",soja:"b",coton:"l",palmiste:"l",poisson:"b",dreches:"b",
+    manioc_sec:"b",manioc_frais:"l",cacao:"l",restes:"l",insectes:"b",coquillage:"n",pierre:"n",moisi:"t",paturage:"l",panicum:"l",brachiaria:"l",
+    pennisetum:"l",andropogon:"n",foin:"n",imperata:"n",chromolaena:"n",fanes_arachide:"l",fanes_niebe:"l",stylosanthes:"l",centrosema:"l",pueraria:"l",
+    cajanus:"l",mucuna:"l",leucaena:"l",gliricidia:"l",moringa:"b",ficus:"n",patate:"b",manioc_feuilles:"l",manguier:"n",bananier:"l",palmier:"n",neem:"n",
+    lantana:"t",laurier_rose:"t",laurier_jaune:"t",ricin:"t",pourghere:"t",datura:"t",abrus:"t",sorgho_jeune:"n",crotalaria:"t"};
+  const PREP = {
+    restes:"Porcs : toujours bouillis 30 minutes, jamais de restes contenant du porc (peste porcine africaine).",
+    manioc_frais:"Porcs : cuire, sécher ou faire fermenter avant de donner ; pas plus de 30 à 40 % de la ration, avec une source de protéines.",
+    manioc_sec:"Porcs : bonne source d'énergie jusqu'à 30 à 40 % de la ration, à compléter en protéines.",
+    coton:"Porcs : 5 % au plus de la ration (gossypol toxique).",
+    palmiste:"Porcs : 10 à 15 % au plus de la ration.",
+    sonble:"Porcs : jusqu'à 20 % en croissance, plus chez la truie gestante (fibres).",
+    sonriz:"Porcs : 20 % au plus, frais.",
+    dreches:"Porcs : jusqu'à 20 à 30 % de la ration, fraîches.",
+    cacao:"Porcs : 5 % au plus, séchées.",
+    patate:"Porcs : bonne verdure, fraîches ou fanées ; les tubercules se donnent cuits.",
+    bananier:"Porcs : tronc haché en complément, avec un aliment riche en protéines.",
+    moringa:"Porcs : feuilles en complément, 5 à 10 % de la ration.",
+    manioc_feuilles:"Porcs : faner ou sécher avant de donner, en complément.",
+    mais:"Porcs : base énergétique de la ration (50 à 65 %), à compléter en protéines et minéraux.",
+    soja:"Porcs : principale source de protéines (15 à 25 % de la ration).",
+    poisson:"Porcs : 3 à 5 % de la ration ; arrêter un mois avant l'abattage (goût de la viande)."};
+  FEEDS.forEach(f=>{ f.s.pc = ST[f.id] || "n"; if(PREP[f.id]) f.prep = f.prep + " " + PREP[f.id]; });
+  FEED_UNIT.pc = "kg par animal et par jour";
+})();
 let DG_EXTRA = [];   // plantes ajoutées par photo : {id, n, st, prep}
 
 function feedOptions(sp){ return FEEDS.filter(f=>f.s[sp]!=='n'); }
@@ -2571,6 +2856,19 @@ function feedEval(d){
       const need = d.type==='chair' ? CHAIR_NEED[Math.min(CHAIR_NEED.length-1, wk)] : d.type==='pond' ? (wk>=18?115:Math.min(80, 15+wk*4)) : d.type==='pintade' ? 80 : 50;
       if(tot < need*0.7){ feats.add('sous_alim'); issues.push(['warn',`Quantité d'aliment donnée (${fmt(tot)} g par oiseau et par jour) inférieure au besoin estimé (environ ${fmt(need)} g à cet âge).`]); }
       else tips.push(`Quantité d'aliment (${fmt(tot)} g par oiseau et par jour) cohérente avec le besoin estimé (environ ${fmt(need)} g).`);
+    }
+  } else if(sp==='pc'){
+    const prot = ['aliment_complet','soja','poisson','dreches','insectes'].some(has);
+    if(!prot){ feats.add('ration_deseq'); issues.push(['warn',"Ration sans bonne source de protéines (tourteau de soja, farine de poisson, aliment complet) : croissance lente, porcs maigres."]); }
+    if(!has('aliment_complet')){ feats.add('sans_mineraux'); issues.push(['info',"Ration fabriquée à la ferme : ajouter un complément minéral et vitaminé pour porcs (CMV, 2,5 à 5 % de la ration)."]); }
+    if(it.some(x=>x.id==='restes')) issues.push(['warn',"Restes de cuisine : toujours les faire bouillir 30 minutes, jamais de restes de porc (peste porcine africaine)."]);
+    if(it.some(x=>x.id==='manioc_frais')) issues.push(['warn',"Manioc frais : le cuire, le sécher ou le faire fermenter avant de le donner."]);
+    const tot = conc.reduce((a,x)=>a+(x.q||0),0);
+    if(tot>0){
+      const wk = Math.max(0, d.age||0);
+      const need = d.type==='truie' ? 2.5 : wk<10 ? 0.7 : wk<16 ? 1.5 : wk<28 ? 2.4 : 2.5;
+      if(tot < need*0.7){ feats.add('sous_alim'); issues.push(['warn',`Quantité d'aliment donnée (${fmt(tot,1)} kg par porc et par jour) inférieure au besoin estimé (environ ${fmt(need,1)} kg à ce stade).`]); }
+      else tips.push(`Quantité d'aliment (${fmt(tot,1)} kg par porc et par jour) cohérente avec le besoin estimé (environ ${fmt(need,1)} kg).`);
     }
   } else {
     if(!forage.length){ feats.add('ration_deseq'); issues.push(['warn','Pas de fourrage déclaré (herbe, foin, fanes, feuillages) : le ruminant a besoin de fibres chaque jour.']); }
@@ -2703,7 +3001,7 @@ function catRender(){
   const q = ($('cat-q').value||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''), sp=$('cat-sp').value;
   const norm = s => String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
   const rows = FEEDS.filter(f=>!q || norm(f.n+' '+(f.sci||'')+' '+f.g).includes(q));
-  $('cat-tbl').innerHTML = `<table><thead><tr><th>Aliment ou plante</th>${sp==='all'?'<th>Mouton, chèvre</th><th>Bovin</th><th>Volaille</th>':'<th>Statut</th>'}<th>Comment le donner</th></tr></thead><tbody>${rows.map(f=>`<tr><td><b>${esc(f.n)}</b>${f.sci?`<br><i class="note">${esc(f.sci)}</i>`:''}<br><span class="note">${esc(f.g)}</span></td>${(sp==='all'?['pr','bv','vol']:[sp]).map(k=>`<td><span class="pill ${ST_LAB[f.s[k]][1]}">${ST_LAB[f.s[k]][0]}</span></td>`).join('')}<td class="note">${esc(f.prep)}</td></tr>`).join('')}</tbody></table>`;
+  $('cat-tbl').innerHTML = `<table><thead><tr><th>Aliment ou plante</th>${sp==='all'?'<th>Mouton, chèvre</th><th>Bovin</th><th>Volaille</th><th>Porc</th>':'<th>Statut</th>'}<th>Comment le donner</th></tr></thead><tbody>${rows.map(f=>`<tr><td><b>${esc(f.n)}</b>${f.sci?`<br><i class="note">${esc(f.sci)}</i>`:''}<br><span class="note">${esc(f.g)}</span></td>${(sp==='all'?['pr','bv','vol','pc']:[sp]).map(k=>`<td><span class="pill ${ST_LAB[f.s[k]][1]}">${ST_LAB[f.s[k]][0]}</span></td>`).join('')}<td class="note">${esc(f.prep)}</td></tr>`).join('')}</tbody></table>`;
 }
 ['cat-q','cat-sp'].forEach(id=>{ $(id).addEventListener('input',catRender); $(id).addEventListener('change',catRender); });
 
@@ -2885,6 +3183,10 @@ const ECO = {
     f:[{k:'achat',l:'Prix d\'achat d\'un jeune caprin',u:'FCFA'},{k:'mort',l:'Mortalité',u:'%'},{k:'jour',l:'Alimentation (concentré et fourrage)',u:'FCFA/jour/tête'},{k:'sante',l:'Déparasitage, vaccins, soins',u:'FCFA/tête'},{k:'autres',l:'Transport, litière, divers',u:'FCFA/tête'},{k:'prix',l:'Prix de vente normal',u:'FCFA/tête'},{k:'prixTab',l:'Prix de vente à la Tabaski',u:'FCFA/tête'},{k:'cycle',l:'Durée d\'engraissement',u:'jours'},{k:'vide',l:'Temps entre deux lots',u:'jours'},{k:'m2tete',l:'Surface de chèvrerie',u:'m²/tête'},{k:'equip',l:'Mangeoires, abreuvoirs, clôture',u:'FCFA/tête'}],
     d:{achat:25000,mort:3,jour:150,sante:2500,autres:800,prix:50000,prixTab:60000,cycle:90,vide:10,m2tete:1.0,equip:2500,m2:15000,install:150000,salaire:75000,parOuv:150,eau:8000,amortB:10,amortE:5,impr:5}},
 };
+
+ECO.porc = {n:"Porcs à l'engraissement", kind:"band", poultry:false, unit:"porc", units:"porcs",
+  f:[{k:"achat",l:"Prix d'un porcelet sevré (environ 20 kg)",u:"FCFA"},{k:"mort",l:"Mortalité",u:"%"},{k:"jour",l:"Aliment",u:"FCFA/jour/tête"},{k:"sante",l:"Déparasitage, vaccins, soins",u:"FCFA/tête"},{k:"autres",l:"Transport, désinfection, divers",u:"FCFA/tête"},{k:"prix",l:"Prix de vente d'un porc charcutier (environ 95 kg vif)",u:"FCFA/tête"},{k:"cycle",l:"Durée d'engraissement",u:"jours"},{k:"vide",l:"Vide sanitaire entre deux bandes",u:"jours"},{k:"m2tete",l:"Surface de porcherie",u:"m²/tête"},{k:"equip",l:"Mangeoires, abreuvoirs (pipettes), cloisons",u:"FCFA/tête"}],
+  d:{achat:30000,mort:4,jour:480,sante:3500,autres:1500,prix:130000,prixTab:130000,cycle:140,vide:14,m2tete:1.0,equip:6000,m2:20000,install:200000,salaire:75000,parOuv:150,eau:15000,amortB:10,amortE:5,impr:5}};
 let HYP = {}, HYP_OVR = load('se-hyp2', {});
 function rebuildHYP(){ Object.keys(ECO).forEach(t=>{ HYP[t] = {...ECO[t].d, ...(HYP_OVR[t]||{})}; }); }
 rebuildHYP();
@@ -2960,7 +3262,7 @@ function evHypUI(){
   const field = f => `<label for="hp-${f.k}">${esc(f.l)} <span class="hint">${esc(f.u)}</span><input id="hp-${f.k}" data-k="${f.k}" type="number" step="any" min="0" inputmode="decimal" value="${P[f.k]}"></label>`;
   $('ev-hyp').innerHTML = `<div class="lab-s">Production</div>${E.f.map(field).join('')}<div class="lab-s">Installation et charges fixes</div>${COMMON_F.map(field).join('')}`;
   $('ev-start-l').hidden = t!=='pondeuse';
-  $('ev-tab-l').hidden = E.poultry;
+  $('ev-tab-l').hidden = E.poultry || t==='porc'; if(t==='porc') $('ev-tab').checked = false;
 }
 function evPresets(){
   $('ev-presets').innerHTML = [100,200,300,400,500,600,700,800,900,1000].map(n=>`<button class="chipb" data-n="${n}" aria-pressed="${+$('ev-n').value===n}">${n}</button>`).join('');
@@ -3134,7 +3436,7 @@ function mkClass(r, sp){
   const dens = r.pop/Math.max(1,r.km2);
   let c = (r.pop>=800000 || dens>=150) ? 3 : (r.pop>=450000 || dens>=60) ? 2 : 1;
   if(BIG_CITY.has(r.name)) c = Math.min(3, c+1);
-  if(sp==='pr' && r.zone==='nord') c = Math.max(1, c-1);
+  if((sp==='pr'||sp==='pc') && r.zone==='nord') c = Math.max(1, c-1);
   return c;
 }
 const MK_LAB = {4:['Très forte','ok'],3:['Forte','ok'],2:['Moyenne','warn'],1:['Faible','crit']};
@@ -3145,6 +3447,29 @@ function mkInit(){
   sel.value = 'Agnéby-Tiassa';
   const {W,H,path} = MAP;
   $('mk-map').innerHTML = `<svg id="mkmap" viewBox="0 0 ${W} ${H}" role="img" aria-label="Carte du potentiel de consommation par région"><g id="mk-regs"></g><path d="${path(GEO.country)}" fill="none" stroke="var(--ink)" stroke-width="1.2" stroke-opacity=".55"/><g id="mk-marks"></g></svg>`;
+}
+
+function mkPorc(from, isAT){
+  $('mk-key').innerHTML = '<div class="callout">La viande de porc se consomme surtout dans le sud et dans les grandes villes, d\'abord à Abidjan (porc au four, porc braisé, charcuterie). La demande monte pendant les fêtes de fin d\'année. Une épidémie de peste porcine africaine fait chuter les ventes et les prix : la biosécurité protège aussi votre marché.</div>';
+  const comp = [
+    ['Élevages porcins du sud et de la périphérie d\'Abidjan','Principale offre de porcs charcutiers pour Abidjan','Abidjan, littoral, Agnéby-Tiassa, Mé'],
+    ['Viande de porc importée et charcuterie','Produits congelés ou transformés vendus en supermarché','Abidjan et grandes villes'],
+    ['Porcs locaux en divagation','Vendus moins cher dans les villages, sans contrôle sanitaire','Villages du sud et du centre'],
+  ];
+  $('mk-comp').innerHTML = `<table><thead><tr><th>Concurrent</th><th>Activité</th><th>Présence</th><th>Source</th></tr></thead><tbody>${comp.map(c=>`<tr><td><b>${esc(c[0])}</b></td><td>${esc(c[1])}</td><td>${esc(c[2])}</td><td><span class="note">constat général</span></td></tr>`).join('')}</tbody></table>
+    <p class="note">Se démarquer par des porcs de poids régulier, nourris proprement, vaccinés et déparasités, abattus à l'abattoir avec inspection des viandes.</p>`;
+  const buyers = [
+    ['Charcutiers et bouchers de porc','Porcs charcutiers vifs ou abattus','Abidjan et villes du sud','Livrer des porcs de poids régulier (90 à 110 kg)'],
+    ['Maquis et restaurants (porc au four, porc braisé)','Porcs de 60 à 100 kg','Abidjan, Agboville, Dabou, villes du sud','Petits volumes chaque semaine, paiement rapide'],
+    ['Abattoirs municipaux','Porcs à abattre avec inspection vétérinaire','Renseignez-vous auprès de la mairie et des services vétérinaires','L\'abattage contrôlé rassure les acheteurs'],
+    ['Particuliers et cérémonies','Porcs entiers ou demi-porcs','Villes et villages du sud','Fêtes de fin d\'année, mariages, funérailles : réserver à l\'avance'],
+  ];
+  $('mk-buyers').innerHTML = `<table><thead><tr><th>Acheteur</th><th>Ce qu'il achète</th><th>Où le trouver</th><th>Conseil</th></tr></thead><tbody>${buyers.map(b=>`<tr><td><b>${esc(b[0])}</b></td><td>${esc(b[1])}</td><td>${esc(b[2])}</td><td class="note">${esc(b[3])}</td></tr>`).join('')}</tbody></table>`;
+  $('mk-contacts').innerHTML = '<p class="note">Je n\'ai pas trouvé de coordonnées publiques et vérifiables d\'acheteurs de porcs. Notez ceux que vous rencontrez dans le carnet ci-dessous.</p>';
+  const ul = document.querySelector('#mk-axis ul.plain');
+  if(ul) ul.innerHTML = '<li>Abidjan, à environ 100 km, est le premier marché du porc : vendre en lots réguliers aux charcutiers et aux maquis.</li><li>Le porc se vend mal dans les zones où il est peu consommé : viser le sud et les grandes villes.</li><li>En cas de peste porcine africaine dans la zone, ne vendre et n\'acheter aucun porc sans l\'accord des services vétérinaires.</li>';
+  const note = document.querySelector('#mk-table p.note');
+  if(note) note.textContent += ' Pour le porc, une classe de moins pour les régions du nord, où la viande de porc est peu consommée.';
 }
 function marche(){
   const sp = $('mk-sp').value, from = GEO.regions.find(r=>r.name===$('mk-from').value);
@@ -3217,6 +3542,7 @@ function marche(){
     ['Abattoir de volailles d\'Azaguié (Afrique sur 7)','https://www.afrique-sur7.fr/484484-aviculture-abattoir-volailles-azaguie'],
     ['Marchés à bétail d\'Abidjan, Tabaski 2025 (Connectionivoirienne)', SRC.tab],
   ];
+  if(sp==='pc') mkPorc(from, isAT);
   $('mk-src').innerHTML = srcs.map(s=>`<li><a href="${s[1]}" target="_blank" rel="noopener">${esc(s[0])} ↗</a></li>`).join('');
 }
 ['mk-from','mk-sp'].forEach(id=>$(id).addEventListener('change',marche));
@@ -3280,6 +3606,13 @@ const REF = [
   {g:'Matières premières pour aliment', id:'mp_phos', l:'Phosphate bicalcique', u:'FCFA/kg', t:[], d:600},
   {g:'Matières premières pour aliment', id:'mp_sel', l:'Sel', u:'FCFA/kg', t:[], d:200},
 ];
+REF.push(
+  {g:"Porcs", id:"achat_porcelet", l:"Porcelet sevré acheté", u:"FCFA/tête", t:[["porc","achat"]]},
+  {g:"Porcs", id:"vente_porc", l:"Porc charcutier vendu", u:"FCFA/tête", t:[["porc","prix"]]},
+  {g:"Porcs", id:"aliment_porc", l:"Alimentation d'un porc à l'engraissement", u:"FCFA/jour", t:[["porc","jour"]]},
+  {g:"Porcs", id:"aliment_porc_kg", l:"Aliment complet porc", u:"FCFA/kg", t:[], d:300},
+  {g:"Installation et main-d'œuvre", id:"construction_porcherie", l:"Construction d'une porcherie", u:"FCFA/m²", t:[["porc","m2"]]});
+(REF.find(r=>r.id==="salaire")||{t:[]}).t.push(["porc","salaire"]);
 const REF_DEF = {}; REF.forEach(r=>{ const v = r.t.length ? ECO[r.t[0][0]].d[r.t[0][1]] : r.d; REF_DEF[r.id] = {v, date:r.date||null, src:r.src||'Valeur de départ du prototype', by:null}; });
 // relevés : produit -> paramètre de référence (+ facteur de conversion)
 const RL_PROD = [
@@ -3298,6 +3631,10 @@ const RL_PROD = [
   {id:'conc_rum', l:'Concentré ou son pour ruminants', u:'FCFA/kg', ref:'aliment_ruminant_kg', f:1},
 ];
 
+RL_PROD.push(
+  {id:"porc", l:"Porc charcutier vif", u:"FCFA/tête", ref:"vente_porc", f:1},
+  {id:"porc_kg", l:"Porc vif au kilo", u:"FCFA/kg", ref:null},
+  {id:"porcelet", l:"Porcelet sevré", u:"FCFA/tête", ref:"achat_porcelet", f:1});
 let REFV = {...REF_DEF, ...load('se-ref',{})};
 let SH = {mode:'local', db:null, user:null, canEdit:(function(){try{return localStorage.getItem('agrodiag.admin')==='1'}catch(e){return false}})(), me:null, hist:[], releves:load('se-releves',[]), buyers:null};
 
@@ -3582,8 +3919,26 @@ const PP_MB = {
       pendant:['Laisser faire si le vêlage progresse ; intervenir si rien ne sort après 1 à 2 heures','Mains et bras lavés, gants propres ; tirer seulement pendant les efforts de la vache','Veau mal placé ou vêlage bloqué : appeler le vétérinaire'],
       apres:['Le veau boit 2 à 4 litres de colostrum dans les premières heures ; cordon désinfecté à l\'iode','Placenta expulsé dans les 12 heures ; sinon, vétérinaire','Vache couchée qui ne se relève pas après le vêlage : fièvre de lait possible, vétérinaire en urgence','Saignement abondant : urgence vétérinaire']},
 };
+
+CAL.pc = {t:"Calendrier d'une portée, de la naissance à la vente", start:"Date de naissance des porcelets (ou d'arrivée des porcelets achetés)", unit:"S", rows:[
+  [0,"h","Naissance","Chaque porcelet tète le colostrum dans les 6 premières heures ; coin chauffé ; cordon désinfecté à l'iode"],
+  [3,"h","Injection de fer","Fer injectable (environ 200 mg) dans le muscle du cou de chaque porcelet entre le 2e et le 4e jour : évite l'anémie"],
+  [3,"h","Dents (si nécessaire)","Épointer les dents seulement si les tétines de la truie sont blessées ; matériel désinfecté"],
+  [14,"h","Castration des mâles destinés à l'engraissement","Avant 3 semaines, matériel désinfecté, plaie surveillée"],
+  [21,"h","Premier aliment porcelet","Un peu d'aliment premier âge à disposition pour habituer les porcelets"],
+  [35,"h","Sevrage (4 à 6 semaines)","Même aliment avant et après le sevrage, changement sur une semaine ; case propre, sèche et chaude"],
+  [42,"d","Premier déparasitage","Vermifuge sur conseil du technicien"],
+  [56,"v","Rouget (si la maladie est présente dans la zone)","Première injection, rappel selon la notice du vaccin"],
+  [84,"d","Déparasitage avant l'engraissement","Puis tous les 3 mois ; traiter aussi contre la gale si besoin"],
+  [168,"h","Vente ou abattage (90 à 110 kg vers 6 mois)","Respecter le délai d'attente des derniers médicaments ; abattage à l'abattoir avec inspection des viandes"],
+], extra:["Truies : vaccins parvovirose et rouget avant la saillie selon le vétérinaire ; déparasiter et traiter contre la gale 2 à 3 semaines avant la mise-bas","Verrats : déparasitage, traitement contre la gale et vaccin rouget deux fois par an","Aucun vaccin n'existe contre la peste porcine africaine : seule la biosécurité protège (porcherie fermée, pas d'eaux grasses crues, pédiluve, aucune visite)","Quarantaine de 3 semaines pour tout porc acheté, avec déparasitage et traitement contre la gale"]};
+PP_SAIN.pc = ["Porcherie clôturée, porcs toujours enfermés ; une seule entrée avec pédiluve","Bottes et tenue réservées à la porcherie ; aucune visite d'un autre élevage le même jour","Jamais de restes de cuisine ou d'abattoir sans 30 minutes d'ébullition, jamais de restes de porc","Conduite en bandes : tout plein, tout vide, nettoyage, désinfection et vide sanitaire entre deux bandes","Eau propre à volonté (une pipette pour 10 porcs), ombre, aération","Lutte contre les rats ; aliment stocké au sec et fermé","Registre : naissances, sevrages, vaccins, traitements, morts, ventes"];
+PP_MALADE.pc = ["Isoler les malades dans une case propre","Faire le diagnostic (onglet Diagnostic) et appeler le vétérinaire","Plusieurs morts en quelques jours, taches rouges ou violacées : prévenir aussitôt les services vétérinaires (peste porcine africaine)","Ne vendre, n'abattre et ne déplacer aucun porc malade","Enterrer les cadavres avec de la chaux ou les brûler ; ne jamais consommer leur viande","Traitement uniquement sur prescription, en respectant les délais d'attente","Après la maladie : nettoyage, désinfection et vide sanitaire avant de remettre des porcs"];
+PP_MB.pc = {avant:["2 à 3 semaines avant : déparasiter et traiter la truie contre la gale","1 semaine avant : laver et désinfecter la case de mise-bas, laver la truie et la mettre en place","Derniers jours : un peu de son ou de fibres contre la constipation ; eau à volonté"],
+  pendant:["Mise-bas normale : 2 à 5 heures, un porcelet toutes les 15 à 30 minutes","Essuyer les porcelets, dégager le nez, les mettre à la tétine et au chaud","Plus de 45 minutes d'efforts sans porcelet : appeler le technicien ou le vétérinaire ; gants propres et lubrifiant"],
+  apres:["Chaque porcelet tète le colostrum dans les 6 heures","Fer injectable entre le 2e et le 4e jour","Truie qui a de la fièvre, une mamelle dure, pas de lait ou ne mange plus : vétérinaire dans la journée (syndrome MMA)","Les placentas sortent dans les 4 heures après le dernier porcelet : les retirer et les enterrer"]};
 function prophylaxie(){
-  const p = $('pp-prod').value, C = CAL[p], ru = (p==='pr'||p==='bv');
+  const p = $('pp-prod').value, C = CAL[p], ru = (p==='pr'||p==='bv'||p==='pc');
   $('pp-date-l').firstChild.textContent = C.start;
   if(!$('pp-date').value) $('pp-date').value = isoOf(addDays(todayUTC(), -10));
   const d0 = parseISO($('pp-date').value), today = todayUTC();
@@ -3593,13 +3948,13 @@ function prophylaxie(){
   const rows = [...C.rows].sort((a,b)=>a[0]-b[0]);
   $('pp-cal').innerHTML = `<table><thead><tr><th>Âge</th><th>Date</th><th>Type</th><th>Intervention</th><th>Comment</th></tr></thead><tbody>${rows.map(r=>{ const ms=d0?addDays(d0,r[0]):null; const st = ms==null?'':(ms<today-DAY*3?'past':ms<=today+DAY*7?'now':''); return `<tr class="${st==='now'?'cur':''}"><td class="mono">${ageLab(r[0])}</td><td>${ms?fdate(ms,false):'—'}${st==='now'?' <span class="pill warn">à faire</span>':st==='past'?' <span class="note">passé</span>':''}</td><td><span class="pill ${kind[r[1]][1]}">${kind[r[1]][0]}</span></td><td><b>${esc(r[2])}</b></td><td class="note">${esc(r[3])}</td></tr>`; }).join('')}</tbody></table>
     ${C.extra?`<ul class="plain" style="margin-top:10px">${C.extra.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}`;
-  $('pp-sain').innerHTML = `<h3>Élevage sain : prophylaxie sanitaire</h3><ul class="plain">${PP_SAIN[ru?'ru':'vol'].map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
-  $('pp-malade').innerHTML = `<h3>Maladie suspectée ou confirmée</h3><ul class="plain">${PP_MALADE[ru?'ru':'vol'].map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
+  $('pp-sain').innerHTML = `<h3>Élevage sain : prophylaxie sanitaire</h3><ul class="plain">${PP_SAIN[p==='pc'?'pc':ru?'ru':'vol'].map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
+  $('pp-malade').innerHTML = `<h3>Maladie suspectée ou confirmée</h3><ul class="plain">${PP_MALADE[p==='pc'?'pc':ru?'ru':'vol'].map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
   $('pp-mb-l').hidden = !ru; $('pp-mbp').hidden = !ru;
   if(ru){
     const M = PP_MB[p], mb = parseISO($('pp-mb').value);
     const blk = (t,arr,dt) => `<p style="margin:8px 0 4px"><b>${t}</b>${dt?` <span class="note">· ${dt}</span>`:''}</p><ul class="plain">${arr.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
-    $('pp-mbp').innerHTML = `<h3>Autour de la mise-bas</h3>` + blk('Avant', M.avant, mb?`à partir du ${fdate(addDays(mb, p==='bv'?-60:-42),false)}`:'') + blk('Pendant', M.pendant, mb?`vers le ${fdate(mb,false)}`:'') + blk('Après', M.apres, '');
+    $('pp-mbp').innerHTML = `<h3>Autour de la mise-bas</h3>` + blk('Avant', M.avant, mb?`à partir du ${fdate(addDays(mb, p==='bv'?-60:p==='pc'?-21:-42),false)}`:'') + blk('Pendant', M.pendant, mb?`vers le ${fdate(mb,false)}`:'') + blk('Après', M.apres, '');
   }
 }
 ['pp-prod','pp-date','pp-mb'].forEach(id=>{ $(id).addEventListener('change',prophylaxie); $(id).addEventListener('input',prophylaxie); });
@@ -3619,12 +3974,17 @@ const GROW = [
   {id:'bovin_e', l:'Bovin à l\'embouche', p1:200, p2:300, gmq:700, conc:3, fourr:6, ref:'aliment_ruminant_kg', kind:'ru'},
   {id:'bovin_x', l:'Bovin au pâturage, avec complément', p1:150, p2:250, gmq:250, conc:1, fourr:5, ref:'aliment_ruminant_kg', kind:'ru'},
 ];
+
+GROW.push(
+  {id:"porcelet_s", l:"Porcelet sevré (post-sevrage)", p1:8, p2:25, gmq:400, ic:1.9, ref:"aliment_porc_kg", kind:"pc"},
+  {id:"porc_e", l:"Porc à l'engraissement", p1:25, p2:100, gmq:600, ic:3.2, ref:"aliment_porc_kg", kind:"pc"},
+  {id:"porc_l", l:"Porc local ou semi-amélioré", p1:15, p2:60, gmq:250, ic:4.5, ref:"aliment_porc_kg", kind:"pc"});
 function refV(id, def){ try{ const v = REFV[id] && REFV[id].v; return Number.isFinite(v)?v:def; }catch(_){ return def; } }
 function alSetDefaults(){
   const g = GROW.find(x=>x.id===$('al-prod').value);
   $('al-p1').value=g.p1; $('al-p2').value=g.p2; $('al-gmq').value=g.gmq;
-  $('al-ic-l').hidden = g.kind!=='vol'; if(g.kind==='vol') $('al-ic').value=g.ic;
-  $('al-px').value = refV(g.ref, g.kind==='vol'?400:200);
+  $('al-ic-l').hidden = !g.ic; if(g.ic) $('al-ic').value=g.ic;
+  $('al-px').value = refV(g.ref, g.kind==='vol'?400:g.kind==='pc'?300:200);
 }
 function croissance(){
   const g = GROW.find(x=>x.id===$('al-prod').value);
@@ -3634,7 +3994,7 @@ function croissance(){
   if(!(p2>p1) || !(gmq>0)){ out.innerHTML = '<p class="note">Le poids visé doit être supérieur au poids actuel, et le gain par jour positif.</p>'; return; }
   const gain = p2-p1, days = Math.ceil(gain*1000/gmq), end = addDays(d0, days);
   let feedHead, feedLab, extra='';
-  if(g.kind==='vol'){ const ic=+$('al-ic').value||g.ic; feedHead = gain*ic; feedLab='Aliment complet'; }
+  if(g.ic){ const ic=+$('al-ic').value||g.ic; feedHead = gain*ic; feedLab='Aliment complet'; }
   else { feedHead = g.conc*days; feedLab='Concentré (complément)'; extra = `<p class="note">En plus du concentré : environ ${fmt(g.fourr*days,0)} kg de matière sèche de fourrage par animal sur la période (herbe, foin, fanes, résidus), de l'eau propre à volonté et une pierre à lécher. Le gain réel dépend surtout de la qualité du fourrage.</p>`; }
   const step = days<=90 ? 7 : 30, rows=[];
   for(let j=0;j<=days;j+=step) rows.push([j, p1+gmq*j/1000]);
@@ -3649,7 +4009,7 @@ function croissance(){
     </div>
     <pre class="formula">Durée     = (poids visé − poids actuel) ÷ gain par jour
           = (${fmt(p2,2)} − ${fmt(p1,2)}) kg ÷ ${fmt(gmq)} g/j = ${fmt(days)} jours
-${g.kind==='vol'?`Aliment   = gain de poids × aliment par kg de gain
+${g.ic?`Aliment   = gain de poids × aliment par kg de gain
           = ${fmt(gain,2)} kg × ${fmt(+$('al-ic').value||g.ic,1)} = ${fmt(feedHead,1)} kg par animal`:`Concentré = durée × ${fmt(g.conc,2)} kg par jour = ${fmt(feedHead,0)} kg par animal`}</pre>
     ${extra}
     <div class="tbl"><table><thead><tr><th>${step===7?'Semaine':'Mois'}</th><th>Date</th><th class="num">Poids attendu (kg)</th></tr></thead><tbody>${rows.map(([j,w])=>`<tr><td class="mono">${step===7?Math.round(j/7):Math.round(j/30)}</td><td>${fdate(addDays(d0,j),false)}</td><td class="num">${fmt(w, w<10?2:0)}</td></tr>`).join('')}</tbody></table></div>
@@ -3729,12 +4089,19 @@ const RESSOURCES = [
   ['Épluchures de manioc séchées','Énergie','Ruminants, porcs, volailles en petite quantité','Toujours bien sécher au soleil avant usage (toxine du manioc frais)'],
   ['Coquillages broyés','Calcium','Pondeuses','Indispensable pour la solidité des coquilles'],
 ];
+
+RATIONS.push(
+  ["Porcelet sevré (8 à 25 kg)","Aliment porcelet à volonté (0,5 à 1 kg par jour) : maïs 55 %, tourteau de soja 25 %, son 10 %, farine de poisson 5 %, CMV porc 5 %","Changer d'aliment progressivement sur une semaine après le sevrage"],
+  ["Porc à l'engraissement (25 à 100 kg)","1,5 kg par jour au début jusqu'à 3 kg en fin d'engraissement : maïs 60 %, son de blé ou de riz 15 %, tourteau de soja 17 %, farine de poisson 3 %, CMV porc 5 %","Eau à volonté (5 à 10 litres par jour) ; verdure (feuilles de patate douce, moringa) en complément"],
+  ["Truie gestante","2 à 2,5 kg par jour d'un aliment riche en fibres (maïs 50 %, son 30 %, tourteau 15 %, CMV 5 %)","Ni maigre ni grasse à la mise-bas ; fibres contre la constipation"],
+  ["Truie allaitante","2 kg + 0,4 kg par porcelet allaité, soit 4 à 6 kg par jour, en 2 ou 3 repas","15 à 30 litres d'eau par jour ; augmenter progressivement après la mise-bas"],
+  ["Verrat","2,5 à 3 kg par jour d'aliment truie gestante","Garder le verrat en bon état, ni trop gras ni maigre"]);
 function alStatic(){
   $('al-rations').innerHTML = `<table><thead><tr><th>Animaux</th><th>Ration journalière</th><th>Précaution</th></tr></thead><tbody>${RATIONS.map(r=>`<tr><td><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td><td class="note">${esc(r[2])}</td></tr>`).join('')}</tbody></table>`;
   $('al-res').innerHTML = `<table><thead><tr><th>Ressource</th><th>Apport</th><th>Pour</th><th>Remarque</th></tr></thead><tbody>${RESSOURCES.map(r=>`<tr><td><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td><td>${esc(r[2])}</td><td class="note">${esc(r[3])}</td></tr>`).join('')}</tbody></table>`;
 }
 function alInit(){
-  $('al-prod').innerHTML = `<optgroup label="Volailles">${GROW.filter(g=>g.kind==='vol').map(g=>`<option value="${g.id}">${esc(g.l)}</option>`).join('')}</optgroup><optgroup label="Ruminants">${GROW.filter(g=>g.kind==='ru').map(g=>`<option value="${g.id}">${esc(g.l)}</option>`).join('')}</optgroup>`;
+  $('al-prod').innerHTML = `<optgroup label="Volailles">${GROW.filter(g=>g.kind==='vol').map(g=>`<option value="${g.id}">${esc(g.l)}</option>`).join('')}</optgroup><optgroup label="Ruminants">${GROW.filter(g=>g.kind==='ru').map(g=>`<option value="${g.id}">${esc(g.l)}</option>`).join('')}</optgroup><optgroup label="Porcs">${GROW.filter(g=>g.kind==='pc').map(g=>`<option value="${g.id}">${esc(g.l)}</option>`).join('')}</optgroup>`;
   $('al-d').value = isoOf(todayUTC()); alSetDefaults(); alStatic(); foInit();
 }
 $('al-prod').addEventListener('change', ()=>{ alSetDefaults(); croissance(); });
