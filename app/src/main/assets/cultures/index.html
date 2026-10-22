@@ -709,6 +709,56 @@ function decision(s){
   if (s>=45) return {lab:'Risqué', cls:'p-risk', col:'var(--risk)'};
   return {lab:'Déconseillé', cls:'p-bad', col:'var(--bad)'};
 }
+
+/* ---------- Pression sanitaire et climat local (au-delà d'Ecocrop) ---------- */
+function zoneGrp(loc){
+  const z=loc.zone||'';
+  if (/Montagneuse/.test(z)) return 'montagne';
+  if (/Soudanienne/.test(z)) return 'nord';
+  if (/Transition|Guinéenne/.test(z)) return 'centre';
+  return 'sud';   // forêt dense humide, littoral, périurbain
+}
+const ZONE_GRP_L={sud:'Sud forestier et littoral, chaud et humide', centre:'Centre (transition forêt-savane)', nord:'Nord (savanes soudaniennes)', montagne:'Zone montagneuse de l\'Ouest'};
+const SOLANEES=['Tomate','Aubergine','Piment'];
+// [pénalité, plafond, constat, recommandations]
+const ZONE_RISK={
+  'Tomate':{
+    sud:[25,52,"flétrissement bactérien (Ralstonia solanacearum), viroses transmises par les aleurodes (enroulement jaune, TYLCV), mildiou et nématodes à galles ; la tomate y réussit mal",
+      ["Tomate au sud : seulement en saison sèche (novembre à mars), sous abri ou en hors-sol, avec des variétés tolérantes au flétrissement bactérien et aux viroses, ou des plants greffés sur un porte-greffe résistant",
+       "Ne pas replanter de solanacées (tomate, aubergine, piment) sur la même parcelle avant 3 à 4 ans ; arracher et brûler les plants flétris",
+       "Pépinière sous filet anti-insectes contre les aleurodes ; chauler pour remonter le pH vers 6 à 6,5"]],
+    centre:[8,80,"maladies fortes en saison des pluies (flétrissement bactérien, mildiou, viroses) : réserver la tomate à la contre-saison",
+      ["Tomate au centre : production de contre-saison avec irrigation ; en saison des pluies, variétés tolérantes et tuteurage obligatoires"]]},
+  'Aubergine':{
+    sud:[12,72,"flétrissement bactérien, fusariose, nématodes et sols acides ; rendements nettement plus faibles qu'au centre et au nord",
+      ["Aubergine au sud : préférer l'aubergine africaine (Solanum aethiopicum), plus tolérante ; rotation de 3 ans sans solanacées, buttes drainées, chaulage"]]},
+  'Piment':{
+    sud:[10,74,"anthracnose des fruits, viroses et flétrissement bactérien",
+      ["Piment au sud : variétés locales tolérantes, rotation sans solanacées, récolte régulière des fruits atteints"]]},
+  'Oignon (sec)':{
+    sud:[25,45,"trop humide et trop chaud pour former de bons bulbes : mildiou, alternariose, pourriture en conservation",
+      ["Au sud, préférer l'oignon feuille ou l'échalote ; l'oignon bulbe se cultive en saison sèche fraîche dans le nord (Korhogo, Ferkessédougou)"]],
+    centre:[10,72,"humidité de saison des pluies : maladies du feuillage et mauvaise conservation des bulbes",
+      ["Oignon au centre : uniquement en saison sèche, avec irrigation, et séchage soigné des bulbes"]]},
+  'Haricot (vert)':{
+    sud:[8,78,"forte humidité : rouille, anthracnose et pourriture des gousses",
+      ["Haricot vert au sud : semis en saison sèche avec irrigation, variétés résistantes à la rouille"]]},
+  'Pastèque':{
+    sud:[8,70,"forte humidité : anthracnose, fusariose et mauvaise nouaison sous la pluie",
+      ["Pastèque au sud : uniquement en saison sèche, sur sol sableux bien drainé, avec paillage"]]},
+  'Concombre':{
+    sud:[5,85,"mildiou et oïdium en saison des pluies",
+      ["Concombre au sud : palissage pour aérer le feuillage, semis en fin de saison des pluies"]]},
+};
+function zoneRisk(loc, c, soil){
+  const g=zoneGrp(loc), R=(ZONE_RISK[c.nom]||{})[g];
+  let pen=0, cap=100, txt=[], reco=[];
+  if (R){ pen+=R[0]; cap=R[1]; txt.push(R[2]); reco.push(...R[3]); }
+  if (SOLANEES.includes(c.nom) && soil.ph<6.0){ pen+=4; txt.push(`sol acide (pH ${fmt(soil.ph,1)}) qui favorise le flétrissement bactérien`); }
+  if (SOLANEES.includes(c.nom) && /Littoral|Périurbain/.test(loc.zone||'')){ pen+=5; txt.push("proximité de la mer : embruns salés, sols sableux riches en nématodes"); reco.push("Près de la mer : brise-vent, apport de matière organique et rotation avec des plantes de service contre les nématodes (Crotalaria, Tagetes)"); }
+  if (!pen) return null;
+  return {pen, cap, txt:`${ZONE_GRP_L[g]} : ${txt.join(' ; ')}`, reco};
+}
 function evaluate(loc, c, soil){
   soil = soil || soilOf(loc);
   if (c.horsModele) return { score:null, facts:[], reco:["Activité hors du modèle sol/climat (aquaculture) : à évaluer avec des critères propres (eau, salinité, site)."], cal:null };
@@ -784,6 +834,9 @@ function evaluate(loc, c, soil){
   if (c.per && c.sec===2 && K.secs<=2 && cap>64){ cap=64; capWhy='pas de vraie saison sèche pour la floraison'; }
   if (score>cap){ facts.push(['Facteur limitant', cap-score, 0, `score plafonné à ${cap} : ${capWhy}`]); score=cap; }
   if (c.alt && loc.zone!=='Zone Montagneuse Ouest'){ score-=25; facts.push(['Altitude', -25, 0, `culture de climat frais (optimum ${fmt(c.ecoT[0])}–${fmt(c.ecoT[1])} °C) hors zone montagneuse`]); reco.push("Culture de climat frais : à réserver à la zone montagneuse de l'Ouest (Man, Biankouma, Danané)."); }
+  { const zr=zoneRisk(loc, c, soil);
+    if (zr){ score-=zr.pen; facts.push(['Pression sanitaire et climat local', -zr.pen, 0, zr.txt]); reco.push(...zr.reco);
+      if (score>zr.cap){ facts.push(['Facteur limitant', zr.cap-score, 0, `score plafonné à ${zr.cap} : réussite limitée par les maladies et le climat de la zone`]); score=zr.cap; } } }
   if (!S.over && !loc.perso) reco.push("Sol issu de la moyenne de zone : confirmer par une analyse de la parcelle (rubrique « Saisir mon analyse de sol »).");
   return { score:Math.max(0,Math.min(100,Math.round(score))), facts, reco:[...new Set(reco)], cal, K };
 }
