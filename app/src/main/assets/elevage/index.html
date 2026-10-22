@@ -3187,6 +3187,10 @@ const ECO = {
 ECO.porc = {n:"Porcs à l'engraissement", kind:"band", poultry:false, unit:"porc", units:"porcs",
   f:[{k:"achat",l:"Prix d'un porcelet sevré (environ 20 kg)",u:"FCFA"},{k:"mort",l:"Mortalité",u:"%"},{k:"jour",l:"Aliment",u:"FCFA/jour/tête"},{k:"sante",l:"Déparasitage, vaccins, soins",u:"FCFA/tête"},{k:"autres",l:"Transport, désinfection, divers",u:"FCFA/tête"},{k:"prix",l:"Prix de vente d'un porc charcutier (environ 95 kg vif, à 2 000 à 2 500 FCFA le kg)",u:"FCFA/tête"},{k:"cycle",l:"Durée d'engraissement",u:"jours"},{k:"vide",l:"Vide sanitaire entre deux bandes",u:"jours"},{k:"m2tete",l:"Surface de porcherie",u:"m²/tête"},{k:"equip",l:"Mangeoires, abreuvoirs (pipettes), cloisons",u:"FCFA/tête"}],
   d:{achat:30000,mort:4,jour:480,sante:3500,autres:1500,prix:214000,prixTab:214000,cycle:140,vide:14,m2tete:1.0,equip:6000,m2:20000,install:200000,salaire:75000,parOuv:150,eau:15000,amortB:10,amortE:5,impr:5}};
+
+/* poids vendu, pour les indicateurs par kg */
+[["chair",1.7],["hybride",2.0],["ovin",35],["caprin",22],["porc",95]].forEach(([t,v])=>{ if(!ECO[t]) return; ECO[t].f.push({k:"poids",l:"Poids vif moyen à la vente",u:"kg/animal"}); ECO[t].d.poids=v; });
+ECO.pondeuse.f.push({k:"kgPl",l:"Poids d'un plateau de 30 œufs",u:"kg"}); ECO.pondeuse.d.kgPl=1.8;
 let HYP = {}, HYP_OVR = load('se-hyp2', {});
 function rebuildHYP(){ Object.keys(ECO).forEach(t=>{ HYP[t] = {...ECO[t].d, ...(HYP_OVR[t]||{})}; }); }
 rebuildHYP();
@@ -3294,6 +3298,12 @@ function devis(){
   const r = econ(t, N, P, o); evLast = {r, t, N, P:{...P}, o};
   const u = r.unit, m6 = r.months[5];
   const ok = u.margin > 0;
+  const kgU = E.kind==='lay' ? (P.kgPl||1.8) : (P.poids||0);
+  const unitsYear = E.kind==='lay' ? (o.start==='poulette'?N:N*(1-P.mortE/100))*(P.taux/100)*(1-P.casse/100)*12 : N*(1-P.mort/100)*365/Math.max(1,P.cycle+P.vide);
+  const perM2 = v => r.surface>0 ? v*unitsYear/r.surface : NaN;
+  const IND = [['Produit brut (prix de vente)',u.price,''],['Charges variables',u.cv,''],['Marge brute',u.mb,'sub'],['Charges fixes',u.cost-u.cv,''],['Marge nette',u.margin,'tot'],['Coût de production',u.cost,'tot']];
+  const indHTML = `<h3 style="margin-top:6px">Coût de production et marges</h3><div class="tbl"><table><thead><tr><th>FCFA</th><th class="num">${E.kind==='lay'?'Par plateau':'Par '+esc(E.unit)}</th><th class="num">Par kg ${E.kind==='lay'?'d\'œufs':'vif'}</th><th class="num">Par m² de bâtiment et par an</th></tr></thead><tbody>${IND.map(([l,v,c])=>`<tr class="${c}"><td>${l}</td><td class="num ${v<0?'neg':''}">${F0(v)}</td><td class="num ${v<0?'neg':''}">${kgU>0?F0(v/kgU):'—'}</td><td class="num ${v<0?'neg':''}">${Number.isFinite(perM2(v))?F0(perM2(v)):'—'}</td></tr>`).join('')}</tbody></table></div>
+    <p class="note">Par kg : ${E.kind==='lay'?`plateau de 30 œufs de ${fmt(kgU,1)} kg`:`${esc(E.unit)} vendu à ${fmt(kgU, kgU<10?1:0)} kg vif`}, modifiable dans « Prix et hypothèses ». Par m² et par an : environ ${fmt(Math.round(unitsYear))} ${E.kind==='lay'?'plateaux':esc(E.units)} vendus par an sur ${fmt(r.surface,0)} m² de bâtiment, en régime normal. En élevage hors-sol, le m² de bâtiment remplace l'hectare des cultures.</p>`;
   $('ev-summary').innerHTML = `
     <div class="btns" style="justify-content:space-between;align-items:center"><h3>${esc(E.n)} · ${fmt(N)} ${E.poultry?'sujets':'têtes'}${t==='pondeuse'?' · départ '+(o.start==='poulette'?'en poulettes':'en poussins'):''}</h3><span class="pill ${ok?'ok':'crit'}">${ok?'Activité rentable avec ces prix':'Non rentable avec ces prix'}</span></div>
     <div class="figs">
@@ -3307,6 +3317,7 @@ function devis(){
       <div class="fig"><div class="lab">Marge nette sur 6 mois</div><div class="big" style="font-size:1.6rem">${fmtShort(m6.mn)}<small>FCFA</small></div></div>
       <div class="fig"><div class="lab">Marge nette par mois en régime normal</div><div class="big" style="font-size:1.6rem">${fmtShort(r.steady)}<small>FCFA</small></div></div>
     </div>
+    ${indHTML}
     <p class="callout">Prix de vente minimum pour couvrir tous les coûts : <b>${F0(u.cost)} FCFA ${esc(u.label)}</b>.${(()=>{ const s=[100,200,300,400,500,600,700,800,900,1000].find(n=>econ(t,n,P,o).unit.margin>0); return s? ` Avec ces prix, l'activité devient rentable à partir d'environ ${fmt(s)} ${E.poultry?'sujets':'têtes'}.` : ' Avec ces prix, aucun effectif de 100 à 1 000 n\'est rentable : il faut vendre plus cher ou réduire les coûts (aliment surtout).'; })()}</p>
     <div class="tbl"><table><thead><tr><th>Composition du coût ${esc(u.label)}</th><th class="num">FCFA</th><th class="num">Part</th></tr></thead><tbody>
       ${u.detail.map(([l,v])=>`<tr><td>${esc(l)}</td><td class="num">${F0(v)}</td><td class="num">${fmt(v/u.cost*100,0)} %</td></tr>`).join('')}
@@ -3402,6 +3413,8 @@ function devisPDF(x){
   ], [55,85,40], {right:[2]});
   w.sec(`3. Coût de production et marge ${u.label}`);
   w.table(['Élément','FCFA'], [...u.detail.map(([l,v])=>[l,F0(v)]), {cells:['Coût de production',F0(u.cost)],bold:true}, ['Prix de vente',F0(u.price)], {cells:['Marge brute',F0(u.mb)]}, {cells:['Marge nette',F0(u.margin)],bold:true, fill: u.margin>=0?[227,241,230]:[247,225,223]}], [140,40], {right:[1]});
+  { const kgU = E.kind==='lay' ? (P.kgPl||1.8) : (P.poids||0);
+    if(kgU>0) w.table([E.kind==='lay'?'Par kg d\'oeufs':'Par kg vif','FCFA/kg'], [['Coût de production',F0(u.cost/kgU)],['Marge brute',F0(u.mb/kgU)],{cells:['Marge nette',F0(u.margin/kgU)],bold:true}], [140,40], {right:[1]}); }
   w.sec('4. Résultats cumulés de 1 à 6 mois (FCFA)');
   const lab = E.kind==='lay'?'Plateaux vendus':'Animaux vendus';
   const col = k => r.months.map(m=>typeof k==='function'?k(m):F0(m[k]));

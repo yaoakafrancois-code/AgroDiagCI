@@ -17,7 +17,17 @@
 .pm-sub{margin-top:10px;font-size:14px}
 .pm-sub ul,.pm-sub ol{margin:4px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:3px}
 .pm-plan{background:var(--accent-soft);border-radius:8px;padding:10px 12px}
-</style></head><body><div class="shell-bar"><a class="shell-back" href="../index.html" aria-label="Retour à l'accueil">&#8592; Accueil · AKA AgroDiag CI</a></div><title>AgroDiag CI</title>
+</style><style id="marges-css">
+.mtab{width:100%;border-collapse:collapse;font-size:13px}
+.mtab th,.mtab td{padding:7px 4px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.mtab th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:600}
+.mtab .num{text-align:right;font-family:var(--font-mono);white-space:nowrap}
+.mtab tr.tot td{font-weight:700}
+.mtab tr.cp td{background:var(--sunk)}
+.mtab .neg{color:var(--bad)} .mtab .pos{color:var(--good)}
+.mtab-wrap{grid-column:1/-1;overflow-x:auto}
+</style>
+</head><body><div class="shell-bar"><a class="shell-back" href="../index.html" aria-label="Retour à l'accueil">&#8592; Accueil · AKA AgroDiag CI</a></div><title>AgroDiag CI</title>
 <style>
 /* Layout : barre d'onglets fixe en haut, une colonne sur téléphone, liste + fiche côte à côte sur grand écran */
 :root{
@@ -389,6 +399,9 @@ table.coords th{background:#E8ECE5;font-family:inherit}
       <div class="notice" id="engBox" style="margin-top:14px"></div>
       <h3 style="font-size:15px;margin-top:18px">Charges par hectare (FCFA/ha)</h3>
       <div class="costs" id="costLines"></div>
+      <h3 style="font-size:15px;margin-top:18px">Charges fixes par hectare et par an (FCFA/ha)</h3>
+      <p class="small muted" style="margin:4px 0 8px">Elles ne dépendent pas de la quantité produite : on les retire de la marge brute pour obtenir la marge nette.</p>
+      <div class="costs" id="fixLines"></div>
       <div class="row" style="margin-top:16px;align-items:center">
         <button class="btn primary" id="saveCost">Enregistrer comme référence</button>
         <span class="small muted" id="costMeta"></span>
@@ -1102,6 +1115,8 @@ function renderCult(){
 const LINES=[['semences','Semences ou plants'],['engrais','Engrais'],['amendements','Amendements (chaux, compost)'],['phyto','Produits phytosanitaires'],['irrigation','Irrigation'],['mo',"Main-d'œuvre"],['autres','Autres (transport, sacs…)']];
 const calcCults=ACTIVE.filter(c=>!c.horsModele);
 $('#cCult').innerHTML=calcCults.map(c=>`<option>${esc(c.nom)}</option>`).join('');
+const FIXL=[['amort',"Amortissement (matériel, magasin, plantation)"],['terre','Location de la terre (fermage)'],['credit','Intérêts du crédit de campagne'],['fautres','Autres frais fixes (gardiennage, cotisations, encadrement)']];
+$('#fixLines').innerHTML=FIXL.map(([k,lab])=>`<label for="cf-${k}">${lab}</label><input type="number" id="cf-${k}" min="0" step="1000" placeholder="0">`).join('');
 $('#costLines').innerHTML=LINES.map(([k,lab])=>`<label for="cl-${k}">${lab}</label><input type="number" id="cl-${k}" min="0" step="1000" placeholder="0">`).join('');
 function refreshCostMeta(){ const c=CULT[$('#cCult').value]; if(!c) return; const r=S.costs[slug(c.nom)]; $('#costMeta').textContent = r ? `Référence enregistrée le ${new Date(r.maj).toLocaleDateString('fr-FR')}` : 'Aucune référence enregistrée pour cette culture.'; }
 function loadCalc(){
@@ -1109,6 +1124,7 @@ function loadCalc(){
   $('#cRend').value = ref?.rendement ?? c.rmoy ?? '';
   $('#cPrix').value = ref?.prix ?? '';
   LINES.forEach(([k])=>$('#cl-'+k).value = ref?.charges?.[k] ?? '');
+  FIXL.forEach(([k])=>$('#cf-'+k).value = ref?.fixes?.[k] ?? '');
   $('#cRendHint').textContent = c.rmoy!=null ? `Repère du fichier : ${fmt(c.rmoy,1)} t/ha en moyenne, ${fmt(c.rmax,1)} t/ha au maximum.` : 'Pas de rendement de référence dans le fichier.';
   renderEng(ref?.prixSac);
   refreshCostMeta(); calc();
@@ -1123,29 +1139,47 @@ function renderEng(prixSac){
 }
 function calc(){
   const c=CULT[$('#cCult').value];
-  const ids=['cSurf','cRend','cPrix',...LINES.map(([k])=>'cl-'+k)];
+  const ids=['cSurf','cRend','cPrix',...LINES.map(([k])=>'cl-'+k),...FIXL.map(([k])=>'cf-'+k)];
   const neg=ids.filter(id=>parseFloat($('#'+id).value)<0);
   ids.forEach(id=>$('#'+id).style.borderColor = neg.includes(id)?'var(--bad)':'');
   if (neg.length){ $('#calcRes').innerHTML='<p class="small" style="color:var(--bad);grid-column:1/-1;margin:0">Les valeurs négatives ne sont pas acceptées : corrigez les champs en rouge.</p>'; $('#calcNote').textContent=''; return; }
   const surf=parseFloat($('#cSurf').value)||0, rend=parseFloat($('#cRend').value)||0, prix=parseFloat($('#cPrix').value)||0;
-  const ch=LINES.reduce((s,[k])=>s+(parseFloat($('#cl-'+k).value)||0),0);
-  const pb=rend*1000*prix, mb=pb-ch;
+  const cv=LINES.reduce((s,[k])=>s+(parseFloat($('#cl-'+k).value)||0),0);
+  const cf=FIXL.reduce((s,[k])=>s+(parseFloat($('#cf-'+k).value)||0),0);
+  const ct=cv+cf, kg=rend*1000, pb=kg*prix, mb=pb-cv, mn=mb-cf;
   const cell=(k,v,cls='')=>`<div><div class="k">${k}</div><div class="v ${cls}">${v}</div></div>`;
-  $('#calcRes').innerHTML=cell('Production', `${fmt(rend*surf,1)} t`)+cell('Produit brut', prix?`${fmt(pb*surf)} F`:'prix à saisir')+
-    cell('Charges', `${fmt(ch*surf)} F`)+cell('Marge brute', prix?`${fmt(mb*surf)} F`:'—', prix?(mb<0?'neg':'pos'):'')+
-    cell('Marge par ha', prix?`${fmt(mb)} F`:'—', prix?(mb<0?'neg':'pos'):'')+cell('Rentabilité / charges', prix&&ch?`${fmt(mb/ch*100)} %`:'—')+
-    cell("Rendement d'équilibre", prix&&ch?`${fmt(ch/(prix*1000),2)} t/ha`:'—')+cell("Prix d'équilibre", rend&&ch?`${fmt(ch/(rend*1000))} F/kg`:'—');
+  const sg=v=>v<0?'neg':'pos';
+  const fk=v=>`${fmt(v, Math.abs(v)<100?1:0)} F`;
+  const line=(lab,v,needPrix,opt={})=>{ const ok=!needPrix||prix>0;
+    const t=ok?`${fmt(v*surf)} F`:'—', h=ok?`${fmt(v)} F`:'—', k=ok&&kg>0?fk(v/kg):'—', s=opt.sign&&ok?sg(v):'';
+    return `<tr class="${opt.cls||''}"><td>${lab}</td><td class="num ${s}">${t}</td><td class="num ${s}">${h}</td><td class="num ${s}">${k}</td></tr>`; };
+  $('#calcRes').innerHTML=
+    cell('Production', `${fmt(rend*surf,1)} t`)+cell('Coût de production', ct&&kg?`${fk(ct/kg)} / kg`:'—')+
+    cell('Marge brute par ha', prix?`${fmt(mb)} F`:'—', prix?sg(mb):'')+cell('Marge nette par ha', prix?`${fmt(mn)} F`:'—', prix?sg(mn):'')+
+    cell('Marge brute par kg', prix&&kg?fk(mb/kg):'—', prix?sg(mb):'')+cell('Marge nette par kg', prix&&kg?fk(mn/kg):'—', prix?sg(mn):'')+
+    `<div class="mtab-wrap"><table class="mtab"><thead><tr><th></th><th class="num">Total ${fmt(surf,surf%1?1:0)} ha</th><th class="num">Par hectare</th><th class="num">Par kg</th></tr></thead><tbody>
+      ${line('Produit brut (ventes)', pb, true)}
+      ${line('Charges variables', cv, false)}
+      ${line('Marge brute', mb, true, {cls:'tot', sign:true})}
+      ${line('Charges fixes', cf, false)}
+      ${line('Marge nette', mn, true, {cls:'tot', sign:true})}
+      ${line('Coût de production', ct, false, {cls:'cp'})}
+    </tbody></table></div>`+
+    cell('Rentabilité / coût total', prix&&ct?`${fmt(mn/ct*100)} %`:'—', prix&&ct?sg(mn):'')+cell("Rendement d'équilibre", prix&&ct?`${fmt(ct/(prix*1000),2)} t/ha`:'—')+
+    cell("Prix d'équilibre (couvre tout)", rend&&ct?`${fmt(ct/kg)} F/kg`:'—')+cell("Prix couvrant les charges variables", rend&&cv?`${fmt(cv/kg)} F/kg`:'—');
   const warn = c.rmax && rend>c.rmax*1.2 ? `Attention : ${fmt(rend,1)} t/ha dépasse le rendement maximal de référence (${fmt(c.rmax,1)} t/ha). ` : '';
-  $('#calcNote').textContent = warn + (c.per?"Culture pérenne : le calcul porte sur une année en pleine production, sans les frais d'installation. ":'') + (ch===0?'Saisissez les charges par hectare pour obtenir la marge.':'');
+  $('#calcNote').textContent = warn + (c.per?"Culture pérenne : le calcul porte sur une année en pleine production ; l'amortissement de la plantation peut être compté dans les charges fixes. ":'') + (ct===0?'Saisissez les charges par hectare pour obtenir les marges.':'Marge brute = produit brut − charges variables. Marge nette = marge brute − charges fixes. Coût de production = charges variables + charges fixes.');
 }
 $('#cCult').addEventListener('change', loadCalc);
 $('#cSurf').addEventListener('input', ()=>{ renderEng($('#cSac')?.value||null); calc(); });
-['cRend','cPrix',...LINES.map(([k])=>'cl-'+k)].forEach(id=>$('#'+id).addEventListener('input', calc));
+['cRend','cPrix',...LINES.map(([k])=>'cl-'+k),...FIXL.map(([k])=>'cf-'+k)].forEach(id=>$('#'+id).addEventListener('input', calc));
 $('#saveCost').onclick=async()=>{
   const c=CULT[$('#cCult').value];
   const doc={ culture:c.nom, rendement:parseFloat($('#cRend').value)||null, prix:parseFloat($('#cPrix').value)||null, prixSac:parseFloat($('#cSac')?.value)||null,
     charges:Object.fromEntries(LINES.map(([k])=>[k, parseFloat($('#cl-'+k).value)||0])), maj:new Date().toISOString() };
   doc.total=Object.values(doc.charges).reduce((a,b)=>a+b,0);
+  doc.fixes=Object.fromEntries(FIXL.map(([k])=>[k, parseFloat($('#cf-'+k).value)||0])); doc.totalFixes=Object.values(doc.fixes).reduce((a,b)=>a+b,0);
+  if (Object.values(doc.fixes).some(v=>v<0)){ toast('Les valeurs négatives ne sont pas acceptées'); return; }
   if (!doc.total){ toast('Saisissez au moins une charge'); return; }
   if (Object.values(doc.charges).some(v=>v<0)||doc.prix<0||doc.rendement<0){ toast('Les valeurs négatives ne sont pas acceptées'); return; }
   if (c.rmax && doc.rendement>c.rmax*2){ toast(`Rendement improbable : plus du double du maximum de référence (${fmt(c.rmax,1)} t/ha)`); return; }
@@ -1209,7 +1243,7 @@ document.querySelectorAll('[data-exp]').forEach(b=>b.onclick=async()=>{
     allLocs().forEach(l=>ACTIVE.forEach(c=>{ if(c.horsModele) return; const e=evaluate(l,c,{ph:l.ph,mo:l.mo,drain:l.drain});
       rows.push([l.nom,l.reg,c.nom,l.ref[c.nom]!=null?'oui':'non',l.ref[c.nom]??'',e.score,decision(e.score).lab,e.cal?(e.cal.irr?'contre-saison':e.cal.ok>0?MOIS_L[e.cal.start]:'aucun'):'pérenne',reliability(l).lab,e.facts.map(f=>`${f[0]} ${Math.round(f[1])}/${f[2]}`).join(' ; '),e.reco.join(' | ')]); }));
     S.over=saved; }
-  else { name='couts_agrodiag.csv'; rows=[['culture','rendement_t_ha','prix_fcfa_kg','prix_sac_engrais',...LINES.map(l=>'cout_'+l[0]+'_fcfa_ha'),'cout_total_fcfa_ha','mise_a_jour']].concat(Object.values(S.costs).map(c=>[c.culture,c.rendement,c.prix,c.prixSac,...LINES.map(l=>c.charges?.[l[0]]??0),c.total,c.maj]));
+  else { name='couts_agrodiag.csv'; rows=[['culture','rendement_t_ha','prix_fcfa_kg','prix_sac_engrais',...LINES.map(l=>'cout_'+l[0]+'_fcfa_ha'),'cout_total_fcfa_ha',...FIXL.map(l=>'fixe_'+l[0]+'_fcfa_ha'),'charges_fixes_fcfa_ha','cout_production_fcfa_ha','cout_production_fcfa_kg','marge_brute_fcfa_ha','marge_nette_fcfa_ha','marge_brute_fcfa_kg','marge_nette_fcfa_kg','mise_a_jour']].concat(Object.values(S.costs).map(c=>[c.culture,c.rendement,c.prix,c.prixSac,...LINES.map(l=>c.charges?.[l[0]]??0),c.total,...FIXL.map(l=>c.fixes?.[l[0]]??0),...(()=>{ const cf=c.totalFixes||0, ct=(c.total||0)+cf, kg=(c.rendement||0)*1000, pb=kg*(c.prix||0), mb=pb-(c.total||0), mn=mb-cf, r=v=>Math.round(v), pk=v=>kg&&c.prix!=null?Math.round(v/kg*10)/10:''; return [cf, ct, kg?Math.round(ct/kg*10)/10:'', c.prix!=null?r(mb):'', c.prix!=null?r(mn):'', pk(mb), pk(mn)]; })(),c.maj]));
     if (rows.length===1){ $('#expNote').textContent="Aucun coût enregistré pour l'instant."; return; } }
   const r=await saveFile(name, csv(rows), 'text/csv');
   $('#expNote').textContent = r==='ok' ? `${name} : ${rows.length-1} lignes.` : r==='declined' ? 'Téléchargement annulé.' : 'Téléchargement impossible.';
