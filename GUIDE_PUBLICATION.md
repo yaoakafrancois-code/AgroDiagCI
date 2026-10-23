@@ -28,14 +28,7 @@ Dans le dépôt : **Settings > Secrets and variables > Actions > New repository 
 
 Gardez le dossier `cle_signature` en lieu sûr (clé USB + copie privée). Toutes les mises à jour de l'application devront être signées avec cette clé.
 
-**APK de test** : il est signé avec une clé privée distincte, gardée elle aussi dans les secrets :
-
-| Nom du secret | Valeur |
-|---|---|
-| `AGRODIAG_TEST_KEYSTORE_BASE64` | le contenu de la clé de test encodé en base64 (alias `agrodiag`) |
-| `AGRODIAG_TEST_KEYSTORE_PASSWORD` | son mot de passe |
-
-Sans ces deux secrets, l'APK de test est compilé mais **n'est pas publié** : aucune clé de signature ne doit se trouver dans le dépôt.
+**APK de test** : rien à faire. Il est signé avec une clé privée créée automatiquement à la première compilation et gardée dans la base Supabase (schéma `prive`, table `cles_build`). La fonction `cle-signature` ne la remet qu'à la compilation `build.yml` de la branche `main` de ce dépôt, sur présentation d'un jeton signé par GitHub. Si la clé ne peut pas être obtenue, l'APK de test n'est **pas publié** : aucune clé de signature ne doit se trouver dans le dépôt.
 
 ## Étape 3 – Mettre en ligne la politique de confidentialité (2 min)
 

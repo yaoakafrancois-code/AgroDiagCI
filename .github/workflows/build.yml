@@ -7,13 +7,13 @@ on:
 
 permissions:
   contents: write
+  id-token: write   # jeton GitHub prouvant que c'est bien ce dépôt qui demande la clé de signature
 
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
       KS: ${{ secrets.AGRODIAG_KEYSTORE_BASE64 }}
-      TEST_KS: ${{ secrets.AGRODIAG_TEST_KEYSTORE_BASE64 }}
     steps:
       - uses: actions/checkout@v5
 
@@ -31,14 +31,29 @@ jobs:
         with:
           gradle-version: '8.13'
 
-      - name: Préparer la clé privée des APK de test
-        if: ${{ env.TEST_KS != '' }}
-        run: echo "$TEST_KS" | base64 -d > "$RUNNER_TEMP/test.jks"
+      # Clé privée des APK de test : gardée dans Supabase, remise uniquement à cette compilation (main)
+      # sur présentation d'un jeton signé par GitHub. Au tout premier passage, une clé est créée ici.
+      - name: Récupérer la clé privée des APK de test
+        id: cle
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: |
+          set -euo pipefail
+          PW=$(openssl rand -hex 24)
+          keytool -genkeypair -keystore "$RUNNER_TEMP/candidat.jks" -storetype PKCS12 -alias agrodiag -keyalg RSA -keysize 4096 -validity 10000 \
+            -storepass "$PW" -keypass "$PW" -dname "CN=AKA AgroDiag CI, O=YAO Aka Francois, C=CI" > /dev/null 2>&1
+          jq -n --arg k "$(base64 -w0 "$RUNNER_TEMP/candidat.jks")" --arg p "$PW" '{keystore:$k,password:$p}' > "$RUNNER_TEMP/candidat.json"
+          OIDC=$(curl -sSf -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=agrodiag-cle-signature" | jq -r .value)
+          curl -sSf -X POST -H "Authorization: Bearer $OIDC" -H "Content-Type: application/json" --data @"$RUNNER_TEMP/candidat.json" \
+            https://uxgwwwdtvrocuqnxuzzn.supabase.co/functions/v1/cle-signature > "$RUNNER_TEMP/cle.json"
+          P=$(jq -r .password "$RUNNER_TEMP/cle.json")
+          echo "::add-mask::$P"
+          jq -r .keystore "$RUNNER_TEMP/cle.json" | base64 -d > "$RUNNER_TEMP/test.jks"
+          rm -f "$RUNNER_TEMP/candidat.jks" "$RUNNER_TEMP/candidat.json" "$RUNNER_TEMP/cle.json"
+          echo "AGRODIAG_TEST_KEYSTORE_PATH=$RUNNER_TEMP/test.jks" >> "$GITHUB_ENV"
+          echo "AGRODIAG_TEST_KEYSTORE_PASSWORD=$P" >> "$GITHUB_ENV"
+          echo "ok=true" >> "$GITHUB_OUTPUT"
 
       - name: APK de test (installable directement sur un téléphone)
-        env:
-          AGRODIAG_TEST_KEYSTORE_PATH: ${{ env.TEST_KS != '' && format('{0}/test.jks', runner.temp) || '' }}
-          AGRODIAG_TEST_KEYSTORE_PASSWORD: ${{ secrets.AGRODIAG_TEST_KEYSTORE_PASSWORD }}
         run: gradle --no-daemon assembleDebug
 
       - name: Préparer la clé de signature
@@ -56,7 +71,7 @@ jobs:
 
       # Publié seulement s'il est signé avec la clé privée (sinon n'importe qui pourrait imiter les mises à jour)
       - name: Publier l'APK de test (lien de téléchargement fixe)
-        if: ${{ env.TEST_KS != '' }}
+        if: ${{ steps.cle.outputs.ok == 'true' }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
