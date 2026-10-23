@@ -23,6 +23,15 @@ jobs:
       - name: Télécharger l'APK de test publié
         run: curl -sSL -o app.apk https://github.com/${{ github.repository }}/releases/download/test/AgroDiag-CI-test.apk
 
+      # Copie signée seulement avec l'ancienne clé de test, pour vérifier que la mise à jour s'installe par-dessus
+      - name: Préparer une « ancienne version » (ancienne clé de test)
+        run: |
+          set -euo pipefail
+          BT="$ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)"
+          curl -sSfL -o ancienne.jks https://raw.githubusercontent.com/${{ github.repository }}/6f4c70bf786dd2801e05449522f3b1deb6ab78f2/app/test-signing.jks
+          cp app.apk ancienne.apk
+          "$BT/apksigner" sign --ks ancienne.jks --ks-key-alias test --ks-pass pass:agrodiagtest --key-pass pass:agrodiagtest ancienne.apk
+
       - name: Installer, ouvrir et capturer l'écran (Android 14)
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -32,6 +41,7 @@ jobs:
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
           script: |
+            adb install ancienne.apk
             adb install -r app.apk
             adb logcat -c
             adb shell am start -W -n com.agrodiag.ci/.MainActivity

@@ -56,6 +56,28 @@ jobs:
       - name: APK de test (installable directement sur un téléphone)
         run: gradle --no-daemon assembleDebug
 
+      # Changement de clé officiel d'Android (signature v3, Android 9 et plus) : l'APK porte la preuve que
+      # l'ancienne clé de test (publique, retirée du dépôt en 1.8.2) passe la main à la nouvelle clé privée.
+      # Les téléphones qui ont l'ancienne version font donc la mise à jour par-dessus, sans perdre leurs données ;
+      # ensuite, seule la nouvelle clé est acceptée pour les mises à jour suivantes.
+      - name: Transmettre l'ancienne clé de test à la nouvelle
+        if: ${{ steps.cle.outputs.ok == 'true' }}
+        run: |
+          set -euo pipefail
+          BT="$ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)"
+          curl -sSfL -o "$RUNNER_TEMP/ancienne.jks" \
+            https://raw.githubusercontent.com/${{ github.repository }}/6f4c70bf786dd2801e05449522f3b1deb6ab78f2/app/test-signing.jks
+          APK=app/build/outputs/apk/debug/app-debug.apk
+          "$BT/apksigner" rotate --out "$RUNNER_TEMP/lignee.bin" \
+            --old-signer --ks "$RUNNER_TEMP/ancienne.jks" --ks-key-alias test --ks-pass pass:agrodiagtest --key-pass pass:agrodiagtest \
+            --new-signer --ks "$AGRODIAG_TEST_KEYSTORE_PATH" --ks-key-alias agrodiag --ks-pass env:AGRODIAG_TEST_KEYSTORE_PASSWORD --key-pass env:AGRODIAG_TEST_KEYSTORE_PASSWORD
+          "$BT/apksigner" sign --lineage "$RUNNER_TEMP/lignee.bin" --rotation-min-sdk-version 28 \
+            --ks "$RUNNER_TEMP/ancienne.jks" --ks-key-alias test --ks-pass pass:agrodiagtest --key-pass pass:agrodiagtest \
+            --next-signer --ks "$AGRODIAG_TEST_KEYSTORE_PATH" --ks-key-alias agrodiag --ks-pass env:AGRODIAG_TEST_KEYSTORE_PASSWORD --key-pass env:AGRODIAG_TEST_KEYSTORE_PASSWORD \
+            "$APK"
+          "$BT/apksigner" verify -v --print-certs "$APK" | grep -E "Verified using|Signer|DN:" || true
+          rm -f "$RUNNER_TEMP/ancienne.jks" "$RUNNER_TEMP/lignee.bin"
+
       - name: Préparer la clé de signature
         if: ${{ env.KS != '' }}
         run: echo "$KS" | base64 -d > "$RUNNER_TEMP/upload.jks"
