@@ -453,7 +453,7 @@ table.coords th{background:#E8ECE5;font-family:inherit}
   <details class="card" id="adminLogin">
     <summary style="cursor:pointer;font-weight:600">Accès administrateur</summary>
     <div class="row" style="margin-top:12px;align-items:flex-end">
-      <div class="field" style="max-width:240px"><label for="admCode">Code administrateur</label><input type="password" id="admCode" autocomplete="off" inputmode="numeric"></div>
+      <div class="field" style="max-width:240px"><label for="admCode">Code administrateur</label><input type="password" id="admCode" autocomplete="off" inputmode="numeric"><label class="small" style="display:flex;gap:6px;align-items:center;margin-top:6px;font-weight:400"><input type="checkbox" id="admShow" style="width:auto" onchange="document.getElementById('admCode').type=this.checked?'text':'password'"> Afficher le code</label></div>
       <div class="field" style="flex:0 0 auto"><button class="btn" id="admGo">Ouvrir l'administration</button></div>
     </div>
     <p class="small" id="admMsg" style="margin:8px 0 0"></p>
@@ -1758,7 +1758,7 @@ function delEd(x){
   ADMIN.key=null; saveDraft(dd, 'Élément supprimé du brouillon');
 }
 $('#admGo').onclick=()=>{
-  const v=$('#admCode').value;
+  const v=String($('#admCode').value||'').replace(/\s+/g,'');
   if (D.adminHash && sha256(v)===D.adminHash){ lsSet('agrodiag.admin','1'); $('#admMsg').textContent=''; toast('Mode administrateur activé'); setTimeout(()=>{ pref.set('agrodiag.tab','qual'); location.reload(); }, 500); }
   else { $('#admMsg').textContent='Code incorrect.'; $('#admMsg').style.color='var(--bad)'; }
 };
