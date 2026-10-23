@@ -100,7 +100,10 @@ public class MainActivity extends Activity {
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri url = request.getUrl();
                 if (HOST.equals(url.getHost())) return false;
-                // Liens externes (NASA POWER, sources) : ouverts dans le navigateur du téléphone
+                // Liens externes (NASA POWER, sources) : ouverts dans le navigateur du téléphone,
+                // uniquement pour les adresses web, courriel et téléphone (pas d'intent:, file:, content:…)
+                String scheme = url.getScheme() == null ? "" : url.getScheme().toLowerCase(java.util.Locale.ROOT);
+                if (!scheme.equals("https") && !scheme.equals("http") && !scheme.equals("mailto") && !scheme.equals("tel")) return true;
                 try {
                     startActivity(new Intent(Intent.ACTION_VIEW, url));
                 } catch (ActivityNotFoundException e) {
@@ -113,6 +116,12 @@ public class MainActivity extends Activity {
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
+                // Le GPS n'est donné qu'aux pages de l'application elle-même
+                Uri o = Uri.parse(origin);
+                if (!"https".equals(o.getScheme()) || !HOST.equals(o.getHost())) {
+                    callback.invoke(origin, false, false);
+                    return;
+                }
                 if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     callback.invoke(origin, true, false);
                 } else {
