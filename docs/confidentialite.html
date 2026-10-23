@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="icon.svg">
+<title>Confidentialité AKA AgroDiag CI</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+/* Layout: one readable column, short numbered articles like a legal notice */
+:root{
+  --bg:#F1F3EE; --surface:#FFFFFF; --ink:#17201A; --muted:#566259; --line:#D5DBD1; --accent:#17694A;
+  --display:"Barlow Semi Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111612; --surface:#19201B; --ink:#E5EBE4; --muted:#9BA89E; --line:#2C362F; --accent:#5DB88C; color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#111612; --surface:#19201B; --ink:#E5EBE4; --muted:#9BA89E; --line:#2C362F; --accent:#5DB88C; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:17px/1.6 var(--body)}
+main{max-width:46rem;margin:0 auto;padding-block:40px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:28px}
+header{border-bottom:3px solid var(--accent);padding-bottom:18px}
+.app{font:700 .9rem var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0}
+h1{font:700 2.2rem/1.1 var(--display);margin:6px 0 8px;text-wrap:balance}
+.meta{color:var(--muted);margin:0;font-size:.95rem}
+section{display:flex;flex-direction:column;gap:8px}
+h2{font:600 1.35rem/1.2 var(--display);margin:0;text-wrap:balance}
+p,ul{margin:0}
+ul{padding-left:1.2em;display:flex;flex-direction:column;gap:4px}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.contact{font-weight:600;user-select:all}
+footer{color:var(--muted);font-size:.9rem;border-top:1px solid var(--line);padding-top:16px}
+</style>
+<main>
+  <header>
+    <p class="app">AKA AgroDiag CI</p>
+    <h1>Politique de confidentialité</h1>
+    <p class="meta">Application Android « AKA AgroDiag CI » (com.agrodiag.ci) · éditeur : YAO Aka François, Abidjan, Côte d'Ivoire · en vigueur le 21 octobre 2026, mise à jour le même jour (inscription transmise à l'éditeur)</p>
+  </header>
+
+  <p class="box">En résumé : votre inscription (nom, prénoms, contact, profil) est transmise à l'éditeur seulement avec votre accord, pour suivre l'utilisation de l'application et vous contacter à son sujet. Tout ce que vous saisissez ensuite dans l'application reste sur votre téléphone. Aucune donnée n'est vendue ni partagée.</p>
+
+  <section>
+    <h2>1. Inscription transmise à l'éditeur</h2>
+    <p>À la première ouverture, l'application vous demande de vous identifier : nom, prénoms, téléphone ou e-mail, et profil (facultatif), sans mot de passe. Si vous cochez la case d'accord, ces informations sont envoyées une fois à la base de données de l'éditeur, hébergée par Supabase en Europe, avec la date d'inscription et la date de votre dernière utilisation (au plus une fois par jour). Elles servent uniquement à connaître le nombre d'utilisateurs et à vous contacter au sujet de l'application (mises à jour, enquêtes de satisfaction). Elles ne sont ni vendues, ni partagées, ni utilisées pour de la publicité. Seul l'éditeur peut les consulter. Les échanges sont chiffrés (HTTPS).</p>
+  </section>
+
+  <section>
+    <h2>2. Données de travail : uniquement sur votre téléphone</h2>
+    <p>Les informations que vous saisissez ensuite restent dans la mémoire de votre téléphone et ne sont envoyées à personne : localités, analyses de sol, coûts de production, fiches terrain, nom et téléphone d'un éleveur, coordonnées GPS d'une parcelle ou d'un élevage, observations sur les animaux, photos de lésions.</p>
+    <ul>
+      <li>Pas d'outil de mesure d'audience, de traceur ou d'identifiant publicitaire.</li>
+      <li>Pas de publicité.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>3. Autorisations du téléphone</h2>
+    <ul>
+      <li><b>Photos et fichiers</b> : uniquement quand vous choisissez vous-même une photo (animal, lésion) ou un fichier à importer. Ils restent sur le téléphone.</li>
+      <li><b>Localisation (GPS)</b> : uniquement quand vous demandez de relever la position d'une parcelle ou d'un élevage. La position reste sur le téléphone.</li>
+      <li><b>Internet</b> : l'application fonctionne hors connexion. Avec une connexion, elle envoie votre inscription si vous l'avez acceptée (voir point 1) et peut télécharger la mise à jour des données de référence publiée par l'éditeur (cultures, prix, recommandations), sans rien envoyer d'autre. Internet sert aussi si vous ouvrez vous-même un lien externe (carte, données climatiques, source citée).</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>4. Fichiers enregistrés</h2>
+    <p>Quand vous enregistrez une fiche PDF ou une sauvegarde, Android vous demande où la ranger sur votre téléphone. L'éditeur n'y a pas accès.</p>
+  </section>
+
+  <section>
+    <h2>5. Conservation, modification et suppression</h2>
+    <p>Les données de travail restent sur le téléphone tant que vous ne les supprimez pas : désinstaller l'application ou vider ses données dans les paramètres Android les efface. Votre inscription est conservée chez l'éditeur tant que vous utilisez l'application. Vous pouvez demander à tout moment à la consulter, la corriger ou la supprimer en écrivant à l'adresse ci-dessous : la suppression est faite sous 30 jours.</p>
+  </section>
+
+  <section>
+    <h2>Formulaire de commande de ce site</h2><p>Si vous envoyez une demande depuis le formulaire de ce site, votre nom, votre téléphone, votre organisation, votre localité et votre message sont envoyés à l'éditeur par WhatsApp ou par e-mail, depuis votre téléphone, uniquement pour vous recontacter au sujet de votre demande. Vous pouvez demander leur suppression à l'adresse ci-dessous.</p>
+<h2>6. Enfants</h2>
+    <p>L'application est destinée aux professionnels et producteurs adultes. Elle ne s'adresse pas aux enfants.</p>
+  </section>
+
+  <section>
+    <h2>7. Contact</h2>
+    <p>Pour toute question, ou pour consulter, corriger ou supprimer votre inscription :</p>
+    <p class="contact">yaoakafrancois@gmail.com</p>
+  </section>
+
+  <footer>Toute modification de cette politique sera publiée sur cette page avec sa nouvelle date d'entrée en vigueur.</footer>
+</main>
+
+</html>
