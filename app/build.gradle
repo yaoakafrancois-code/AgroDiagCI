@@ -21,12 +21,16 @@ android {
     }
 
     signingConfigs {
-        // Clé fixe pour les APK de test : les mises à jour s'installent par-dessus sans perdre les données
+        // Clé privée des APK de test (secrets GitHub, jamais dans le dépôt) : les mises à jour
+        // s'installent par-dessus sans perdre les données. Sans elle (ordinateur), clé de débogage d'Android.
         debug {
-            storeFile file('test-signing.jks')
-            storePassword 'agrodiagtest'
-            keyAlias 'test'
-            keyPassword 'agrodiagtest'
+            def testPath = System.getenv('AGRODIAG_TEST_KEYSTORE_PATH')
+            if (testPath) {
+                storeFile file(testPath)
+                storePassword System.getenv('AGRODIAG_TEST_KEYSTORE_PASSWORD')
+                keyAlias 'agrodiag'
+                keyPassword System.getenv('AGRODIAG_TEST_KEYSTORE_PASSWORD')
+            }
         }
         release {
             def storePath = sig('AGRODIAG_KEYSTORE_PATH', 'storeFile')
