@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       KS: ${{ secrets.AGRODIAG_KEYSTORE_BASE64 }}
+      TEST_KS: ${{ secrets.AGRODIAG_TEST_KEYSTORE_BASE64 }}
     steps:
       - uses: actions/checkout@v5
 
@@ -30,7 +31,14 @@ jobs:
         with:
           gradle-version: '8.13'
 
+      - name: Préparer la clé privée des APK de test
+        if: ${{ env.TEST_KS != '' }}
+        run: echo "$TEST_KS" | base64 -d > "$RUNNER_TEMP/test.jks"
+
       - name: APK de test (installable directement sur un téléphone)
+        env:
+          AGRODIAG_TEST_KEYSTORE_PATH: ${{ env.TEST_KS != '' && format('{0}/test.jks', runner.temp) || '' }}
+          AGRODIAG_TEST_KEYSTORE_PASSWORD: ${{ secrets.AGRODIAG_TEST_KEYSTORE_PASSWORD }}
         run: gradle --no-daemon assembleDebug
 
       - name: Préparer la clé de signature
@@ -46,7 +54,9 @@ jobs:
           AGRODIAG_KEY_PASSWORD: ${{ secrets.AGRODIAG_KEY_PASSWORD }}
         run: gradle --no-daemon bundleRelease
 
+      # Publié seulement s'il est signé avec la clé privée (sinon n'importe qui pourrait imiter les mises à jour)
       - name: Publier l'APK de test (lien de téléchargement fixe)
+        if: ${{ env.TEST_KS != '' }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

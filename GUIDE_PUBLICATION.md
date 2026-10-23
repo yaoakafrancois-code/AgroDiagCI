@@ -28,6 +28,15 @@ Dans le dépôt : **Settings > Secrets and variables > Actions > New repository 
 
 Gardez le dossier `cle_signature` en lieu sûr (clé USB + copie privée). Toutes les mises à jour de l'application devront être signées avec cette clé.
 
+**APK de test** : il est signé avec une clé privée distincte, gardée elle aussi dans les secrets :
+
+| Nom du secret | Valeur |
+|---|---|
+| `AGRODIAG_TEST_KEYSTORE_BASE64` | le contenu de la clé de test encodé en base64 (alias `agrodiag`) |
+| `AGRODIAG_TEST_KEYSTORE_PASSWORD` | son mot de passe |
+
+Sans ces deux secrets, l'APK de test est compilé mais **n'est pas publié** : aucune clé de signature ne doit se trouver dans le dépôt.
+
 ## Étape 3 – Mettre en ligne la politique de confidentialité (2 min)
 
 Google l'exige. Dans le dépôt : **Settings > Pages**. Source : **Deploy from a branch**, branche `main`, dossier `/docs`, puis **Save**. Après une minute, la page est en ligne à l'adresse :
