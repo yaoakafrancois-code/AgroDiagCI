@@ -1,4 +1,240 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><style id="shell-back">
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><style id="ft-css">
+.ft-switch{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 0}
+.ft-chiffres{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin:0 0 6px}
+.ft-chiffres div{background:var(--surface,#fff);border:1px solid var(--line,#D5DBD1);border-radius:10px;padding:8px 10px}
+.ft-chiffres span{display:block;font-size:.8rem;color:var(--muted,#566259)}
+.ft-chiffres b{font-size:.98rem}
+.ft-sec{margin-top:16px}.ft-sec h3{margin:0 0 8px}
+.ft-fig{margin:8px 0 10px;max-width:680px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.ft-fig svg{min-width:540px}
+.ft-picts{display:flex;gap:8px;margin:4px 0}
+.ft-sec ul{margin:6px 0 0;padding-left:20px}.ft-sec li{margin:3px 0}
+</style>
+<script>
+/* Illustrations des fiches techniques d'élevage : plans et coupes cotés (SVG). */
+(function(){
+  'use strict';
+  const C={ink:'#1E2B22',mut:'#5B6A60',line:'#2F3B33',wall:'#B9A68A',wallD:'#8C7A5E',soil:'#8A6A45',soilL:'#B08E62',grass:'#5E9C5A',grassD:'#3F7E46',roof:'#A35A2A',tin:'#9AA6A0',wire:'#7A8A82',water:'#5EA3D6',green:'#17694A',ochre:'#E0A526',straw:'#E8C76A',white:'#FFFFFF',paper:'#FBF8F1'};
+  const T=(x,y,s,o={})=>`<text x="${x}" y="${y}" font-family="Source Sans 3,Segoe UI,Arial,sans-serif" font-size="${o.fs||15}" font-weight="${o.fw||600}" fill="${o.c||C.ink}" text-anchor="${o.a||'middle'}"${o.rot?` transform="rotate(${o.rot} ${x} ${y})"`:''}>${s}</text>`;
+  // cote avec flèches
+  const dim=(x1,y1,x2,y2,lab,o={})=>{ const id='a'+Math.random().toString(36).slice(2,7); const mx=(x1+x2)/2, my=(y1+y2)/2; const vert=Math.abs(x1-x2)<1;
+    return `<defs><marker id="${id}" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="${C.green}"/></marker></defs>
+    <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${C.green}" stroke-width="2" marker-start="url(#${id})" marker-end="url(#${id})"/>
+    ${vert?T(mx+(o.dx??-8),my+5,lab,{c:C.green,a:o.a||'end',fs:14,fw:700}):T(mx,my+(o.dy??-8),lab,{c:C.green,fs:14,fw:700})}`; };
+  const callout=(x,y,tx,ty,lab,a='start')=>`<line x1="${x}" y1="${y}" x2="${tx}" y2="${ty}" stroke="${C.mut}" stroke-width="1.4"/><circle cx="${x}" cy="${y}" r="3.5" fill="${C.mut}"/>${T(tx+(a==='start'?4:-4),ty+5,lab,{a,fs:14,c:C.ink})}`;
+  const svg=(w,h,body,title)=>`<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${title}" style="width:100%;height:auto;display:block;background:${C.paper};border-radius:12px">${body}</svg>`;
+  const snail=(x,y,s=1,f=false)=>`<g transform="translate(${x} ${y}) scale(${f?-s:s} ${s})"><path d="M-14 6 Q-20 6 -22 2 L-26 -4 M-22 2 L-28 -1" stroke="#6B4E2E" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M-22 6 L16 6 Q20 6 18 3 L-20 3 Z" fill="#9C7A55"/><ellipse cx="2" cy="-6" rx="13" ry="11" fill="#7A4B22"/><path d="M2 -6 m-9 0 a9 8 0 1 0 9 -8 a6 5 0 1 0 5 6" fill="none" stroke="#E2B26A" stroke-width="2"/></g>`;
+  const rabbit=(x,y,s=1)=>`<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="0" cy="0" rx="20" ry="13" fill="#D9D2C5"/><circle cx="17" cy="-9" r="9" fill="#D9D2C5"/><ellipse cx="17" cy="-25" rx="3.5" ry="11" fill="#D9D2C5" transform="rotate(-12 17 -25)"/><ellipse cx="23" cy="-24" rx="3.5" ry="11" fill="#CFC6B6" transform="rotate(10 23 -24)"/><circle cx="20" cy="-10" r="1.8" fill="#3A2A1E"/><circle cx="-20" cy="-2" r="4" fill="#F4F0E8"/></g>`;
+  const agouti=(x,y,s=1)=>`<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="0" cy="0" rx="26" ry="14" fill="#8A6A45"/><ellipse cx="22" cy="-6" rx="12" ry="9" fill="#7A5C3A"/><circle cx="16" cy="-14" r="4" fill="#6A4E30"/><circle cx="28" cy="-8" r="1.8" fill="#1E140C"/><path d="M-26 2 q-12 2 -16 -2" stroke="#6A4E30" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M-12 12 v6 M12 12 v6" stroke="#5A4028" stroke-width="3"/></g>`;
+  const pig=(x,y,s=1)=>`<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="0" cy="0" rx="26" ry="15" fill="#E7B7A6"/><ellipse cx="25" cy="-2" rx="9" ry="8" fill="#E7B7A6"/><ellipse cx="32" cy="0" rx="4" ry="4" fill="#D69886"/><path d="M18 -12 l6 -7 l3 8z" fill="#D69886"/><circle cx="25" cy="-5" r="1.6" fill="#3A2A1E"/><path d="M-12 13 v7 M12 13 v7" stroke="#C98E7B" stroke-width="4"/></g>`;
+  const hen=(x,y,s=1)=>`<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="0" cy="0" rx="13" ry="10" fill="#F2EDE2"/><circle cx="11" cy="-9" r="6" fill="#F2EDE2"/><path d="M9 -16 q2 -5 5 0 q2 -4 4 1" fill="#C8372D"/><path d="M17 -9 l5 2 l-5 2z" fill="${C.ochre}"/><path d="M-3 10 v6 M3 10 v6" stroke="${C.ochre}" stroke-width="2"/></g>`;
+  const sheep=(x,y,s=1)=>`<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="0" cy="0" rx="22" ry="14" fill="#EFE9DC"/><ellipse cx="22" cy="-5" rx="8" ry="7" fill="#5A4636"/><path d="M-12 12 v9 M10 12 v9" stroke="#5A4636" stroke-width="3"/></g>`;
+
+  /* ---------------- ESCARGOTS ---------------- */
+  function escargotierePlan(){
+    let b='';
+    b+=T(320,28,'Escargotière en parcs : vue de dessus',{fs:18,fw:700});
+    // caniveau d'eau
+    b+=`<rect x="60" y="50" width="520" height="290" rx="10" fill="${C.water}" opacity=".35"/>`;
+    b+=`<rect x="78" y="68" width="484" height="254" fill="${C.wall}"/>`;
+    // 4 compartiments
+    const xs=[90,210,330,450];
+    xs.forEach((x,i)=>{ b+=`<rect x="${x}" y="80" width="110" height="230" fill="${C.soilL}"/>`;
+      for(let k=0;k<9;k++) b+=`<path d="M${x+10+(k%3)*35} ${100+Math.floor(k/3)*70} q6 -14 12 0" stroke="${C.grassD}" stroke-width="3" fill="none"/>`;
+      b+=snail(x+55,150+ (i%2)*60,0.9,i%2===1)+snail(x+40,250,0.75); });
+    b+=['Reproducteurs','Pondoir','Naissains','Croissance'].map((l,i)=>`<rect x="${xs[i]+8}" y="86" width="94" height="22" rx="6" fill="#FBF8F1" opacity=".9"/>`+T(xs[i]+55,102,l,{fs:13,fw:700})).join('');
+    b+=dim(90,372,200,372,'1 m',{dy:16});
+    b+=dim(612,80,612,310,'2 m',{dx:-10,a:'start'}).replace('text-anchor="start"','text-anchor="end"');
+    b+=callout(70,190,10,190,'','start');
+    b+=`<text x="40" y="200" transform="rotate(-90 40 200)" font-family="Source Sans 3,Arial" font-size="13" font-weight="700" fill="#2D6E9E" text-anchor="middle">Caniveau d'eau contre les fourmis</text>`;
+    return svg(640,390,b,"Plan d'escargotière");
+  }
+  function escargotiereCoupe(){
+    let b=T(320,28,'Coupe d\'un parc',{fs:18,fw:700});
+    // sol
+    b+=`<rect x="20" y="300" width="600" height="70" fill="${C.soil}"/>`;
+    // caniveaux
+    b+=`<rect x="70" y="286" width="40" height="22" fill="${C.water}"/><rect x="530" y="286" width="40" height="22" fill="${C.water}"/>`;
+    // murs (fondation 20 cm)
+    b+=`<rect x="120" y="180" width="22" height="160" fill="${C.wall}" stroke="${C.wallD}"/><rect x="498" y="180" width="22" height="160" fill="${C.wall}" stroke="${C.wallD}"/>`;
+    // rebord anti-fuite
+    b+=`<path d="M131 180 h40" stroke="${C.tin}" stroke-width="6"/><path d="M509 180 h-40" stroke="${C.tin}" stroke-width="6"/>`;
+    // substrat
+    b+=`<rect x="142" y="250" width="356" height="50" fill="${C.soilL}"/>`;
+    b+=`<rect x="142" y="240" width="356" height="12" fill="#6E8F3E"/>`;
+    for(let k=0;k<6;k++) b+=`<path d="M${170+k*55} 240 q8 -26 16 0" stroke="${C.grassD}" stroke-width="4" fill="none"/>`;
+    b+=snail(250,232,1)+snail(390,232,1,true);
+    // abreuvoir et mangeoire
+    b+=`<rect x="300" y="234" width="40" height="8" rx="3" fill="${C.water}"/><rect x="430" y="232" width="44" height="10" rx="3" fill="${C.ochre}"/>`;
+    // grillage
+    b+=`<path d="M120 172 L520 172" stroke="${C.wire}" stroke-width="3" stroke-dasharray="6 4"/>`;
+    // toit ombrage
+    b+=`<path d="M80 92 L320 60 L560 92" stroke="${C.roof}" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M110 92 v80 M530 92 v80" stroke="${C.wallD}" stroke-width="6"/>`;
+    b+=dim(100,180,100,300,'60 cm',{dx:-6});
+    b+=dim(160,262,160,300,'20–30 cm',{dx:10,a:'start'});
+    b+=callout(160,180,60,140,'Rebord en tôle vers l\'intérieur','start').replace('x="64"','x="40"');
+    b+=callout(320,172,330,150,'Grillage fin contre rats et oiseaux','start');
+    b+=callout(320,64,360,48,'Toit d\'ombrage (palmes, paille)','start');
+    b+=callout(90,296,40,350,'Caniveau d\'eau','start');
+    b+=callout(320,238,300,210,'Abreuvoir peu profond','end');
+    b+=callout(452,234,470,212,'Aliment + calcium','start');
+    b+=callout(300,280,230,345,'Terre meuble humide (humus), sans argile collante','start');
+    return svg(640,380,b,"Coupe d'un parc à escargots");
+  }
+  function escargotPonte(){
+    let b=T(320,28,'Ponte et éclosion',{fs:18,fw:700});
+    const step=(x,n,lab,inner)=>`<g transform="translate(${x} 60)"><rect width="180" height="210" rx="16" fill="${C.white}" stroke="#D8D1C2"/><circle cx="26" cy="26" r="16" fill="${C.ochre}"/>${T(26,32,n,{fs:16,fw:700})}${inner}${T(90,192,lab,{fs:14})}</g>`;
+    b+=step(20,'1','L\'escargot creuse et pond',`<rect x="20" y="110" width="140" height="60" fill="${C.soilL}"/>${snail(90,104,1.1)}<g fill="#F6EFD8" stroke="#D9C9A0">${[0,1,2,3,4,5].map(i=>`<ellipse cx="${60+(i%3)*22}" cy="${140+Math.floor(i/3)*14}" rx="7" ry="6"/>`).join('')}</g>`);
+    b+=step(230,'2','Laisser les œufs 2 à 4 semaines',`<rect x="20" y="70" width="140" height="100" fill="${C.soilL}"/><g fill="#F6EFD8" stroke="#D9C9A0">${[0,1,2,3,4,5,6,7].map(i=>`<ellipse cx="${50+(i%4)*26}" cy="${100+Math.floor(i/4)*30}" rx="8" ry="7"/>`).join('')}</g>${T(90,62,'Arroser légèrement',{fs:13,c:'#2D6E9E'})}`);
+    b+=step(440,'3','Les petits sortent : parc à naissains',`<rect x="20" y="120" width="140" height="50" fill="${C.soilL}"/>${[0,1,2,3,4].map(i=>snail(40+i*28,114,0.45,i%2===1)).join('')}${T(90,90,'Feuilles tendres + calcium',{fs:13,c:C.green})}`);
+    return svg(640,290,b,"Ponte des escargots");
+  }
+
+  /* ---------------- LAPINS ---------------- */
+  function clapierFace(){
+    let b=T(320,28,'Clapier à 3 cages : vue de face',{fs:18,fw:700});
+    b+=`<path d="M60 70 L580 70 L560 54 L80 54 Z" fill="${C.roof}"/>`;
+    // pieds
+    b+=`<path d="M90 230 v120 M550 230 v120 M320 230 v120" stroke="${C.wallD}" stroke-width="8"/>`;
+    b+=`<rect x="40" y="345" width="560" height="18" fill="${C.soil}"/>`;
+    // cages
+    const cage=(x,lab,inner)=>`<g><rect x="${x}" y="72" width="160" height="150" fill="#F4F1EA" stroke="${C.line}" stroke-width="3"/>${Array.from({length:9},(_,i)=>`<path d="M${x+16*(i+1)} 72 v150" stroke="${C.wire}" stroke-width="1.2"/>`).join('')}${Array.from({length:5},(_,i)=>`<path d="M${x} ${72+25*(i+1)} h160" stroke="${C.wire}" stroke-width="1.2"/>`).join('')}${inner}${T(x+80,248,lab,{fs:14})}</g>`;
+    b+=cage(80,'Femelle + boîte à nid',`<rect x="160" y="160" width="70" height="56" fill="#C9A26B" stroke="${C.wallD}"/>${T(195,193,'nid',{fs:12,c:C.white})}${rabbit(118,195,0.9)}`);
+    b+=cage(250,'Mâle',rabbit(330,195,1));
+    b+=cage(420,'Engraissement (4 à 6)',rabbit(460,200,0.7)+rabbit(520,185,0.7)+rabbit(490,210,0.6));
+    // mangeoire, abreuvoir
+    b+=`<rect x="92" y="200" width="22" height="16" fill="${C.ochre}"/><circle cx="300" cy="120" r="8" fill="${C.water}"/>`;
+    // bac déjections
+    b+=`<path d="M80 236 L580 236" stroke="${C.mut}" stroke-width="2" stroke-dasharray="5 4"/>`;
+    b+=callout(103,206,40,300,'Mangeoire','start');
+    b+=callout(300,120,330,100,'Biberon ou abreuvoir propre','start');
+    b+=dim(80,268,240,268,'80 cm',{dy:16});
+    b+=dim(66,72,66,222,'45 cm',{dx:-5});
+    b+=dim(612,236,612,345,'80 cm',{dx:-8});
+    b+=callout(450,300,380,320,'Les crottes tombent à travers le grillage','end');
+    return svg(640,380,b,'Clapier pour lapins');
+  }
+  function clapierBatiment(){
+    let b=T(320,28,'Bâtiment d\'élevage (coupe)',{fs:18,fw:700});
+    b+=`<rect x="20" y="320" width="600" height="40" fill="${C.soil}"/>`;
+    b+=`<path d="M60 130 L320 70 L580 130" stroke="${C.tin}" stroke-width="12" fill="none"/><path d="M60 130 L320 70 L580 130" stroke="#C3CDC7" stroke-width="4" fill="none"/>`;
+    b+=`<rect x="80" y="130" width="14" height="190" fill="${C.wall}"/><rect x="546" y="130" width="14" height="190" fill="${C.wall}"/>`;
+    b+=`<rect x="80" y="250" width="14" height="70" fill="${C.wallD}"/><rect x="546" y="250" width="14" height="70" fill="${C.wallD}"/>`;
+    b+=`<path d="M80 140 v100 M560 140 v100" stroke="${C.wire}" stroke-width="5" stroke-dasharray="4 3"/>`;
+    // cages
+    b+=`<rect x="140" y="190" width="150" height="60" fill="#F4F1EA" stroke="${C.line}" stroke-width="2"/><rect x="350" y="190" width="150" height="60" fill="#F4F1EA" stroke="${C.line}" stroke-width="2"/>`;
+    b+=rabbit(210,230,0.7)+rabbit(420,230,0.7);
+    b+=`<path d="M150 250 v70 M280 250 v70 M360 250 v70 M490 250 v70" stroke="${C.wallD}" stroke-width="5"/>`;
+    // flèches d'air
+    b+=`<path d="M20 180 h50 m-10 -8 l10 8 l-10 8" stroke="#2D6E9E" stroke-width="3" fill="none"/><path d="M570 180 h50 m-10 -8 l10 8 l-10 8" stroke="#2D6E9E" stroke-width="3" fill="none"/>`;
+    b+=`<circle cx="600" cy="58" r="18" fill="#F4C24E"/>`;
+    b+=callout(80,190,30,110,'Murets bas + grillage : air qui circule','start');
+    b+=callout(320,74,360,52,'Toit avec débord, isolé (paille ou palmes)','start');
+    b+=callout(320,285,300,305,'Sol cimenté en pente, facile à laver','end');
+    b+=T(320,375,'Ni soleil direct, ni pluie, ni courant d\'air froid. Au-dessus de 30 °C, les lapins souffrent.',{fs:14,c:C.mut,fw:400});
+    return svg(640,385,b,'Bâtiment pour lapins');
+  }
+  function lapinCycle(){
+    let b=T(320,28,'Cycle de la lapine',{fs:18,fw:700});
+    const steps=[['J0','Saillie chez le mâle'],['J12','Palpation'],['J27','Boîte à nid'],['J31','Mise-bas (6 à 8)'],['J66','Sevrage (5 sem.)']];
+    b+=`<path d="M70 150 H570" stroke="${C.green}" stroke-width="6" stroke-linecap="round"/>`;
+    steps.forEach(([j,l],i)=>{ const x=70+i*125; b+=`<circle cx="${x}" cy="150" r="22" fill="${i===3?C.ochre:C.white}" stroke="${C.green}" stroke-width="4"/>${T(x,156,j,{fs:14,fw:700})}${T(x,205,l,{fs:13})}`; });
+    b+=rabbit(380,100,0.9)+`<rect x="330" y="96" width="34" height="22" fill="#C9A26B"/>`;
+    return svg(640,240,b,'Cycle de reproduction de la lapine');
+  }
+
+  /* ---------------- AGOUTIS ---------------- */
+  function enclosAgouti(){
+    let b=T(320,28,'Enclos à agoutis : vue de dessus',{fs:18,fw:700});
+    b+=`<rect x="50" y="50" width="540" height="270" fill="${C.wall}"/>`;
+    // loges reproduction
+    [[66,'Loge de reproduction','1 mâle + 4 à 6 femelles'],[246,'Loge de reproduction','1 mâle + 4 à 6 femelles']].forEach(([x,l,s])=>{ b+=`<rect x="${x}" y="66" width="164" height="150" fill="#D9CDB8"/>`+agouti(x+60,130,0.9)+agouti(x+110,170,0.75)+agouti(x+50,190,0.7)+T(x+82,92,l,{fs:13,fw:700})+T(x+82,110,s,{fs:12,fw:400,c:C.mut});
+      b+=`<rect x="${x+120}" y="190" width="34" height="20" fill="${C.ochre}"/><circle cx="${x+20}" cy="200" r="9" fill="${C.water}"/>`; });
+    b+=`<rect x="426" y="66" width="148" height="238" fill="#D9CDB8"/>`+T(500,92,'Engraissement',{fs:13,fw:700})+T(500,110,'jeunes après sevrage',{fs:12,fw:400,c:C.mut})+[0,1,2,3,4].map(i=>agouti(460+(i%2)*60,150+i*30,0.6)).join('');
+    // couloir
+    b+=`<rect x="66" y="232" width="344" height="72" fill="#EFE6D3"/>`+T(238,274,'Couloir de service (portes grillagées)',{fs:13,c:C.mut});
+    // abri
+    
+    b+=dim(66,342,230,342,'2 m',{dy:16})+dim(36,66,36,216,'1,5 m',{dx:6,a:'start'});
+    b+=T(320,375,'Murs lisses de 1 m de haut, sol cimenté, porte qui ferme bien : l\'agouti saute et ronge.',{fs:14,c:C.mut,fw:400});
+    return svg(640,385,b,'Enclos à agoutis');
+  }
+  function agoutiManip(){
+    let b=T(320,28,'Attraper un agouti sans le blesser',{fs:18,fw:700});
+    const card=(x,ok,lab,inner)=>`<g transform="translate(${x} 50)"><rect width="290" height="230" rx="16" fill="${C.white}" stroke="${ok?C.green:'#C8372D'}" stroke-width="3"/>${inner}<circle cx="262" cy="28" r="18" fill="${ok?C.green:'#C8372D'}"/>${ok?'<path d="M253 28 l7 7 l12 -14" stroke="#fff" stroke-width="4" fill="none"/>':'<path d="M254 20 l16 16 M270 20 l-16 16" stroke="#fff" stroke-width="4"/>'}${T(145,212,lab,{fs:14})}</g>`;
+    b+=card(20,false,'Jamais par la queue : elle s\'arrache',agouti(140,120,1.6)+`<path d="M70 124 q-30 -40 -10 -70" stroke="#E0B08A" stroke-width="14" fill="none" stroke-linecap="round"/>`);
+    b+=card(330,true,'Cage-trappe ou sac, puis tenir par le dos',`<rect x="40" y="70" width="200" height="100" rx="8" fill="none" stroke="${C.wire}" stroke-width="4"/>${Array.from({length:9},(_,i)=>`<path d="M${60+i*20} 70 v100" stroke="${C.wire}" stroke-width="1.5"/>`).join('')}${agouti(140,130,1.2)}`);
+    return svg(640,300,b,'Manipulation de l\'agouti');
+  }
+
+  /* ---------------- PORCS, VOLAILLES, PETITS RUMINANTS ---------------- */
+  function porcherie(){
+    let b=T(320,28,'Porcherie : vue de dessus',{fs:18,fw:700});
+    b+=`<rect x="40" y="50" width="560" height="270" fill="${C.wall}"/>`;
+    const box=(x,w,lab,sub,inner)=>`<rect x="${x}" y="66" width="${w}" height="168" fill="#DCD6CB"/><rect x="${x}" y="190" width="${w}" height="44" fill="#C9C1B3"/>${T(x+w/2,214,'aire de déjection',{fs:11,c:C.mut,fw:400})}${inner}${T(x+w/2,88,lab,{fs:13,fw:700})}${T(x+w/2,104,sub,{fs:11,fw:400,c:C.mut})}`;
+    b+=box(56,170,'Maternité','case 6 m² + barres',pig(130,150,1.1)+`<path d="M70 125 h140" stroke="${C.line}" stroke-width="4"/>`+`<rect x="180" y="150" width="36" height="30" fill="${C.ochre}" opacity=".7"/>${T(198,170,'coin chaud',{fs:9,fw:600})}`);
+    b+=box(234,170,'Verrat / truies','2 à 7 m² par animal',pig(300,145,1)+pig(330,175,0.8));
+    b+=box(412,172,'Engraissement','0,6 à 1 m² par porc',pig(450,140,0.75)+pig(530,140,0.75)+pig(490,170,0.75));
+    b+=`<rect x="56" y="250" width="528" height="54" fill="#EFE6D3"/>`+T(320,282,'Couloir · pédiluve à l\'entrée · auges et abreuvoirs à pipette du côté couloir',{fs:13,c:C.mut});
+    b+=`<rect x="300" y="300" width="40" height="16" fill="${C.water}"/>`;
+    b+=T(320,350,'Sol cimenté en pente de 2 à 3 % vers la rigole, toit avec débord, murets de 1,2 m.',{fs:14,c:C.mut,fw:400});
+    return svg(640,365,b,'Porcherie');
+  }
+  function poulailler(){
+    let b=T(320,28,'Poulailler : coupe',{fs:18,fw:700});
+    b+=`<rect x="20" y="300" width="600" height="50" fill="${C.soil}"/>`;
+    b+=`<path d="M40 120 L320 60 L600 120" stroke="${C.tin}" stroke-width="12" fill="none"/>`;
+    b+=`<rect x="70" y="120" width="12" height="180" fill="${C.wall}"/><rect x="558" y="120" width="12" height="180" fill="${C.wall}"/>`;
+    b+=`<rect x="70" y="250" width="12" height="50" fill="${C.wallD}"/><rect x="558" y="250" width="12" height="50" fill="${C.wallD}"/>`;
+    b+=`<path d="M76 130 v118 M564 130 v118" stroke="${C.wire}" stroke-width="5" stroke-dasharray="4 3"/>`;
+    b+=`<rect x="82" y="286" width="476" height="14" fill="${C.straw}"/>`;
+    [140,200,260,330,400,470].forEach((x,i)=>b+=hen(x,276-(i%2)*4,1.1));
+    b+=`<path d="M220 240 v40 M196 240 h48" stroke="${C.line}" stroke-width="3"/><rect x="200" y="276" width="40" height="10" fill="${C.ochre}"/>`;
+    b+=`<rect x="420" y="262" width="26" height="22" rx="4" fill="${C.water}"/><rect x="414" y="284" width="38" height="4" fill="${C.wallD}"/>`;
+    b+=callout(220,250,240,200,'Mangeoire à hauteur du dos','start');
+    b+=callout(433,262,560,232,'Abreuvoir surélevé','end');
+    b+=callout(300,292,300,330,'Litière 5 à 10 cm : copeaux, balle de riz','middle').replace('text-anchor="start"','text-anchor="middle"');
+    b+=callout(76,180,20,160,'','start')+T(30,150,'Grillage + rideaux',{fs:13,a:'start'});
+    b+=callout(320,64,360,44,'Orientation est-ouest, débord de toit 1 m','start');
+    b+=T(320,370,'Densité : 8 à 10 poulets de chair par m² en finition ; vide sanitaire de 2 à 3 semaines entre deux bandes.',{fs:14,c:C.mut,fw:400});
+    return svg(640,380,b,'Poulailler');
+  }
+  function bergerie(){
+    let b=T(320,28,'Bergerie sur caillebotis : coupe',{fs:18,fw:700});
+    b+=`<rect x="20" y="310" width="600" height="40" fill="${C.soil}"/>`;
+    b+=`<path d="M50 110 L320 60 L590 110" stroke="${C.roof}" stroke-width="12" fill="none"/>`;
+    b+=`<path d="M70 110 v200 M570 110 v200" stroke="${C.wallD}" stroke-width="8"/>`;
+    b+=`<rect x="70" y="220" width="500" height="10" fill="#B58B5A"/>`+Array.from({length:24},(_,i)=>`<rect x="${74+i*20.6}" y="220" width="14" height="10" fill="#8C6A42"/>`).join('');
+    b+=`<path d="M100 230 v80 M320 230 v80 M540 230 v80" stroke="#8C6A42" stroke-width="6"/>`;
+    b+=sheep(200,202,1.2)+sheep(330,202,1.1)+sheep(450,202,1.2);
+    b+=`<rect x="80" y="170" width="60" height="30" fill="${C.grass}"/>${T(110,190,'râtelier',{fs:11,c:C.white})}`;
+    b+=`<path d="M70 120 v95 M570 120 v95" stroke="${C.wire}" stroke-width="4" stroke-dasharray="4 3"/>`;
+    b+=`<path d="M120 300 q100 -6 200 0 t200 0" stroke="#6B4E2E" stroke-width="10" fill="none" opacity=".6"/>`;
+    b+=dim(600,230,600,310,'80 cm–1 m',{dx:-8});
+    b+=callout(330,226,250,262,'Lattes espacées de 1,5 cm','end');
+    b+=callout(300,300,330,343,'Fumier ramassé sous le plancher : compost','start');
+    b+=T(320,372,'1 à 1,5 m² par adulte, 1,5 à 2 m² pour une femelle avec ses petits.',{fs:14,c:C.mut,fw:400});
+    return svg(640,380,b,'Bergerie');
+  }
+
+  /* ---------------- pictogrammes ---------------- */
+  const PICT={
+    eau:`<path d="M24 6 C14 20 10 26 10 32 a14 14 0 0 0 28 0 c0 -6 -4 -12 -14 -26z" fill="${C.water}"/>`,
+    feuille:`<path d="M8 40 C8 14 26 6 42 6 C42 28 30 42 8 40z" fill="${C.grass}"/><path d="M8 40 L34 14" stroke="${C.grassD}" stroke-width="3"/>`,
+    calcium:`<path d="M8 36 a16 16 0 0 1 32 0z" fill="#EFE7D6" stroke="#B9A68A" stroke-width="2"/><path d="M14 36 l6 -14 l6 14 l6 -14 l4 14" stroke="#B9A68A" stroke-width="2" fill="none"/>`,
+    sac:`<path d="M12 10 h24 l4 30 h-32z" fill="${C.ochre}"/><path d="M12 10 q12 -6 24 0" stroke="#9C6B12" stroke-width="2" fill="none"/>`,
+    seringue:`<rect x="10" y="20" width="24" height="10" rx="2" fill="#DCE8F2" stroke="#4E7AA0" stroke-width="2"/><path d="M34 25 h10 M4 20 v10 M10 25 h-6" stroke="#4E7AA0" stroke-width="3"/>`,
+    nettoyer:`<path d="M30 6 L18 30" stroke="${C.wallD}" stroke-width="4"/><path d="M8 30 h22 l-4 12 h-14z" fill="${C.ochre}"/>`,
+    thermo:`<rect x="20" y="6" width="8" height="28" rx="4" fill="#fff" stroke="#C8372D" stroke-width="2"/><circle cx="24" cy="38" r="7" fill="#C8372D"/><rect x="22" y="18" width="4" height="18" fill="#C8372D"/>`,
+    ombre:`<circle cx="24" cy="16" r="9" fill="#F4C24E"/><path d="M4 30 h40 l-6 -8 h-28z" fill="${C.roof}"/>`
+  };
+  const pict=(k)=>`<svg viewBox="0 0 48 48" width="40" height="40" aria-hidden="true">${PICT[k]||''}</svg>`;
+
+  window.ILLUS_ELEV = {escargotierePlan, escargotiereCoupe, escargotPonte, clapierFace, clapierBatiment, lapinCycle, enclosAgouti, agoutiManip, porcherie, poulailler, bergerie, pict, snail, rabbit, agouti};
+})();
+
+</script>
+<style id="shell-back">
 .shell-bar{position:relative;z-index:1000;background:#17694A;padding:6px 12px}
 .shell-back{display:inline-flex;align-items:center;gap:6px;min-height:36px;font:600 15px system-ui,sans-serif;text-decoration:none;color:#fff}
 @media print{.shell-bar{display:none}}
@@ -210,7 +446,7 @@ details.envax[open]>summary{border-bottom:1px solid var(--line)}
 <header class="app">
   <div class="brand">
     <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="9" fill="var(--accent)"/><path d="M20 8c-5 0-9 4-9 9 0 7 9 15 9 15s9-8 9-15c0-5-4-9-9-9z" fill="none" stroke="var(--accent-ink)" stroke-width="2.4"/><path d="M16 17h8M20 13v8" stroke="var(--accent-ink)" stroke-width="2.4" stroke-linecap="round"/></svg>
-    <div><h1>Santé Élevage CI</h1><p class="tag">Volailles · porcs · petits ruminants · gros ruminants — Côte d'Ivoire</p></div>
+    <div><h1>Santé Élevage CI</h1><p class="tag">Volailles · porcs · ruminants · lapins · agoutis · escargots — Côte d'Ivoire</p></div>
   </div>
   <span class="proto">Version 1 · normes indicatives à faire valider</span>
 </header>
@@ -218,6 +454,7 @@ details.envax[open]>summary{border-bottom:1px solid var(--line)}
 <nav class="mods" aria-label="Modules">
   <div class="row" role="tablist">
     <button role="tab" id="t-diag" aria-controls="m-diag" aria-selected="true">Diagnostic</button>
+    <button role="tab" id="t-fiches" aria-controls="m-fiches" aria-selected="false">Fiches techniques</button>
     <button role="tab" id="t-proph" aria-controls="m-proph" aria-selected="false">Prophylaxie</button>
     <button role="tab" id="t-alim" aria-controls="m-alim" aria-selected="false">Alimentation &amp; croissance</button>
     <button role="tab" id="t-zone" aria-controls="m-zone" aria-selected="false">Zone GPS &amp; satellite</button>
@@ -231,15 +468,30 @@ details.envax[open]>summary{border-bottom:1px solid var(--line)}
   </div>
 </nav>
 
+
+<!-- ============ FICHES TECHNIQUES ============ -->
+<section class="mod" id="m-fiches" role="tabpanel" aria-labelledby="t-fiches" hidden>
+  <div class="mod-head"><h2>Fiches techniques illustrées</h2>
+  <p>Comment construire le logement, conduire la reproduction, nourrir et soigner, avec des plans et des schémas.</p></div>
+  <div class="ft-switch" id="ft-sp" role="group" aria-label="Élevage"></div>
+  <div class="panel" style="margin-top:12px">
+    <div class="btns" style="justify-content:flex-end"><button class="b" id="ft-print">Imprimer ou enregistrer en PDF</button></div>
+    <div id="ft-out"></div>
+  </div>
+</section>
+
 <!-- ============ DIAGNOSTIC ============ -->
 <section class="mod" id="m-diag" role="tabpanel" aria-labelledby="t-diag" hidden>
   <div class="mod-head"><h2>Diagnostic et fiche à remettre à l'éleveur</h2>
-  <p>Volailles, porcs, petits ruminants (moutons, chèvres) et gros ruminants (bovins). Renseignez le lot ou le troupeau, l'état de la ferme et de son environnement, puis les signes observés : l'application classe les maladies possibles en tenant compte des conditions d'élevage, évalue l'urgence, propose des solutions durables et prépare la fiche imprimable.</p></div>
+  <p>Volailles, porcs, petits ruminants (moutons, chèvres), bovins, lapins, agoutis et escargots. Renseignez le lot ou le troupeau, l'état de la ferme et de son environnement, puis les signes observés : l'application classe les maladies possibles en tenant compte des conditions d'élevage, évalue l'urgence, propose des solutions durables et prépare la fiche imprimable.</p></div>
   <div class="esp-switch" role="radiogroup" aria-label="Espèce">
     <button class="esp" data-esp="vol" aria-pressed="true">Volailles</button>
     <button class="esp" data-esp="pr" aria-pressed="false">Petits ruminants</button>
     <button class="esp" data-esp="bv" aria-pressed="false">Bovins</button>
     <button class="esp" data-esp="pc" aria-pressed="false">Porcs</button>
+    <button class="esp" data-esp="lap" aria-pressed="false">Lapins</button>
+    <button class="esp" data-esp="agt" aria-pressed="false">Agoutis</button>
+    <button class="esp" data-esp="esc" aria-pressed="false">Escargots</button>
   </div>
   <div class="grid">
     <div class="stack">
@@ -357,6 +609,11 @@ details.envax[open]>summary{border-bottom:1px solid var(--line)}
           <optgroup label="Porcs">
             <option value="porc">Porcs à l'engraissement</option>
           </optgroup>
+          <optgroup label="Autres élevages">
+            <option value="lapin">Lapins à l'engraissement</option>
+            <option value="agouti">Agoutis à l'engraissement</option>
+            <option value="escargot">Escargots</option>
+          </optgroup>
         </select></label>
         <div><div class="lab-s">Effectif de départ</div>
           <div class="chips" id="ev-presets"></div></div>
@@ -402,7 +659,7 @@ Marge par animal     = prix de vente − coût de production</pre>
     <div class="stack">
       <div class="panel">
         <label for="mk-from">Lieu de l'élevage<select id="mk-from"></select></label>
-        <label for="mk-sp">Production<select id="mk-sp"><option value="vol">Volailles (poulets, œufs)</option><option value="pr">Petits ruminants (moutons, chèvres)</option><option value="pc">Porcs</option></select></label>
+        <label for="mk-sp">Production<select id="mk-sp"><option value="vol">Volailles (poulets, œufs)</option><option value="pr">Petits ruminants (moutons, chèvres)</option><option value="pc">Porcs</option><option value="lap">Lapins</option><option value="agt">Agoutis</option><option value="esc">Escargots</option></select></label>
         <div id="mk-key"></div>
       </div>
       <div class="panel" id="mk-axis"></div>
@@ -495,6 +752,7 @@ Marge par animal     = prix de vente − coût de production</pre>
           <optgroup label="Volailles"><option value="chair">Poulets de chair</option><option value="pond">Poules pondeuses</option><option value="locale">Poulets locaux ou améliorés</option><option value="pintade">Pintades</option></optgroup>
           <optgroup label="Ruminants"><option value="pr">Moutons et chèvres</option><option value="bv">Bovins</option></optgroup>
           <optgroup label="Porcs"><option value="pc">Porcs (porcelets à la vente, truies)</option></optgroup>
+          <optgroup label="Autres élevages"><option value="lap">Lapins</option><option value="agt">Agoutis</option><option value="esc">Escargots</option></optgroup>
         </select></label>
         <label for="pp-date" id="pp-date-l">Date d'éclosion ou d'arrivée des poussins<input id="pp-date" type="date"></label>
         <label for="pp-mb" id="pp-mb-l" hidden>Date prévue de la prochaine mise-bas <span class="hint">facultatif</span><input id="pp-mb" type="date"></label>
@@ -556,7 +814,7 @@ Marge par animal     = prix de vente − coût de production</pre>
       <div class="panel">
         <h3>Catalogue des aliments, fourrages et plantes</h3>
         <div class="two"><label for="cat-q">Rechercher<input id="cat-q" placeholder="ex. leucaena, manioc, lantana"></label>
-        <label for="cat-sp">Pour<select id="cat-sp"><option value="all">Toutes les espèces</option><option value="pr">Moutons et chèvres</option><option value="bv">Bovins</option><option value="vol">Volailles</option><option value="pc">Porcs</option></select></label></div>
+        <label for="cat-sp">Pour<select id="cat-sp"><option value="all">Toutes les espèces</option><option value="pr">Moutons et chèvres</option><option value="bv">Bovins</option><option value="vol">Volailles</option><option value="pc">Porcs</option><option value="lap">Lapins</option><option value="agt">Agoutis</option><option value="esc">Escargots</option></select></label></div>
         <div class="tbl" id="cat-tbl"></div>
       </div>
       <div class="panel"><h3>Rations types avec les ressources locales</h3><div class="tbl" id="al-rations"></div></div>
@@ -977,6 +1235,13 @@ const DENS = [
   {g:'Porcs', id:'pc-truie', n:'Truie gestante en groupe', mode:'head', lo:2.0, hi:2.5, def:2.25, u:'m²/tête'},
   {g:'Porcs', id:'pc-mb', n:'Truie avec sa portée (case de mise-bas)', mode:'head', lo:5, hi:7, def:6, u:'m²/tête'},
   {g:'Porcs', id:'pc-verrat', n:'Verrat', mode:'head', lo:6, hi:8, def:7, u:'m²/tête'},
+  {g:'Escargots', id:'esc-repro', n:'Escargots reproducteurs', mode:'m2', lo:5, hi:10, def:8, u:'escargots/m²'},
+  {g:'Escargots', id:'esc-crois', n:'Escargots en croissance', mode:'m2', lo:20, hi:30, def:25, u:'escargots/m²'},
+  {g:'Escargots', id:'esc-nais', n:'Naissains', mode:'m2', lo:80, hi:120, def:100, u:'escargots/m²'},
+  {g:'Lapins', id:'lap-fem', n:'Lapine avec boîte à nid', mode:'head', lo:0.45, hi:0.5, def:0.48, u:'m²/tête'},
+  {g:'Lapins', id:'lap-eng', n:'Lapins à l\'engraissement', mode:'head', lo:0.07, hi:0.1, def:0.08, u:'m²/tête'},
+  {g:'Agoutis', id:'agt-repro', n:'Agoutis reproducteurs (groupe de 5 à 7)', mode:'head', lo:0.4, hi:0.6, def:0.5, u:'m²/tête'},
+  {g:'Agoutis', id:'agt-eng', n:'Agoutis à l\'engraissement', mode:'head', lo:0.2, hi:0.3, def:0.25, u:'m²/tête'},
 ];
 (function(){
   const sel = $('d-cat'); let g=null, og=null;
@@ -988,7 +1253,7 @@ function densCalc(d, S, N, hot){
   // returns capacity (animals) and surface needed for N, using the cautious end when hot
   if(d.mode==='m2'){
     const per = hot ? d.lo : d.def;              // animals per m²
-    return {cap: Math.floor(S*per), capMin: Math.floor(S*d.lo), capMax: Math.floor(S*d.hi), need: N/per, perLabel:`${fmt(per, per%1?1:0)} sujets/m²`, actual: S>0? N/S : NaN, actualU:'sujets/m²'};
+    return {cap: Math.floor(S*per), capMin: Math.floor(S*d.lo), capMax: Math.floor(S*d.hi), need: N/per, perLabel:`${fmt(per, per%1?1:0)} ${d.u}`, actual: S>0? N/S : NaN, actualU:d.u};
   } else {
     const per = hot ? d.hi : d.def;              // m² per head
     return {cap: Math.floor(S/per), capMin: Math.floor(S/d.hi), capMax: Math.floor(S/d.lo), need: N*per, perLabel:`${fmt(per,1)} m² par tête`, actual: N>0? S/N : NaN, actualU:'m²/tête'};
@@ -1016,6 +1281,9 @@ function densite(){
     <p class="note">Norme appliquée : ${r.perLabel}${hot?' (valeur prudente, forte chaleur)':''}. Fourchette admise pour ${fmt(S,1)} m² : ${fmt(r.capMin)} à ${fmt(r.capMax)} ${d.mode==='m2'?'sujets':'têtes'}.</p>
     <pre class="formula">${formula}</pre>
     ${d.g==='Petits ruminants'?'<p class="note">Prévoir en plus une aire d\'exercice extérieure d\'environ 2 à 3 m² par tête.</p>':''}
+    ${d.g==='Escargots'?'<p class="note">Escargots : parcs de 1 m × 2 m ; séparer reproducteurs, naissains et escargots en croissance.</p>':''}
+    ${d.g==='Lapins'?'<p class="note">Lapins : surface de cage. Cages surélevées à 80 cm, dans un bâtiment ombragé et aéré.</p>':''}
+    ${d.g==='Agoutis'?'<p class="note">Agoutis : loges de 2 m × 1,5 m pour 1 mâle et 4 à 6 femelles.</p>':''}
     ${d.g==='Porcs'?'<p class="note">Porcs : séparer l\'aire de couchage (sèche, à l\'ombre) de l\'aire de déjection, et prévoir un abreuvoir à pipette pour 10 porcs. Par forte chaleur, prendre la valeur haute.</p>':''}
     ${d.g==='Gros ruminants'?'<p class="note">Au pâturage, la charge dépend de la production d\'herbe de la parcelle ; ce calcul sera relié aux indices de végétation satellitaires dans la version serveur.</p>':''}`;
 }
@@ -1197,6 +1465,9 @@ const RATIO = [
 ];
 GEST.push({id:"truie", n:"Truie", d:114, lo:112, hi:116, cyc:21, tar:null, back:40});
 RATIO.push({id:"verrat", n:"Verrat (monte naturelle)", per:20});
+GEST.push({id:"lapine", n:"Lapine", d:31, lo:30, hi:32, cyc:12, tar:null, back:11, palp:true},
+  {id:"agoutie", n:"Agouti (femelle)", d:152, lo:145, hi:160, cyc:60, tar:null, back:45, palp:true});
+RATIO.push({id:"lapin_m", n:"Lapin mâle", per:9},{id:"agouti_m", n:"Agouti mâle", per:5});
 const REL = [
   {n:'Aucun lien connu', f:0},
   {n:'Cousins germains', f:6.25},
@@ -1232,7 +1503,9 @@ function gestation(){
   const due = addDays(d0,g.d);
   const ev = [
     {ms:d0, t:'Saillie ou insémination', s:'Noter la date et le mâle utilisé dans le registre'},
+    g.palp ? {ms:addDays(d0,g.cyc), t: g.id==='lapine' ? 'Palpation du ventre' : 'Contrôle de gestation (ventre, poids)', s: g.id==='lapine' ? 'Entre 10 et 14 jours : des boules de la taille d\'une bille = lapine pleine' : 'Vers 2 mois : ventre arrondi, prise de poids'} :
     {ms:addDays(d0,g.cyc), t:'Surveiller un retour en chaleur', s:`Un cycle après (${g.cyc} jours) : pas de chaleur = gestation probable`},
+    g.palp ? {ms:addDays(d0,g.d-4), t: g.id==='lapine' ? 'Mettre la boîte à nid' : 'Calme autour de la femelle', s: g.id==='lapine' ? 'Avec de la paille propre et sèche' : 'Ne plus la manipuler ni la déplacer'} :
     {ms:addDays(d0,2*g.cyc), t:'Deuxième contrôle des chaleurs', s:'Confirmer la gestation par un agent ou un vétérinaire si possible'},
   ];
   if(g.tar) ev.push({ms:addDays(due,-g.tar), t:'Tarissement', s:`${g.tar} jours avant la mise-bas pour une vache traite`});
@@ -1858,6 +2131,265 @@ SP.pc = {label:"Porcs", lot:"La bande ou la porcherie", unitAge:"semaines", ageD
   alert:[], vet:["dystocie","couche"], lesWarn:"Ne pas ouvrir de cadavre si plusieurs porcs meurent en quelques jours avec des taches rouges ou violacées : suspicion de peste porcine africaine, alerter les services vétérinaires. Sinon, autopsie seulement par un technicien ou un vétérinaire, avec des gants, loin de la porcherie.",
   sample:{age:2, eff:40, sick:10, dead:1, days:3, signs:["diarrhee","diarrhee_jaune"]}};
 Object.assign(QMAP, {q_fer:"sans_fer", q_sevrage:"post_sevrage", q_chaleur:"chaleur", q_sol:"sol_abime"});
+
+/* ---------- escargots, lapins, agoutis ---------- */
+const NEW_GENERAL = {
+  esc:["Retirer chaque jour les escargots morts et les coquilles vides","Remplacer la terre du parc touché par une terre neuve et humide","Laver les abreuvoirs et mangeoires, retirer les restes d'aliment chaque matin","Réduire le nombre d'escargots par parc"],
+  lap:["Isoler les lapins malades dans une cage propre, loin des autres","Eau propre à volonté, foin sec, pas d'herbe mouillée","Retirer les crottes sous les cages chaque jour, désinfecter les cages vidées","Ne vendre ni consommer un lapin mort de maladie ; enterrer avec de la chaux"],
+  agt:["Isoler l'animal malade dans une loge calme, avec de l'eau et de l'herbe fraîche","Limiter les visites et le bruit : l'agouti stresse facilement","Ne jamais attraper un agouti par la queue","Retirer les restes d'herbe et les crottes chaque jour"]};
+const ESC_SIGNS = [
+  {g:"Comportement", id:"prostr", l:"Escargots rétractés, inactifs même la nuit"},
+  {g:"Comportement", id:"appetit", l:"Ne mangent plus"},
+  {g:"Comportement", id:"estivation", l:"Coquille fermée par un opercule (voile blanc)"},
+  {g:"Comportement", id:"fuite", l:"Escargots qui cherchent à s'échapper du parc"},
+  {g:"Corps et bave", id:"bave", l:"Bave abondante ou mousseuse"},
+  {g:"Corps et bave", id:"dessech", l:"Corps desséché, ridé"},
+  {g:"Corps et bave", id:"odeur_fetide", l:"Escargots morts qui sentent très mauvais"},
+  {g:"Coquille", id:"coq_molle", l:"Coquille mince, molle ou décolorée"},
+  {g:"Coquille", id:"coq_cassee", l:"Coquilles cassées ou trouées"},
+  {g:"Croissance et ponte", id:"croissance", l:"Croissance très lente"},
+  {g:"Croissance et ponte", id:"ponte_nulle", l:"Pas de ponte, ou œufs qui n'éclosent pas"},
+  {g:"Parasites et prédateurs", id:"parasites_v", l:"Petits acariens ou mouches sur les escargots"},
+  {g:"Parasites et prédateurs", id:"fourmis", l:"Fourmis, rats ou traces de prédateurs dans le parc"},
+];
+const ESC_Q = [
+  {id:"q_aliment", show:s=>s.prostr||s.bave||s.appetit, type:"check", l:"Aliment nouveau, ou feuilles venant d'un champ traité"},
+  {id:"q_calcium", show:s=>s.coq_molle||s.coq_cassee||s.croissance||s.ponte_nulle, type:"check", l:"Pas de calcium donné (coquilles d'huîtres, os broyés)"},
+  {id:"q_sec", show:s=>s.dessech||s.estivation||s.appetit, type:"check", l:"Terre du parc sèche, pas d'arrosage"},
+];
+const DIS_ESC = [
+ {id:"bact", n:"Infection bactérienne (mortalité des escargots)", agent:"Bactéries (souvent Pseudomonas), favorisées par la saleté, l'excès d'eau stagnante et le surpeuplement", regl:false, zoon:false,
+  rules:[["odeur_fetide",5,"cadavres à odeur fétide"],["bave",4,"bave mousseuse"],["mort_haute",3,"mortalité élevée"],["mort_moy",1,"mortalité notable"],["prostr",1,"escargots inactifs"],["nett_rare",2,"parc rarement nettoyé"],["surpeuple",1,"parc surpeuplé"],["humidite",1,"terre détrempée"]],
+  confirm:"Examen des escargots morts au laboratoire vétérinaire si les pertes continuent.",
+  immediat:["Retirer tous les morts et les coquilles vides, deux fois par jour","Vider le parc touché : terre neuve, désinfection des murs à la chaux"],
+  traitement:["Pas de médicament simple : l'hygiène et la baisse de densité arrêtent les pertes","Ne jamais mélanger escargots malades et sains"],
+  prevention:["Changer ou retourner la terre tous les 6 mois","Pas plus de 10 reproducteurs ou 30 escargots en croissance par m²","Arroser sans faire de boue : terre humide, jamais détrempée"]},
+ {id:"dessech", n:"Déshydratation et estivation", agent:"Air trop sec, chaleur, terre sèche : l'escargot se ferme et s'arrête de manger", regl:false, zoon:false,
+  rules:[["dessech",5,"corps desséché"],["estivation",4,"opercule fermé"],["sec",3,"terre du parc sèche"],["seche",2,"saison sèche"],["appetit",1,"ne mangent plus"],["manque_eau",2,"manque d'eau"],["chaleur",2,"chaleur"],["bave",-2,"bave mousseuse (plutôt infection)"]],
+  confirm:"Toucher la terre : elle doit être fraîche et humide, sans boue.",
+  immediat:["Arroser la terre et les murs le soir, mettre de l'ombrage","Plonger quelques secondes les escargots operculés dans l'eau tiède pour les réveiller"],
+  traitement:["Feuilles fraîches et fruits juteux (papaye, concombre) après le réveil"],
+  prevention:["Ombrage permanent, paillage de feuilles mortes, arrosage du soir en saison sèche","Abreuvoir plat avec des cailloux"]},
+ {id:"calc", n:"Manque de calcium", agent:"La coquille ne se forme pas sans calcium", regl:false, zoon:false,
+  rules:[["coq_molle",6,"coquille molle ou mince"],["calcium",4,"pas de calcium dans la ration"],["sans_mineraux",3,"pas de calcium déclaré"],["coq_cassee",2,"coquilles cassées"],["croissance",2,"croissance lente"],["ponte_nulle",1,"peu de ponte"],["odeur_fetide",-2,"cadavres fétides (plutôt infection)"]],
+  confirm:"Coquille qui se plie sous le doigt chez les jeunes ; bilan de la ration.",
+  immediat:["Mettre à volonté des coquilles d'huîtres broyées, des os calcinés broyés ou de la poudre de coquilles d'œufs"],
+  traitement:["20 à 30 % de calcium dans l'aliment composé"],
+  prevention:["Calcium toujours disponible dans une mangeoire à part"]},
+ {id:"pred", n:"Prédateurs (fourmis magnans, rats, oiseaux, lézards)", agent:"Animaux qui entrent dans le parc et mangent les escargots ou leurs œufs", regl:false, zoon:false,
+  rules:[["fourmis",6,"prédateurs vus dans le parc"],["coq_cassee",3,"coquilles cassées ou trouées"],["mort_subite",2,"disparitions ou morts brutales"],["nuisibles",3,"rongeurs ou insectes nombreux"],["contact_ext",2,"parc mal fermé"],["ponte_nulle",1,"œufs disparus"]],
+  confirm:"Observer le parc la nuit avec une lampe ; chercher les passages de fourmis.",
+  immediat:["Remettre de l'eau dans le caniveau autour de l'escargotière","Réparer le grillage du dessus et boucher les trous"],
+  traitement:["Pièges à rats autour, jamais de raticide dans le parc"],
+  prevention:["Caniveau d'eau permanent, grillage fin, murets lisses, désherbage autour"]},
+ {id:"surpop", n:"Surpeuplement et stress", agent:"Trop d'escargots : ils mangent moins, grandissent mal et pondent peu", regl:false, zoon:false,
+  rules:[["surpeuple",4,"parc surpeuplé"],["croissance",3,"croissance lente"],["ponte_nulle",2,"peu de ponte"],["fuite",2,"escargots qui fuient"],["bave",-1,"bave mousseuse (plutôt infection)"]],
+  confirm:"Compter les escargots d'un parc et diviser par sa surface.",
+  immediat:["Dédoubler les parcs : reproducteurs 5 à 10 par m², croissance 20 à 30 par m²"],
+  traitement:["Trier par taille : séparer les gros des petits"],
+  prevention:["Prévoir les parcs avant les éclosions"]},
+ {id:"para", n:"Acariens et mouches parasites", agent:"Petits acariens et larves de mouches, favorisés par les restes d'aliment pourris", regl:false, zoon:false,
+  rules:[["parasites_v",6,"parasites visibles"],["prostr",1,"escargots affaiblis"],["nett_rare",2,"restes d'aliment non retirés"],["croissance",1,"croissance lente"]],
+  confirm:"Observer à la loupe le corps et l'ouverture de la coquille.",
+  immediat:["Retirer tous les restes d'aliment chaque matin","Changer la terre du parc"],
+  traitement:["Laver délicatement les escargots atteints à l'eau propre"],
+  prevention:["Distribuer juste la quantité mangée dans la nuit"]},
+ {id:"intox", n:"Intoxication (pesticides, sel, cendre)", agent:"Feuilles traitées, aliment salé, produits chimiques près des parcs", regl:false, zoon:false,
+  rules:[["plante_toxique",5,"aliment ou plante dangereux"],["aliment",3,"aliment ou feuilles d'un champ traité"],["pesticides",4,"pesticides à proximité"],["mort_subite",2,"morts brutales"],["bave",2,"bave abondante"],["evo_brutale",2,"apparition brutale"]],
+  confirm:"Rechercher l'origine des feuilles et de l'aliment distribués ces derniers jours.",
+  immediat:["Retirer tout l'aliment, donner des feuilles sûres et de l'eau propre","Changer la terre du parc"],
+  traitement:["Pas d'antidote : supprimer la cause"],
+  prevention:["Jamais de feuilles de bord de route ou de champs traités ; jamais de sel"]},
+];
+const LAP_SIGNS = [
+  {g:"État général", id:"prostr", l:"Abattu, poil terne, reste dans un coin"},
+  {g:"État général", id:"appetit", l:"Ne mange plus"},
+  {g:"État général", id:"amaigr", l:"Amaigrissement, croissance lente"},
+  {g:"État général", id:"mort_subite", l:"Morts subites"},
+  {g:"Digestif", id:"diarrhee", l:"Diarrhée, arrière-train souillé"},
+  {g:"Digestif", id:"ballon", l:"Ventre gonflé, dur"},
+  {g:"Respiratoire", id:"jetage", l:"Écoulement du nez, pattes avant collées"},
+  {g:"Respiratoire", id:"eternu", l:"Éternuements"},
+  {g:"Respiratoire", id:"resp", l:"Respiration rapide, bouche ouverte"},
+  {g:"Respiratoire", id:"saign_nez", l:"Sang au nez sur des lapins morts"},
+  {g:"Peau et oreilles", id:"croutes_oreilles", l:"Croûtes brunes dans les oreilles, secoue la tête"},
+  {g:"Peau et oreilles", id:"demang", l:"Démangeaisons"},
+  {g:"Peau et oreilles", id:"perte_poils", l:"Plaques sans poils, rondes ou croûteuses"},
+  {g:"Peau et oreilles", id:"abces", l:"Boules (abcès) sous la peau"},
+  {g:"Pattes et tête", id:"pattes_plaies", l:"Plaies sous les pattes arrière"},
+  {g:"Pattes et tête", id:"tete_penchee", l:"Tête penchée, tourne sur lui-même"},
+  {g:"Reproduction", id:"mamelle", l:"Mamelle dure, chaude ou rouge"},
+  {g:"Reproduction", id:"abandon", l:"Lapereaux abandonnés, hors du nid ou mangés"},
+  {g:"Reproduction", id:"avort", l:"Avortements, femelles qui ne prennent pas"},
+];
+const LAP_Q = [
+  {id:"q_jeunes", show:s=>s.diarrhee||s.ballon||s.amaigr, type:"check", l:"Ce sont surtout les lapereaux après le sevrage"},
+  {id:"q_aliment", show:s=>s.diarrhee||s.ballon||s.mort_subite||s.appetit, type:"check", l:"Herbe mouillée, ou changement brutal d'aliment"},
+  {id:"q_chaleur", show:s=>s.resp||s.mort_subite||s.prostr, type:"check", l:"Forte chaleur dans le clapier"},
+  {id:"q_eau", show:s=>s.abandon||s.appetit||s.mamelle, type:"check", l:"L'eau manque parfois dans les cages"},
+];
+const DIS_LAP = [
+ {id:"cocci", n:"Coccidiose", agent:"Parasite de l'intestin et du foie (Eimeria), surtout chez les lapereaux sevrés", regl:false, zoon:false,
+  rules:[["diarrhee",3,"diarrhée"],["ballon",2,"ventre gonflé"],["amaigr",2,"amaigrissement"],["jeunes",3,"lapereaux après sevrage"],["age_jeune",2,"jeunes lapins"],["nett_rare",1,"cages mal nettoyées"],["evo_jours",1,"évolution sur quelques jours"],["age_adult",-2,"adultes"]],
+  confirm:"Examen des crottes au laboratoire ; à l'ouverture, points blancs sur le foie.",
+  immediat:["Nettoyer et désinfecter les cages, retirer les crottes chaque jour","Eau propre à volonté"],
+  traitement:["Anticoccidien dans l'eau (toltrazuril, sulfamide) sur prescription"],
+  prevention:["Grillage au sol pour que les crottes tombent","Anticoccidien préventif au sevrage sur conseil du technicien"]},
+ {id:"enterite", n:"Entérite et ballonnement", agent:"Changement brutal d'aliment, herbe mouillée ou moisie, manque de fibres", regl:false, zoon:false,
+  rules:[["ballon",4,"ventre gonflé"],["diarrhee",3,"diarrhée"],["aliment",3,"herbe mouillée ou aliment changé"],["appetit",1,"ne mange plus"],["mort_moy",1,"morts"],["ration_deseq",2,"ration déséquilibrée"]],
+  confirm:"Contexte alimentaire ; examen par le technicien.",
+  immediat:["Supprimer l'herbe fraîche et le concentré 24 heures, donner du foin sec et de l'eau"],
+  traitement:["Réhydratation ; antibiotique seulement sur prescription"],
+  prevention:["Faner l'herbe 24 heures avant de la donner, changer d'aliment sur une semaine","Toujours du foin ou des fibres"]},
+ {id:"past", n:"Coryza et pasteurellose", agent:"Bactéries (Pasteurella), favorisées par l'ammoniac, les courants d'air et le stress", regl:false, zoon:false,
+  rules:[["jetage",4,"écoulement nasal"],["eternu",4,"éternuements"],["resp",2,"respiration difficile"],["tete_penchee",2,"tête penchée"],["abces",2,"abcès"],["ammoniac",2,"odeur d'ammoniac"],["courant_air",1,"courants d'air"]],
+  confirm:"Examen clinique ; prélèvement du nez si l'élevage est très touché.",
+  immediat:["Isoler les malades, aérer sans courant d'air, retirer les crottes"],
+  traitement:["Antibiotique sur prescription ; réformer les lapins qui rechutent"],
+  prevention:["Bonne aération, pas d'ammoniac, quarantaine des lapins achetés"]},
+ {id:"gale_or", n:"Gale des oreilles", agent:"Acarien (Psoroptes cuniculi)", regl:false, zoon:false,
+  rules:[["croutes_oreilles",7,"croûtes dans les oreilles"],["demang",2,"démangeaisons"],["tete_penchee",1,"tête secouée ou penchée"]],
+  confirm:"Croûtes brunes en feuillets dans l'oreille.",
+  immediat:["Ramollir les croûtes à l'huile, sans les arracher"],
+  traitement:["Ivermectine sur conseil du technicien, à répéter après 10 à 14 jours, à tous les lapins"],
+  prevention:["Inspecter les oreilles chaque semaine, traiter les lapins achetés"]},
+ {id:"teigne", n:"Teigne et gale du corps", agent:"Champignon (teigne) ou acarien (gale), transmissibles à l'homme pour la teigne", regl:false, zoon:true,
+  rules:[["perte_poils",5,"plaques sans poils"],["demang",2,"démangeaisons"],["nett_rare",1,"hygiène insuffisante"]],
+  confirm:"Raclage de peau au laboratoire.",
+  immediat:["Isoler les lapins atteints ; gants pour les manipuler"],
+  traitement:["Antifongique ou acaricide sur conseil du technicien"],
+  prevention:["Désinfecter les cages, se laver les mains après les soins"]},
+ {id:"vhd", n:"Maladie hémorragique virale du lapin (VHD)", agent:"Virus (calicivirus), très contagieux", regl:true, zoon:false,
+  rules:[["mort_subite",5,"morts subites"],["saign_nez",6,"sang au nez"],["mort_haute",3,"mortalité élevée"],["evo_brutale",2,"apparition brutale"],["vvhd_non",1,"pas de vaccin"],["vvhd_oui",-3,"vaccinés"],["intro",2,"lapins introduits"],["vois_morts",2,"morts chez les voisins"]],
+  confirm:"Prélèvements par les services vétérinaires (foie) analysés au laboratoire.",
+  immediat:["Prévenir les services vétérinaires","Aucun lapin n'entre ni ne sort ; enterrer les morts avec de la chaux"],
+  traitement:["Pas de traitement ; vaccin des lapins sains si disponible"],
+  prevention:["Quarantaine, pas de visiteurs, vaccin là où il existe"]},
+ {id:"podo", n:"Mal de pattes (pododermatite)", agent:"Grillage trop fin ou blessant, cages sales et humides", regl:false, zoon:false,
+  rules:[["pattes_plaies",7,"plaies sous les pattes"],["entretien_mauvais",1,"cages en mauvais état"],["amaigr",1,"amaigrissement"]],
+  confirm:"Examen du dessous des pattes.",
+  immediat:["Mettre un repose-pattes (planchette) dans la cage, nettoyer et désinfecter les plaies"],
+  traitement:["Antiseptique ; antibiotique sur prescription si abcès"],
+  prevention:["Grillage de fil épais (maille 13 × 75 mm au sol), repose-pattes pour les reproducteurs"]},
+ {id:"chaleur", n:"Coup de chaleur", agent:"Au-dessus de 30 °C, le lapin ne se refroidit plus", regl:false, zoon:false,
+  rules:[["chaleur",4,"forte chaleur"],["resp",3,"respiration rapide"],["mort_subite",2,"morts brutales"],["prostr",1,"abattement"],["manque_eau",2,"manque d'eau"],["evo_chron",-3,"évolution lente"]],
+  confirm:"Heure des morts (après-midi), température du clapier.",
+  immediat:["Ombre, aération, eau fraîche ; mouiller les oreilles"],
+  traitement:["Bouteille d'eau congelée dans la cage aux heures chaudes"],
+  prevention:["Toit isolé, bâtiment ombragé et aéré, eau à volonté"]},
+ {id:"mammite", n:"Mammite de la lapine", agent:"Infection de la mamelle", regl:false, zoon:false,
+  rules:[["mamelle",6,"mamelle dure ou chaude"],["post_mb",2,"mise-bas récente"],["abandon",1,"lapereaux affaiblis"],["fievre",1,"fièvre"]],
+  confirm:"Examen de la mamelle par le technicien.",
+  immediat:["Nettoyer la cage et le nid"],
+  traitement:["Antibiotique sur prescription ; confier les lapereaux à une autre lapine si possible"],
+  prevention:["Nid propre et sec, cages désinfectées"]},
+ {id:"abandon", n:"Abandon ou cannibalisme des lapereaux", agent:"Stress, manque d'eau ou de nid, lapine trop jeune", regl:false, zoon:false,
+  rules:[["abandon",6,"lapereaux abandonnés ou mangés"],["eau",3,"eau parfois absente"],["manque_eau",2,"manque d'eau"],["visiteurs",1,"dérangements"],["mamelle",-1,"mamelle anormale (plutôt mammite)"]],
+  confirm:"Vérifier l'eau, la boîte à nid et le calme du clapier.",
+  immediat:["Eau à volonté, boîte à nid avec paille 3 à 4 jours avant la mise-bas"],
+  traitement:["Ne pas toucher le nid les premiers jours"],
+  prevention:["Calme, pas de visiteurs, lapine de plus de 4 mois et 3 kg à la première saillie"]},
+ {id:"malnut", n:"Sous-alimentation et ration déséquilibrée", agent:"Manque de protéines, de fibres ou de minéraux", regl:false, zoon:false,
+  rules:[["ration_deseq",4,"ration déséquilibrée"],["sous_alim",3,"quantité insuffisante"],["amaigr",3,"amaigrissement"],["evo_chron",2,"évolution lente"],["mort_subite",-2,"morts subites"]],
+  confirm:"Bilan de la ration et pesée de quelques lapins.",
+  immediat:["Ajouter des légumineuses (Stylosanthes, Centrosema), du son et une pierre à lécher"],
+  traitement:["Granulés lapin si disponibles"],
+  prevention:["Ration régulière : fourrage + concentré + eau"]},
+];
+const AGT_SIGNS = [
+  {g:"État général", id:"prostr", l:"Abattu, ne bouge plus"},
+  {g:"État général", id:"appetit", l:"Ne mange plus"},
+  {g:"État général", id:"amaigr", l:"Amaigrissement"},
+  {g:"État général", id:"mort_subite", l:"Morts subites (souvent après un transport ou une capture)"},
+  {g:"Digestif", id:"diarrhee", l:"Diarrhée"},
+  {g:"Respiratoire", id:"resp", l:"Respiration difficile"},
+  {g:"Respiratoire", id:"jetage", l:"Écoulement du nez"},
+  {g:"Blessures", id:"blessure", l:"Plaies, queue arrachée, patte cassée"},
+  {g:"Blessures", id:"boiterie", l:"Boiterie"},
+  {g:"Peau et dents", id:"croutes_peau", l:"Croûtes, perte de poils"},
+  {g:"Peau et dents", id:"dents", l:"Dents trop longues, bave, n'arrive pas à manger"},
+  {g:"Reproduction", id:"avort", l:"Avortements, petits mort-nés"},
+];
+const AGT_Q = [
+  {id:"q_aliment", show:s=>s.diarrhee||s.appetit, type:"check", l:"Herbe mouillée ou moisie, ou changement brutal d'aliment"},
+  {id:"q_stress", show:s=>s.mort_subite||s.avort||s.blessure, type:"check", l:"Capture, transport, visiteurs ou bruit récents"},
+  {id:"q_deparas", show:s=>s.amaigr||s.diarrhee, type:"check", l:"Pas de déparasitage depuis plus de 3 mois"},
+];
+const DIS_AGT = [
+ {id:"stress", n:"Stress, blessures et mort de capture", agent:"Animal sauvage peu domestiqué : la capture, le transport et le bruit peuvent le tuer", regl:false, zoon:false,
+  rules:[["blessure",5,"blessures"],["stress",4,"capture, transport ou bruit"],["mort_subite",3,"morts brutales"],["visiteurs",2,"visiteurs nombreux"],["surpeuple",1,"loges surpeuplées"],["fievre",-2,"fièvre (plutôt infection)"]],
+  confirm:"Circonstances : morts après une capture ou un transport.",
+  immediat:["Laisser l'animal au calme, dans une loge sombre avec de l'eau et de l'herbe","Soigner les plaies avec un antiseptique"],
+  traitement:["Fracture : vétérinaire ; queue arrachée : couper proprement et désinfecter"],
+  prevention:["Capturer avec une cage-trappe, jamais par la queue","Transporter tôt le matin, en caisse aérée","Limiter les visites"]},
+ {id:"enterite", n:"Diarrhée et entérite", agent:"Herbe mouillée ou moisie, changement brutal d'aliment, eau sale", regl:false, zoon:false,
+  rules:[["diarrhee",4,"diarrhée"],["aliment",3,"herbe mouillée ou aliment changé"],["appetit",1,"ne mange plus"],["humidite",1,"loges humides"],["nett_rare",1,"loges sales"]],
+  confirm:"Contexte alimentaire ; analyse des crottes si les morts continuent.",
+  immediat:["Herbe sèche et fraîche, eau propre ; retirer l'aliment suspect"],
+  traitement:["Réhydratation ; antibiotique seulement sur prescription"],
+  prevention:["Faucher l'herbe le matin sans rosée, changer d'aliment progressivement"]},
+ {id:"pneumo", n:"Pneumonie", agent:"Bactéries favorisées par le froid, la pluie et les courants d'air", regl:false, zoon:false,
+  rules:[["resp",4,"respiration difficile"],["jetage",3,"écoulement nasal"],["courant_air",2,"courants d'air"],["humidite",2,"loges humides"],["pluies",1,"saison des pluies"]],
+  confirm:"Examen clinique par le vétérinaire.",
+  immediat:["Loge sèche, abritée du vent et de la pluie"],
+  traitement:["Antibiotique sur prescription"],
+  prevention:["Abri dans chaque loge, murs pleins du côté des vents de pluie"]},
+ {id:"parasites", n:"Vers et parasites internes", agent:"Vers de l'intestin, surtout chez les jeunes", regl:false, zoon:false,
+  rules:[["amaigr",3,"amaigrissement"],["deparas",3,"pas de déparasitage"],["diarrhee",1,"diarrhée"],["evo_chron",2,"évolution lente"],["mort_subite",-2,"morts subites"]],
+  confirm:"Examen des crottes au laboratoire.",
+  immediat:["Nettoyer les loges chaque jour"],
+  traitement:["Vermifuge sur conseil du technicien"],
+  prevention:["Déparasiter tous les 3 mois"]},
+ {id:"gale", n:"Gale et teigne", agent:"Acariens ou champignons de la peau", regl:false, zoon:true,
+  rules:[["croutes_peau",5,"croûtes, perte de poils"],["nett_rare",1,"hygiène insuffisante"],["surpeuple",1,"surpeuplement"]],
+  confirm:"Raclage de peau au laboratoire.",
+  immediat:["Isoler l'animal ; gants pour le manipuler"],
+  traitement:["Acaricide ou antifongique sur conseil du technicien"],
+  prevention:["Désinfecter les loges, quarantaine des animaux achetés"]},
+ {id:"dents", n:"Dents trop longues (malocclusion)", agent:"Les incisives poussent sans arrêt : sans tiges dures à ronger, elles s'allongent", regl:false, zoon:false,
+  rules:[["dents",7,"dents trop longues"],["amaigr",2,"amaigrissement"],["appetit",2,"ne mange plus"]],
+  confirm:"Regarder les incisives.",
+  immediat:["Faire couper les dents par un technicien"],
+  traitement:["Donner des tiges dures : herbe à éléphant, canne à sucre"],
+  prevention:["Tiges dures à ronger chaque jour"]},
+ {id:"avort", n:"Avortements par stress", agent:"Bruit, manipulations, transport ou bagarres pendant la gestation (5 mois)", regl:false, zoon:false,
+  rules:[["avort",6,"avortements"],["stress",3,"stress récent"],["visiteurs",2,"visiteurs"],["intro",1,"animaux introduits"]],
+  confirm:"Circonstances ; examen par le vétérinaire si plusieurs femelles avortent.",
+  immediat:["Calme absolu autour des loges de reproduction"],
+  traitement:["Gants pour toucher les avortons ; les enterrer"],
+  prevention:["Ne pas déplacer ni manipuler les femelles gestantes"]},
+ {id:"malnut", n:"Sous-alimentation", agent:"Fourrage insuffisant ou pauvre, manque de complément et de minéraux", regl:false, zoon:false,
+  rules:[["ration_deseq",4,"ration déséquilibrée"],["sous_alim",3,"quantité insuffisante"],["amaigr",3,"amaigrissement"],["evo_chron",2,"évolution lente"]],
+  confirm:"Bilan de la ration, pesée des animaux.",
+  immediat:["Herbe de Guinée fraîche à volonté + 50 à 100 g de complément par jour"],
+  traitement:["Ajouter sel et minéraux"],
+  prevention:["Cultiver une parcelle de Panicum à côté de l'élevage"]},
+];
+const ESC_CTX=[{id:"pesticides", l:"Champs ou jardins traités aux pesticides à proximité", f:"pesticides"}];
+const LAP_CTX=[{id:"post_mb", l:"Lapines qui ont mis bas il y a moins de 3 semaines"}];
+const AGT_CTX=[{id:"captures", l:"Animaux capturés ou transportés récemment", f:"stress"}];
+Object.assign(SP, {
+  esc:{label:"Escargots", lot:"Le parc ou l'escargotière", unitAge:"mois", ageDef:6,
+    types:[["achatina","Achatina achatina (gros escargot)"],["marginata","Archachatina marginata"],["fulica","Achatina fulica"]], typeDef:"achatina",
+    vacc:[], ctx:ESC_CTX, ageBands:a=> a<3?"age_jeune":a<12?"age_sub":"age_adult", mort:[10,3],
+    signs:ESC_SIGNS, questions:ESC_Q, les:[], dis:DIS_ESC, general:NEW_GENERAL.esc, alert:[], vet:[],
+    lesWarn:"Pas d'autopsie pour les escargots : observez les cadavres, la coquille et la terre du parc.",
+    sample:{age:8, eff:300, sick:40, dead:25, days:5, signs:["bave","odeur_fetide"]}},
+  lap:{label:"Lapins", lot:"Le clapier", unitAge:"semaines", ageDef:8,
+    types:[["eng","Lapins à l'engraissement"],["repro","Lapines et mâles reproducteurs"],["lapereau","Lapereaux sous la mère"]], typeDef:"eng",
+    vacc:[["vhd","Vaccin VHD","non"]], ctx:LAP_CTX, ageBands:a=> a<5?"age_jeune":a<16?"age_sub":"age_adult", mort:[8,2],
+    signs:LAP_SIGNS, questions:LAP_Q, les:[{id:"les_foie",l:"Points blancs sur le foie"},{id:"les_intestin",l:"Intestin rempli de liquide ou de gaz"}], dis:DIS_LAP, general:NEW_GENERAL.lap, alert:[], vet:[],
+    lesWarn:"Ouvrir un lapin mort seulement avec des gants, loin des cages. Si plusieurs lapins meurent d'un coup avec du sang au nez, ne pas ouvrir : alerter les services vétérinaires.",
+    sample:{age:7, eff:40, sick:8, dead:2, days:4, signs:["diarrhee","ballon"]}},
+  agt:{label:"Agoutis", lot:"Les loges", unitAge:"mois", ageDef:6,
+    types:[["eng","Agoutis à l'engraissement"],["repro","Reproducteurs (mâle et femelles)"],["jeune","Jeunes sous la mère"]], typeDef:"eng",
+    vacc:[], ctx:AGT_CTX, ageBands:a=> a<2?"age_jeune":a<8?"age_sub":"age_adult", mort:[6,2],
+    signs:AGT_SIGNS, questions:AGT_Q, les:[], dis:DIS_AGT, general:NEW_GENERAL.agt, alert:[], vet:[],
+    lesWarn:"Autopsie seulement par un technicien ou un vétérinaire, avec des gants.",
+    sample:{age:5, eff:20, sick:3, dead:1, days:3, signs:["diarrhee","appetit"]}},
+});
+SP.lap.les.forEach(()=>{}); DIS_LAP.find(d=>d.id==='cocci').rules.push(["les_foie",5,"points blancs sur le foie"]); DIS_LAP.find(d=>d.id==='enterite').rules.push(["les_intestin",3,"intestin rempli de liquide ou de gaz"]);
+Object.assign(QMAP, {q_calcium:"calcium", q_sec:"sec", q_eau:"eau", q_stress:"stress"});
 let ESP = load('se-esp','vol'); if(!SP[ESP]) ESP='vol';
 /* =====================================================================
    ÉVALUATION DE LA FERME : hygiène, vide sanitaire, eau, bâtiment,
@@ -2197,6 +2729,41 @@ const ENV_NOTES = {
     vois_bv:[["fa",1]], eaux_grasses:[["ppa",4]], maternite:[["mbpc",2],["colib",2],["anemie",1]]};
   Object.entries(PCZ).forEach(([k,v])=>{ ENV_DZ[k] = ENV_DZ[k] || {}; ENV_DZ[k].pc = v; });
 })();
+
+/* escargots, lapins, agoutis : questions et facteurs de la ferme */
+(function(){
+  const at = (id, q) => { const i = ENV_Q.findIndex(x=>x.id===id); ENV_Q.splice(i+1, 0, q); };
+  at("constr", {ax:"bat", id:"parc_esc", sp:["esc"], t:"sel", l:"Parcs à escargots", o:[
+    O("ok","Murets avec rebord, grillage fin dessus, caniveau d'eau autour"),
+    O("part","Clôture simple, sans caniveau ni grillage",2,["nuisibles","contact_ext"],["a_parc_esc"]),
+    O("aucun","Escargots en caisses ou en tas, sans protection",3,["nuisibles","contact_ext","surpeuple"],["a_parc_esc"])]});
+  at("parc_esc", {ax:"bat", id:"humid_esc", sp:["esc"], t:"sel", l:"Ombrage et humidité du parc", o:[
+    O("ok","Ombragé, terre fraîche et humide, arrosage le soir en saison sèche"),
+    O("sec","Terre souvent sèche, ombrage insuffisant",3,["sec","chaleur"],["a_humid_esc"]),
+    O("boue","Terre détrempée, boueuse",2,["humidite"],["a_humid_esc"])]});
+  at("constr", {ax:"bat", id:"cage_lap", sp:["lap"], t:"sel", l:"Cages des lapins", o:[
+    O("ok","Cages grillagées surélevées à 80 cm, boîte à nid pour chaque lapine"),
+    O("sol","Lapins au sol ou dans des caisses en bois",2,["nett_rare","humidite"],["a_cage_lap"]),
+    O("abime","Grillage abîmé ou trop fin qui blesse les pattes",2,["entretien_mauvais"],["a_cage_lap"])]});
+  at("constr", {ax:"bat", id:"loge_agt", sp:["agt"], t:"sel", l:"Loges des agoutis", o:[
+    O("ok","Loges en dur, murs lisses de 1 m, abri et sol cimenté"),
+    O("part","Loges en bois ou en grillage : évasions et blessures",2,["stress","contact_ext"],["a_loge_agt"]),
+    O("cage","Animaux gardés en cages étroites",3,["stress","surpeuple"],["a_loge_agt"])]});
+  Object.assign(ACT, {
+    a_parc_esc:{w:"dur",c:"F",t:"Construire des parcs en briques de 1 m × 2 m : murets de 60 cm avec rebord en tôle vers l'intérieur, grillage fin sur le dessus et caniveau d'eau tout autour contre les fourmis."},
+    a_humid_esc:{w:"now",c:"G",t:"Garder la terre des parcs fraîche et humide sans boue : ombrage de palmes, paillage de feuilles mortes, arrosage du soir en saison sèche."},
+    a_cage_lap:{w:"dur",c:"I",t:"Installer des cages grillagées surélevées à 80 cm (fil épais au sol, repose-pattes pour les reproducteurs) et une boîte à nid par lapine."},
+    a_loge_agt:{w:"dur",c:"I",t:"Construire des loges en dur de 2 m × 1,5 m, murs lisses de 1 m, sol cimenté, un abri par loge ; 1 mâle pour 4 à 6 femelles."}});
+  Object.assign(FL, {sec:"terre du parc trop sèche", stress:"stress (capture, transport, visiteurs)", pesticides:"pesticides à proximité"});
+  const Z = {
+    esc:{nett_rare:[["bact",2],["para",2]], surpeuple:[["surpop",3],["bact",1]], nuisibles:[["pred",3]], contact_ext:[["pred",2]], manque_eau:[["dessech",3]], chaleur:[["dessech",2]], sec:[["dessech",3]], humidite:[["bact",2]], abri_precaire:[["dessech",1],["pred",1]], ordures:[["intox",1]], pesticides:[["intox",3]], sans_desinf:[["bact",1]]},
+    lap:{nett_rare:[["cocci",2],["gale_or",1]], ammoniac:[["past",3]], humidite:[["past",1],["cocci",1]], chaleur:[["chaleur",3]], courant_air:[["past",2]], surpeuple:[["cocci",1],["past",1]], sans_quarantaine:[["past",1],["vhd",1],["gale_or",1]], visiteurs:[["vhd",1],["abandon",1]], vois_morts:[["vhd",2]], entretien_mauvais:[["podo",2]], manque_eau:[["chaleur",1],["abandon",2]], ages_meles:[["cocci",1]], sans_desinf:[["cocci",1]]},
+    agt:{visiteurs:[["avort",2],["stress",1]], courant_air:[["pneumo",2]], humidite:[["pneumo",2],["enterite",1]], nett_rare:[["enterite",1],["gale",1]], deparas:[["parasites",3]], surpeuple:[["stress",2]], sans_quarantaine:[["gale",1],["pneumo",1]], stress:[["stress",3],["avort",2]], abri_precaire:[["pneumo",1]]}};
+  Object.entries(Z).forEach(([sp,m])=>Object.entries(m).forEach(([k,v])=>{ ENV_DZ[k]=ENV_DZ[k]||{}; ENV_DZ[k][sp]=v; }));
+  // questions réservées aux autres espèces qui s'appliquent aussi ici
+  ENV_Q.forEach(q=>{ if(q.sp && ["dejec","qte"].includes(q.id)) q.sp=[...q.sp,"lap","agt"]; if(q.sp && q.id==="vide") q.sp=[...q.sp,"lap"]; });
+  const elev = ENV_Q.find(q=>q.id==="elev"); if(elev){ elev.o.forEach(o=>{ if(typeof o.r==='object'){ o.r.esc=0; o.r.lap=0; o.r.agt=0; } }); }
+})();
 function envItems(esp){ return ENV_Q.filter(q=>!q.sp||q.sp.includes(esp)); }
 function envOpts(q, esp){ return q.o.filter(o=>!o.sp||o.sp.includes(esp)); }
 function envR(o, esp){ return typeof o.r==='object' ? (o.r[esp]||0) : (o.r||0); }
@@ -2374,6 +2941,8 @@ const PH_ZONES = [
 ];
 
 PH_ZONES[0][1].forEach(z=>{ if(z[2]===RUM) z[2] = [...RUM, "pc"]; });
+
+PH_ZONES[0][1].forEach(z=>{ if(Array.isArray(z[2]) && z[2].includes('pr')) z[2] = [...z[2], 'lap', 'agt']; });
 const PH_CAD = new Set(PH_ZONES[1][1].map(z=>z[0]));
 let DG_PH = [], PH_PENDING = [];
 const PH_PROB = {forte:['Forte','ok',4], moyenne:['Moyenne','warn',2], faible:['Faible','neutral',1]};
@@ -2511,12 +3080,12 @@ function phFicheHTML(photos){
 
 function dgSignsUI(keep){
   const S = SP[ESP];
-  document.querySelectorAll('.esp').forEach(b=>b.setAttribute('aria-pressed', b.dataset.esp===ESP));
+  document.querySelectorAll('.esp[data-esp]').forEach(b=>b.setAttribute('aria-pressed', b.dataset.esp===ESP));
   $('dg-lot-t').textContent = S.lot;
   const sel = (id,lab,opts,def) => `<label for="${id}">${esc(lab)}<select id="${id}">${opts.map(o=>`<option value="${o[0]}"${o[0]===def?' selected':''}>${esc(o[1])}</option>`).join('')}</select></label>`;
   const VO = [['oui','Oui, à jour'],['non','Non'],['nsp','Ne sait pas']];
-  let h = `<div class="two">${sel('dg-type', ESP==='vol'?'Type de volaille':ESP==='pc'?'Catégorie de porcs':'Espèce ou race', S.types, S.typeDef)}<label for="dg-age">Âge moyen des malades (${S.unitAge})<input id="dg-age" type="number" min="0" step="1" inputmode="numeric" value="${S.sample.age}"></label></div>
-    <div class="two"><label for="dg-eff">Effectif ${ESP==='vol'?'du lot':ESP==='pc'?'de la porcherie':'du troupeau'}<input id="dg-eff" type="number" min="0" inputmode="numeric" value="${S.sample.eff}"></label><label for="dg-days">Malades depuis (jours)<input id="dg-days" type="number" min="0" inputmode="numeric" value="${S.sample.days}"></label></div>
+  let h = `<div class="two">${sel('dg-type', ({vol:'Type de volaille',pc:'Catégorie de porcs',esc:'Espèce d\'escargot',lap:'Catégorie de lapins',agt:'Catégorie d\'agoutis'})[ESP]||'Espèce ou race', S.types, S.typeDef)}<label for="dg-age">Âge moyen des malades (${S.unitAge})<input id="dg-age" type="number" min="0" step="1" inputmode="numeric" value="${S.sample.age}"></label></div>
+    <div class="two"><label for="dg-eff">Effectif ${({vol:'du lot',pc:'de la porcherie',esc:'des parcs',lap:'du clapier',agt:'des loges'})[ESP]||'du troupeau'}<input id="dg-eff" type="number" min="0" inputmode="numeric" value="${S.sample.eff}"></label><label for="dg-days">Malades depuis (jours)<input id="dg-days" type="number" min="0" inputmode="numeric" value="${S.sample.days}"></label></div>
     <div class="two"><label for="dg-sick">Animaux malades<input id="dg-sick" type="number" min="0" inputmode="numeric" value="${S.sample.sick}"></label><label for="dg-dead">Animaux morts<input id="dg-dead" type="number" min="0" inputmode="numeric" value="${S.sample.dead}"></label></div>
     <div class="two">${S.vacc.map(v=>sel('dg-v-'+v[0], v[1], VO, v[2])).join('')}${sel('dg-saison','Saison',[['pluies','Saison des pluies'],['seche','Saison sèche']],'pluies')}</div>
     <label class="ck"><input type="checkbox" id="dg-intro"> Nouveaux animaux introduits dans les 3 dernières semaines</label>
@@ -2810,6 +3379,17 @@ const FORAGE_GROUPS = new Set(['Herbes et fourrages','Légumineuses','Feuilles d
   FEEDS.forEach(f=>{ f.s.pc = ST[f.id] || "n"; if(PREP[f.id]) f.prep = f.prep + " " + PREP[f.id]; });
   FEED_UNIT.pc = "kg par animal et par jour";
 })();
+
+/* statut des aliments pour escargots, lapins et agoutis */
+(function(){
+  const M = {
+    esc:{aliment_complet:"l",mais:"l",brisures:"l",sonble:"b",sonriz:"l",soja:"b",palmiste:"l",poisson:"l",manioc_sec:"l",manioc_frais:"l",restes:"l",coquillage:"b",moisi:"t",patate:"b",moringa:"b",manioc_feuilles:"l",bananier:"l",chromolaena:"n",mucuna:"n",leucaena:"l",cajanus:"l",centrosema:"l",pueraria:"l",lantana:"t",laurier_rose:"t",laurier_jaune:"t",ricin:"t",pourghere:"t",datura:"t",abrus:"t",crotalaria:"t"},
+    lap:{aliment_complet:"b",conc_rum:"l",mais:"l",brisures:"l",sonble:"b",sonriz:"b",soja:"l",coton:"n",palmiste:"l",dreches:"l",manioc_sec:"l",manioc_frais:"t",cacao:"n",restes:"l",pierre:"b",moisi:"t",paturage:"l",panicum:"b",brachiaria:"b",pennisetum:"l",andropogon:"l",foin:"b",imperata:"l",chromolaena:"l",fanes_arachide:"b",fanes_niebe:"b",stylosanthes:"b",centrosema:"b",pueraria:"b",cajanus:"b",mucuna:"l",leucaena:"l",gliricidia:"l",moringa:"b",ficus:"l",patate:"b",manioc_feuilles:"l",manguier:"l",bananier:"l",palmier:"n",neem:"n",lantana:"t",laurier_rose:"t",laurier_jaune:"t",ricin:"t",pourghere:"t",datura:"t",abrus:"t",sorgho_jeune:"t",crotalaria:"t"},
+    agt:{aliment_complet:"b",conc_rum:"b",mais:"b",brisures:"b",sonble:"b",sonriz:"b",soja:"b",coton:"l",palmiste:"b",dreches:"l",manioc_sec:"b",manioc_frais:"l",cacao:"l",restes:"l",pierre:"b",moisi:"t",paturage:"l",panicum:"b",brachiaria:"b",pennisetum:"b",andropogon:"b",foin:"b",imperata:"l",chromolaena:"n",fanes_arachide:"l",fanes_niebe:"l",stylosanthes:"l",centrosema:"l",pueraria:"l",cajanus:"l",mucuna:"n",leucaena:"l",gliricidia:"l",moringa:"b",ficus:"l",patate:"b",manioc_feuilles:"l",manguier:"l",bananier:"l",palmier:"l",neem:"n",lantana:"t",laurier_rose:"t",laurier_jaune:"t",ricin:"t",pourghere:"t",datura:"t",abrus:"t",sorgho_jeune:"t",crotalaria:"t"}};
+  const PREP = {coquillage:"Escargots : calcium indispensable, à volonté dans une mangeoire à part.", patate:"Lapins et escargots : excellente verdure ; lapins : faner quelques heures.", panicum:"Agoutis : aliment de base, faucher sans rosée. Lapins : faner 24 heures.", pennisetum:"Agoutis : tiges dures à ronger, elles usent les dents."};
+  FEEDS.forEach(f=>{ ['esc','lap','agt'].forEach(sp=>{ f.s[sp] = M[sp][f.id] || 'n'; }); if(PREP[f.id]) f.prep = f.prep + ' ' + PREP[f.id]; });
+  Object.assign(FEED_UNIT, {esc:"g pour 100 escargots et par jour", lap:"g par lapin et par jour", agt:"g par agouti et par jour"});
+})();
 let DG_EXTRA = [];   // plantes ajoutées par photo : {id, n, st, prep}
 
 function feedOptions(sp){ return FEEDS.filter(f=>f.s[sp]!=='n'); }
@@ -2817,7 +3397,7 @@ function feedUI(){
   const sp = ESP, list = feedOptions(sp);
   let g=null, h=`<p class="note">Cochez ce que mangent les animaux et indiquez la quantité (${FEED_UNIT[sp]}) si vous la connaissez.</p>`;
   list.forEach(f=>{ if(f.g!==g){ if(g) h+='</fieldset>'; h+=`<fieldset><legend>${esc(f.g)}</legend>`; g=f.g; }
-    h+=`<div class="feedrow"><label class="ck"><input type="checkbox" id="fd-${f.id}"> ${esc(f.n)}${f.s[sp]==='t'?' <span class="pill crit">toxique</span>':''}</label><input class="mono fd-q" id="fq-${f.id}" type="number" min="0" step="any" inputmode="decimal" placeholder="${sp==='vol'?'g/j':'kg/j'}" aria-label="Quantité : ${esc(f.n)}" hidden></div>`; });
+    h+=`<div class="feedrow"><label class="ck"><input type="checkbox" id="fd-${f.id}"> ${esc(f.n)}${f.s[sp]==='t'?' <span class="pill crit">toxique</span>':''}</label><input class="mono fd-q" id="fq-${f.id}" type="number" min="0" step="any" inputmode="decimal" placeholder="${sp==='vol'||sp==='esc'||sp==='lap'||sp==='agt'?'g/j':'kg/j'}" aria-label="Quantité : ${esc(f.n)}" hidden></div>`; });
   h += '</fieldset><label class="ck" style="margin-top:8px"><input type="checkbox" id="fd-eau" checked> Eau propre disponible à volonté</label>';
   $('dg-feed').innerHTML = `<div class="signs">${h}</div><div id="dg-extra"></div>`;
   renderExtra();
@@ -2857,6 +3437,17 @@ function feedEval(d){
       if(tot < need*0.7){ feats.add('sous_alim'); issues.push(['warn',`Quantité d'aliment donnée (${fmt(tot)} g par oiseau et par jour) inférieure au besoin estimé (environ ${fmt(need)} g à cet âge).`]); }
       else tips.push(`Quantité d'aliment (${fmt(tot)} g par oiseau et par jour) cohérente avec le besoin estimé (environ ${fmt(need)} g).`);
     }
+  } else if(sp==='esc'){
+    if(!has('coquillage')){ feats.add('sans_mineraux'); issues.push(['warn',"Pas de calcium (coquilles d'huîtres, os calcinés broyés) : coquilles molles et croissance lente."]); }
+    if(!it.some(x=>FORAGE_GROUPS.has(x.g))) { feats.add('ration_deseq'); issues.push(['warn',"Pas de feuilles fraîches : donner des feuilles de papayer, de patate douce ou de taro chaque soir."]); }
+  } else if(sp==='lap'){
+    if(!it.some(x=>FORAGE_GROUPS.has(x.g))){ feats.add('ration_deseq'); issues.push(['warn',"Pas de fourrage : le lapin a besoin de fibres chaque jour (herbe fanée, foin, légumineuses)."]); }
+    if(!['aliment_complet','sonble','sonriz','soja','fanes_arachide','fanes_niebe','stylosanthes','centrosema','pueraria','cajanus'].some(has)){ feats.add('ration_deseq'); issues.push(['warn',"Ration pauvre en protéines : ajouter des légumineuses ou des granulés lapin."]); }
+    if(!F.eau){ issues.push(['crit',"Une lapine allaitante boit 1 à 2 litres par jour : sans eau, elle abandonne ou mange ses petits."]); }
+    const tot = conc.reduce((a,x)=>a+(x.q||0),0); if(tot>0 && tot<60){ feats.add('sous_alim'); issues.push(['warn',`Concentré : ${fmt(tot)} g par lapin et par jour, moins que les 100 à 150 g conseillés à l'engraissement.`]); }
+  } else if(sp==='agt'){
+    if(!['panicum','pennisetum','brachiaria','andropogon','foin'].some(has)){ feats.add('ration_deseq'); issues.push(['warn',"Pas de graminée (herbe de Guinée, herbe à éléphant) : c'est la base de la ration de l'agouti."]); }
+    if(!has('pierre')){ feats.add('sans_mineraux'); issues.push(['info',"Ajouter du sel et des minéraux (pierre à lécher ou coquilles broyées)."]); }
   } else if(sp==='pc'){
     const prot = ['aliment_complet','soja','poisson','dreches','insectes'].some(has);
     if(!prot){ feats.add('ration_deseq'); issues.push(['warn',"Ration sans bonne source de protéines (tourteau de soja, farine de poisson, aliment complet) : croissance lente, porcs maigres."]); }
@@ -3001,7 +3592,7 @@ function catRender(){
   const q = ($('cat-q').value||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''), sp=$('cat-sp').value;
   const norm = s => String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
   const rows = FEEDS.filter(f=>!q || norm(f.n+' '+(f.sci||'')+' '+f.g).includes(q));
-  $('cat-tbl').innerHTML = `<table><thead><tr><th>Aliment ou plante</th>${sp==='all'?'<th>Mouton, chèvre</th><th>Bovin</th><th>Volaille</th><th>Porc</th>':'<th>Statut</th>'}<th>Comment le donner</th></tr></thead><tbody>${rows.map(f=>`<tr><td><b>${esc(f.n)}</b>${f.sci?`<br><i class="note">${esc(f.sci)}</i>`:''}<br><span class="note">${esc(f.g)}</span></td>${(sp==='all'?['pr','bv','vol','pc']:[sp]).map(k=>`<td><span class="pill ${ST_LAB[f.s[k]][1]}">${ST_LAB[f.s[k]][0]}</span></td>`).join('')}<td class="note">${esc(f.prep)}</td></tr>`).join('')}</tbody></table>`;
+  $('cat-tbl').innerHTML = `<table><thead><tr><th>Aliment ou plante</th>${sp==='all'?'<th>Mouton, chèvre</th><th>Bovin</th><th>Volaille</th><th>Porc</th><th>Lapin</th><th>Agouti</th><th>Escargot</th>':'<th>Statut</th>'}<th>Comment le donner</th></tr></thead><tbody>${rows.map(f=>`<tr><td><b>${esc(f.n)}</b>${f.sci?`<br><i class="note">${esc(f.sci)}</i>`:''}<br><span class="note">${esc(f.g)}</span></td>${(sp==='all'?['pr','bv','vol','pc','lap','agt','esc']:[sp]).map(k=>`<td><span class="pill ${ST_LAB[f.s[k]][1]}">${ST_LAB[f.s[k]][0]}</span></td>`).join('')}<td class="note">${esc(f.prep)}</td></tr>`).join('')}</tbody></table>`;
 }
 ['cat-q','cat-sp'].forEach(id=>{ $(id).addEventListener('input',catRender); $(id).addEventListener('change',catRender); });
 
@@ -3188,6 +3779,18 @@ ECO.porc = {n:"Porcs à l'engraissement", kind:"band", poultry:false, unit:"porc
   f:[{k:"achat",l:"Prix d'un porcelet sevré (environ 20 kg)",u:"FCFA"},{k:"mort",l:"Mortalité",u:"%"},{k:"jour",l:"Aliment",u:"FCFA/jour/tête"},{k:"sante",l:"Déparasitage, vaccins, soins",u:"FCFA/tête"},{k:"autres",l:"Transport, désinfection, divers",u:"FCFA/tête"},{k:"prix",l:"Prix de vente d'un porc charcutier (environ 95 kg vif, à 2 000 à 2 500 FCFA le kg)",u:"FCFA/tête"},{k:"cycle",l:"Durée d'engraissement",u:"jours"},{k:"vide",l:"Vide sanitaire entre deux bandes",u:"jours"},{k:"m2tete",l:"Surface de porcherie",u:"m²/tête"},{k:"equip",l:"Mangeoires, abreuvoirs (pipettes), cloisons",u:"FCFA/tête"}],
   d:{achat:30000,mort:4,jour:480,sante:3500,autres:1500,prix:214000,prixTab:214000,cycle:140,vide:14,m2tete:1.0,equip:6000,m2:20000,install:200000,salaire:75000,parOuv:150,eau:15000,amortB:10,amortE:5,impr:5}};
 
+Object.assign(ECO, {
+  escargot:{n:"Escargots (Achatina)", kind:"band", poultry:false, unit:"escargot", units:"escargots",
+    f:[{k:"achat",l:"Coût d'un naissain (produit ou acheté)",u:"FCFA"},{k:"mort",l:"Mortalité",u:"%"},{k:"jour",l:"Aliment et calcium",u:"FCFA/jour/escargot"},{k:"sante",l:"Terre, chaux, soins",u:"FCFA/escargot"},{k:"autres",l:"Divers",u:"FCFA/escargot"},{k:"prix",l:"Prix de vente d'un gros escargot",u:"FCFA"},{k:"cycle",l:"Durée de croissance",u:"jours"},{k:"vide",l:"Préparation du parc",u:"jours"},{k:"m2tete",l:"Surface de parc",u:"m²/escargot"},{k:"equip",l:"Parcs, grillage, caniveau",u:"FCFA/escargot"}],
+    d:{achat:50,mort:15,jour:0.5,sante:20,autres:10,prix:600,prixTab:600,cycle:360,vide:15,m2tete:0.04,equip:150,m2:8000,install:50000,salaire:0,parOuv:5000,eau:3000,amortB:8,amortE:5,impr:5}},
+  lapin:{n:"Lapins à l'engraissement", kind:"band", poultry:false, unit:"lapin", units:"lapins",
+    f:[{k:"achat",l:"Coût d'un lapereau sevré (produit ou acheté)",u:"FCFA"},{k:"mort",l:"Mortalité",u:"%"},{k:"jour",l:"Aliment (granulés, son, fourrage)",u:"FCFA/jour/lapin"},{k:"sante",l:"Anticoccidien, soins",u:"FCFA/lapin"},{k:"autres",l:"Divers",u:"FCFA/lapin"},{k:"prix",l:"Prix de vente d'un lapin vif (2,3 kg)",u:"FCFA"},{k:"cycle",l:"Durée d'engraissement",u:"jours"},{k:"vide",l:"Vide sanitaire",u:"jours"},{k:"m2tete",l:"Surface de cage",u:"m²/lapin"},{k:"equip",l:"Cages, mangeoires, abreuvoirs",u:"FCFA/lapin"}],
+    d:{achat:1000,mort:8,jour:35,sante:150,autres:100,prix:4500,prixTab:4500,cycle:56,vide:7,m2tete:0.25,equip:2500,m2:15000,install:100000,salaire:60000,parOuv:500,eau:8000,amortB:10,amortE:5,impr:5}},
+  agouti:{n:"Agoutis à l'engraissement", kind:"band", poultry:false, unit:"agouti", units:"agoutis",
+    f:[{k:"achat",l:"Coût d'un jeune agouti sevré (produit ou acheté)",u:"FCFA"},{k:"mort",l:"Mortalité",u:"%"},{k:"jour",l:"Complément (maïs, son) + fourrage",u:"FCFA/jour/agouti"},{k:"sante",l:"Déparasitage, soins",u:"FCFA/agouti"},{k:"autres",l:"Divers",u:"FCFA/agouti"},{k:"prix",l:"Prix de vente d'un agouti vif (4 kg)",u:"FCFA"},{k:"cycle",l:"Durée d'engraissement",u:"jours"},{k:"vide",l:"Nettoyage des loges",u:"jours"},{k:"m2tete",l:"Surface de loge",u:"m²/agouti"},{k:"equip",l:"Loges, abris, cage-trappe",u:"FCFA/agouti"}],
+    d:{achat:4000,mort:8,jour:25,sante:500,autres:300,prix:18000,prixTab:18000,cycle:240,vide:10,m2tete:0.5,equip:4000,m2:15000,install:100000,salaire:60000,parOuv:300,eau:5000,amortB:10,amortE:5,impr:5}}});
+[["escargot",0.25],["lapin",2.3],["agouti",4]].forEach(([t,v])=>{ ECO[t].f.push({k:"poids",l:"Poids vif moyen à la vente",u:"kg/animal"}); ECO[t].d.poids=v; });
+
 /* poids vendu, pour les indicateurs par kg */
 [["chair",1.7],["hybride",2.0],["ovin",35],["caprin",22],["porc",95]].forEach(([t,v])=>{ if(!ECO[t]) return; ECO[t].f.push({k:"poids",l:"Poids vif moyen à la vente",u:"kg/animal"}); ECO[t].d.poids=v; });
 ECO.pondeuse.f.push({k:"kgPl",l:"Poids d'un plateau de 30 œufs",u:"kg"}); ECO.pondeuse.d.kgPl=1.8;
@@ -3266,7 +3869,7 @@ function evHypUI(){
   const field = f => `<label for="hp-${f.k}">${esc(f.l)} <span class="hint">${esc(f.u)}</span><input id="hp-${f.k}" data-k="${f.k}" type="number" step="any" min="0" inputmode="decimal" value="${P[f.k]}"></label>`;
   $('ev-hyp').innerHTML = `<div class="lab-s">Production</div>${E.f.map(field).join('')}<div class="lab-s">Installation et charges fixes</div>${COMMON_F.map(field).join('')}`;
   $('ev-start-l').hidden = t!=='pondeuse';
-  $('ev-tab-l').hidden = E.poultry || t==='porc'; if(t==='porc') $('ev-tab').checked = false;
+  $('ev-tab-l').hidden = E.poultry || ['porc','lapin','agouti','escargot'].includes(t); if(['porc','lapin','agouti','escargot'].includes(t)) $('ev-tab').checked = false;
 }
 function evPresets(){
   $('ev-presets').innerHTML = [100,200,300,400,500,600,700,800,900,1000].map(n=>`<button class="chipb" data-n="${n}" aria-pressed="${+$('ev-n').value===n}">${n}</button>`).join('');
@@ -3449,7 +4052,7 @@ function mkClass(r, sp){
   const dens = r.pop/Math.max(1,r.km2);
   let c = (r.pop>=800000 || dens>=150) ? 3 : (r.pop>=450000 || dens>=60) ? 2 : 1;
   if(BIG_CITY.has(r.name)) c = Math.min(3, c+1);
-  if((sp==='pr'||sp==='pc') && r.zone==='nord') c = Math.max(1, c-1);
+  if((sp==='pr'||sp==='pc'||sp==='esc') && r.zone==='nord') c = Math.max(1, c-1);
   return c;
 }
 const MK_LAB = {4:['Très forte','ok'],3:['Forte','ok'],2:['Moyenne','warn'],1:['Faible','crit']};
@@ -3483,6 +4086,28 @@ function mkPorc(from, isAT){
   if(ul) ul.innerHTML = '<li>Abidjan, à environ 100 km, est le premier marché du porc : vendre en lots réguliers aux charcutiers et aux maquis.</li><li>Le porc se vend mal dans les zones où il est peu consommé : viser le sud et les grandes villes.</li><li>En cas de peste porcine africaine dans la zone, ne vendre et n\'acheter aucun porc sans l\'accord des services vétérinaires.</li>';
   const note = document.querySelector('#mk-table p.note');
   if(note) note.textContent += ' Pour le porc, une classe de moins pour les régions du nord, où la viande de porc est peu consommée.';
+}
+
+function mkNew(sp, isAT){
+  const T = {
+    esc:{key:"Le gros escargot se consomme surtout dans le sud forestier et à Abidjan (sauce, brochettes). Le ramassage en forêt se fait en saison des pluies : l'escargot d'élevage se vend mieux et plus cher en saison sèche.",
+      comp:[["Ramasseurs d'escargots sauvages","Grosses quantités en saison des pluies, prix bas","Zones forestières"],["Revendeuses des marchés","Achètent aux ramasseurs et revendent en ville","Abidjan et villes du sud"]],
+      buy:[["Maquis et restaurants","Gros escargots vivants pour sauce et brochettes","Abidjan, Agboville, Dabou","Livrer régulièrement des escargots calibrés"],["Revendeuses et grossistes","Lots d'escargots vivants","Marchés d'Abidjan","Vendre en saison sèche, quand le sauvage manque"],["Hôtels et particuliers","Escargots de qualité","Villes du sud","Calibrer par taille, vendre à la pièce"]],
+      ax:["Vendre en saison sèche, quand l'escargot sauvage se fait rare : les prix montent.","Abidjan est à portée de route : livrer les maquis chaque semaine."]},
+    lap:{key:"La viande de lapin se vend surtout en ville : maquis, restaurants, hôtels et supermarchés d'Abidjan. La demande est régulière toute l'année et monte pendant les fêtes.",
+      comp:[["Petits élevages périurbains","Lapins vendus vivants aux maquis","Abidjan et grandes villes"],["Lapin importé congelé","Supermarchés","Abidjan"]],
+      buy:[["Maquis et restaurants","Lapins vifs de 2 à 2,5 kg","Abidjan, Bouaké, Yamoussoukro","Livraisons régulières, poids homogène"],["Hôtels et supermarchés","Lapins abattus et emballés","Abidjan","Abattage propre, régularité"],["Particuliers","Lapins pour les fêtes","Villes","Réservations"]],
+      ax:["Abidjan absorbe toute la production : viser les maquis et les hôtels.","Proposer aussi des reproducteurs aux nouveaux éleveurs."]},
+    agt:{key:"L'agouti est l'une des viandes les plus appréciées de Côte d'Ivoire, partout dans le pays. L'agouti d'élevage remplace la viande de brousse chassée et se vend à bon prix toute l'année.",
+      comp:[["Chasseurs et vendeurs de viande de brousse","Agoutis sauvages, offre irrégulière","Bords de routes, marchés"],["Élevages d'agoutis","Encore peu nombreux : concurrence faible","Sud et centre"]],
+      buy:[["Maquis et restaurants","Agoutis vifs ou fumés de 3,5 à 5 kg","Toutes les villes","Régularité, animaux bien finis"],["Particuliers et cérémonies","Agoutis entiers","Partout","Réservations pour les fêtes et funérailles"],["Nouveaux éleveurs","Reproducteurs","Toutes zones","Vendre des groupes 1 mâle + 4 femelles"]],
+      ax:["Demande forte et prix élevés toute l'année.","Vendre aussi des reproducteurs : marché en pleine croissance."]}}[sp];
+  if(!T) return;
+  $('mk-key').innerHTML = `<div class="callout">${esc(T.key)}</div>`;
+  $('mk-comp').innerHTML = `<table><thead><tr><th>Concurrent</th><th>Activité</th><th>Présence</th><th>Source</th></tr></thead><tbody>${T.comp.map(c=>`<tr><td><b>${esc(c[0])}</b></td><td>${esc(c[1])}</td><td>${esc(c[2])}</td><td><span class="note">constat général</span></td></tr>`).join('')}</tbody></table>`;
+  $('mk-buyers').innerHTML = `<table><thead><tr><th>Acheteur</th><th>Ce qu'il achète</th><th>Où le trouver</th><th>Conseil</th></tr></thead><tbody>${T.buy.map(b=>`<tr><td><b>${esc(b[0])}</b></td><td>${esc(b[1])}</td><td>${esc(b[2])}</td><td class="note">${esc(b[3])}</td></tr>`).join('')}</tbody></table>`;
+  $('mk-contacts').innerHTML = '<p class="note">Notez les acheteurs que vous rencontrez dans le carnet ci-dessous.</p>';
+  const ul = document.querySelector('#mk-axis ul.plain'); if(ul) ul.innerHTML = T.ax.map(x=>`<li>${esc(x)}</li>`).join('');
 }
 function marche(){
   const sp = $('mk-sp').value, from = GEO.regions.find(r=>r.name===$('mk-from').value);
@@ -3556,6 +4181,7 @@ function marche(){
     ['Marchés à bétail d\'Abidjan, Tabaski 2025 (Connectionivoirienne)', SRC.tab],
   ];
   if(sp==='pc') mkPorc(from, isAT);
+  if(['lap','agt','esc'].includes(sp)) mkNew(sp, isAT);
   $('mk-src').innerHTML = srcs.map(s=>`<li><a href="${s[1]}" target="_blank" rel="noopener">${esc(s[0])} ↗</a></li>`).join('');
 }
 ['mk-from','mk-sp'].forEach(id=>$(id).addEventListener('change',marche));
@@ -3626,6 +4252,12 @@ REF.push(
   {g:"Porcs", id:"aliment_porc_kg", l:"Aliment complet porc", u:"FCFA/kg", t:[], d:300},
   {g:"Installation et main-d'œuvre", id:"construction_porcherie", l:"Construction d'une porcherie", u:"FCFA/m²", t:[["porc","m2"]]});
 (REF.find(r=>r.id==="salaire")||{t:[]}).t.push(["porc","salaire"]);
+REF.push(
+  {g:"Escargots, lapins, agoutis", id:"vente_escargot", l:"Gros escargot vendu", u:"FCFA/pièce", t:[["escargot","prix"]]},
+  {g:"Escargots, lapins, agoutis", id:"vente_lapin", l:"Lapin vif vendu", u:"FCFA/tête", t:[["lapin","prix"]]},
+  {g:"Escargots, lapins, agoutis", id:"achat_lapereau", l:"Lapereau sevré acheté", u:"FCFA/tête", t:[["lapin","achat"]]},
+  {g:"Escargots, lapins, agoutis", id:"vente_agouti", l:"Agouti vif vendu", u:"FCFA/tête", t:[["agouti","prix"]]},
+  {g:"Escargots, lapins, agoutis", id:"aliment_lapin_kg", l:"Granulés lapin", u:"FCFA/kg", t:[], d:350});
 const REF_DEF = {}; REF.forEach(r=>{ const v = r.t.length ? ECO[r.t[0][0]].d[r.t[0][1]] : r.d; REF_DEF[r.id] = {v, date:r.date||null, src:r.src||'Valeur de départ du prototype', by:null}; });
 // relevés : produit -> paramètre de référence (+ facteur de conversion)
 const RL_PROD = [
@@ -3648,6 +4280,7 @@ RL_PROD.push(
   {id:"porc", l:"Porc charcutier vif", u:"FCFA/tête", ref:"vente_porc", f:1},
   {id:"porc_kg", l:"Porc vif au kilo (converti pour un porc de 95 kg)", u:"FCFA/kg", ref:"vente_porc", f:95},
   {id:"porcelet", l:"Porcelet sevré", u:"FCFA/tête", ref:"achat_porcelet", f:1});
+RL_PROD.push({id:"escargot", l:"Gros escargot", u:"FCFA/pièce", ref:"vente_escargot", f:1},{id:"lapin", l:"Lapin vif", u:"FCFA/tête", ref:"vente_lapin", f:1},{id:"agouti", l:"Agouti vif", u:"FCFA/tête", ref:"vente_agouti", f:1});
 let REFV = {...REF_DEF, ...load('se-ref',{})};
 let SH = {mode:'local', db:null, user:null, canEdit:(function(){try{return localStorage.getItem('agrodiag.admin')==='1'}catch(e){return false}})(), me:null, hist:[], releves:load('se-releves',[]), buyers:null};
 
@@ -3950,8 +4583,48 @@ PP_MALADE.pc = ["Isoler les malades dans une case propre","Faire le diagnostic (
 PP_MB.pc = {avant:["2 à 3 semaines avant : déparasiter et traiter la truie contre la gale","1 semaine avant : laver et désinfecter la case de mise-bas, laver la truie et la mettre en place","Derniers jours : un peu de son ou de fibres contre la constipation ; eau à volonté"],
   pendant:["Mise-bas normale : 2 à 5 heures, un porcelet toutes les 15 à 30 minutes","Essuyer les porcelets, dégager le nez, les mettre à la tétine et au chaud","Plus de 45 minutes d'efforts sans porcelet : appeler le technicien ou le vétérinaire ; gants propres et lubrifiant"],
   apres:["Chaque porcelet tète le colostrum dans les 6 heures","Fer injectable entre le 2e et le 4e jour","Truie qui a de la fièvre, une mamelle dure, pas de lait ou ne mange plus : vétérinaire dans la journée (syndrome MMA)","Les placentas sortent dans les 4 heures après le dernier porcelet : les retirer et les enterrer"]};
+
+Object.assign(CAL, {
+  esc:{t:"Calendrier de l'escargotière", start:"Date d'éclosion des naissains (ou d'arrivée des escargots)", unit:"M", rows:[
+    [-30,"h","Préparer les parcs","Terre meuble neuve, désinfection des murets à la chaux, caniveau rempli d'eau"],
+    [0,"h","Naissains dans le parc à naissains","100 par m², feuilles tendres et calcium à volonté, arrosage léger le soir"],
+    [60,"h","Premier tri par taille","Passer les plus gros dans le parc de croissance (20 à 30 par m²)"],
+    [180,"h","Retourner ou changer la terre","Tous les 6 mois dans chaque parc"],
+    [240,"h","Choisir les futurs reproducteurs","Les plus gros, coquille intacte et bien formée"],
+    [365,"h","Vente des premiers gros escargots","200 à 300 g pour Achatina achatina, selon l'alimentation"],
+  ], extra:["Chaque soir : feuilles fraîches, aliment, calcium ; chaque matin : retirer les restes","Saison sèche : arroser le soir et renforcer l'ombrage pour éviter l'estivation","Caniveau d'eau toujours plein contre les fourmis magnans"]},
+  lap:{t:"Calendrier d'une portée de lapins", start:"Date de naissance des lapereaux", unit:"S", rows:[
+    [-4,"h","Mettre la boîte à nid","Paille propre et sèche, 3 à 4 jours avant la mise-bas"],
+    [0,"h","Mise-bas","Ne pas déranger ; vérifier le nid le lendemain et retirer les morts"],
+    [10,"h","Remise de la lapine au mâle (rythme semi-intensif)","Ou attendre le sevrage si la lapine est maigre"],
+    [21,"h","Les lapereaux sortent du nid","Granulés et foin à disposition"],
+    [35,"h","Sevrage","Retirer la mère ; lapereaux en cage d'engraissement par 4 à 6"],
+    [35,"d","Anticoccidien préventif au sevrage","Sur conseil du technicien"],
+    [42,"v","Vaccin VHD (si disponible dans la zone)","Selon le vétérinaire, rappel annuel pour les reproducteurs"],
+    [84,"h","Vente (2 à 2,5 kg)","Vers 11 à 13 semaines"],
+  ], extra:["Inspecter les oreilles chaque semaine (gale) et le dessous des pattes","Déparasiter les reproducteurs tous les 3 mois","Vide sanitaire et désinfection des cages entre deux bandes"]},
+  agt:{t:"Calendrier de l'élevage d'agoutis", start:"Date de naissance des petits", unit:"M", rows:[
+    [-150,"h","Saillie dans la loge de reproduction","1 mâle pour 4 à 6 femelles"],
+    [-30,"h","Calme autour des femelles gestantes","Ne pas les manipuler ni les déplacer"],
+    [0,"h","Naissance (2 à 6 petits)","Les petits naissent avec des poils et les yeux ouverts"],
+    [45,"h","Sevrage (6 semaines)","Petits en loge d'engraissement, par sexe"],
+    [60,"d","Premier déparasitage","Puis tous les 3 mois"],
+    [240,"h","Choisir les futurs reproducteurs","Femelles de plus de 2,5 kg, mâles vigoureux d'une autre lignée"],
+    [300,"h","Vente (3,5 à 5 kg)","Vers 8 à 12 mois ; transporter tôt le matin, en caisse aérée"],
+  ], extra:["Herbe de Guinée fraîche chaque jour, fauchée sans rosée ; tiges dures à ronger","Jamais attraper par la queue : cage-trappe ou sac","Changer le mâle reproducteur tous les 2 ans"]}});
+Object.assign(PP_SAIN, {
+  esc:["Caniveau d'eau plein, grillage intact, murets lisses","Terre humide sans boue, ombrage permanent","Retirer chaque matin les restes d'aliment et les morts","Calcium à volonté","Pas de pesticides près des parcs"],
+  lap:["Cages surélevées, crottes retirées chaque jour","Eau propre à volonté, foin sec, herbe fanée","Bâtiment ombragé et aéré, sans courant d'air","Quarantaine de 3 semaines pour tout lapin acheté","Registre : saillies, mises-bas, sevrages, ventes"],
+  agt:["Calme : peu de visites, pas de bruit","Herbe fraîche sans rosée, eau propre, minéraux","Loges sèches avec abri","Déparasiter tous les 3 mois","Manipulation à la cage-trappe"]});
+Object.assign(PP_MALADE, {
+  esc:["Retirer morts et coquilles vides deux fois par jour","Changer la terre du parc touché, désinfecter à la chaux","Réduire la densité","Chercher la cause : aliment, sécheresse, prédateurs"],
+  lap:["Isoler les malades","Faire le diagnostic (onglet Diagnostic)","Morts subites avec sang au nez : services vétérinaires","Traitement uniquement sur prescription","Désinfecter les cages vidées"],
+  agt:["Isoler l'animal dans une loge calme et sombre","Faire le diagnostic (onglet Diagnostic)","Soigner les plaies, appeler le technicien","Ne pas multiplier les captures"]});
+Object.assign(PP_MB, {
+  lap:{avant:["4 jours avant : boîte à nid avec paille propre","Eau et aliment à volonté, calme"],pendant:["La lapine fait son nid avec ses poils : ne pas la déranger","La mise-bas dure moins d'une heure, souvent la nuit"],apres:["Vérifier le nid le lendemain, retirer les morts","Eau à volonté : une lapine allaitante boit 1 à 2 litres par jour","Lapereaux qui sortent du nid vers 3 semaines : granulés et foin"]},
+  agt:{avant:["Dernier mois : ne pas manipuler la femelle","Herbe fraîche et complément à volonté"],pendant:["La femelle met bas seule, souvent la nuit"],apres:["Ne pas toucher les petits","Sevrage à 6 semaines"]}});
 function prophylaxie(){
-  const p = $('pp-prod').value, C = CAL[p], ru = (p==='pr'||p==='bv'||p==='pc');
+  const p = $('pp-prod').value, C = CAL[p], ru = (p==='pr'||p==='bv'||p==='pc'||p==='lap'||p==='agt');
   $('pp-date-l').firstChild.textContent = C.start;
   if(!$('pp-date').value) $('pp-date').value = isoOf(addDays(todayUTC(), -10));
   const d0 = parseISO($('pp-date').value), today = todayUTC();
@@ -3961,13 +4634,13 @@ function prophylaxie(){
   const rows = [...C.rows].sort((a,b)=>a[0]-b[0]);
   $('pp-cal').innerHTML = `<table><thead><tr><th>Âge</th><th>Date</th><th>Type</th><th>Intervention</th><th>Comment</th></tr></thead><tbody>${rows.map(r=>{ const ms=d0?addDays(d0,r[0]):null; const st = ms==null?'':(ms<today-DAY*3?'past':ms<=today+DAY*7?'now':''); return `<tr class="${st==='now'?'cur':''}"><td class="mono">${ageLab(r[0])}</td><td>${ms?fdate(ms,false):'—'}${st==='now'?' <span class="pill warn">à faire</span>':st==='past'?' <span class="note">passé</span>':''}</td><td><span class="pill ${kind[r[1]][1]}">${kind[r[1]][0]}</span></td><td><b>${esc(r[2])}</b></td><td class="note">${esc(r[3])}</td></tr>`; }).join('')}</tbody></table>
     ${C.extra?`<ul class="plain" style="margin-top:10px">${C.extra.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}`;
-  $('pp-sain').innerHTML = `<h3>Élevage sain : prophylaxie sanitaire</h3><ul class="plain">${PP_SAIN[p==='pc'?'pc':ru?'ru':'vol'].map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
-  $('pp-malade').innerHTML = `<h3>Maladie suspectée ou confirmée</h3><ul class="plain">${PP_MALADE[p==='pc'?'pc':ru?'ru':'vol'].map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
+  $('pp-sain').innerHTML = `<h3>Élevage sain : prophylaxie sanitaire</h3><ul class="plain">${PP_SAIN[PP_SAIN[p]?p:ru?'ru':'vol'].map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
+  $('pp-malade').innerHTML = `<h3>Maladie suspectée ou confirmée</h3><ul class="plain">${PP_MALADE[PP_MALADE[p]?p:ru?'ru':'vol'].map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
   $('pp-mb-l').hidden = !ru; $('pp-mbp').hidden = !ru;
   if(ru){
     const M = PP_MB[p], mb = parseISO($('pp-mb').value);
     const blk = (t,arr,dt) => `<p style="margin:8px 0 4px"><b>${t}</b>${dt?` <span class="note">· ${dt}</span>`:''}</p><ul class="plain">${arr.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
-    $('pp-mbp').innerHTML = `<h3>Autour de la mise-bas</h3>` + blk('Avant', M.avant, mb?`à partir du ${fdate(addDays(mb, p==='bv'?-60:p==='pc'?-21:-42),false)}`:'') + blk('Pendant', M.pendant, mb?`vers le ${fdate(mb,false)}`:'') + blk('Après', M.apres, '');
+    $('pp-mbp').innerHTML = `<h3>Autour de la mise-bas</h3>` + blk('Avant', M.avant, mb?`à partir du ${fdate(addDays(mb, ({bv:-60,pc:-21,lap:-4,agt:-30})[p]||-42),false)}`:'') + blk('Pendant', M.pendant, mb?`vers le ${fdate(mb,false)}`:'') + blk('Après', M.apres, '');
   }
 }
 ['pp-prod','pp-date','pp-mb'].forEach(id=>{ $(id).addEventListener('change',prophylaxie); $(id).addEventListener('input',prophylaxie); });
@@ -3992,12 +4665,17 @@ GROW.push(
   {id:"porcelet_s", l:"Porcelet sevré (post-sevrage)", p1:8, p2:25, gmq:400, ic:1.9, ref:"aliment_porc_kg", kind:"pc"},
   {id:"porc_e", l:"Porc à l'engraissement", p1:25, p2:100, gmq:600, ic:3.2, ref:"aliment_porc_kg", kind:"pc"},
   {id:"porc_l", l:"Porc local ou semi-amélioré", p1:15, p2:60, gmq:250, ic:4.5, ref:"aliment_porc_kg", kind:"pc"});
+
+GROW.push(
+  {id:"lapin_e", l:"Lapin à l'engraissement", p1:0.8, p2:2.4, gmq:30, ic:3.5, ref:"aliment_lapin_kg", kind:"lap"},
+  {id:"agouti_e", l:"Agouti à l'engraissement", p1:0.8, p2:4, gmq:12, conc:0.08, fourr:0.6, ref:"aliment_ruminant_kg", kind:"ru"},
+  {id:"escargot", l:"Escargot (Achatina) en croissance", p1:0.005, p2:0.25, gmq:0.7, ic:4, ref:"aliment_lapin_kg", kind:"esc"});
 function refV(id, def){ try{ const v = REFV[id] && REFV[id].v; return Number.isFinite(v)?v:def; }catch(_){ return def; } }
 function alSetDefaults(){
   const g = GROW.find(x=>x.id===$('al-prod').value);
   $('al-p1').value=g.p1; $('al-p2').value=g.p2; $('al-gmq').value=g.gmq;
   $('al-ic-l').hidden = !g.ic; if(g.ic) $('al-ic').value=g.ic;
-  $('al-px').value = refV(g.ref, g.kind==='vol'?400:g.kind==='pc'?300:200);
+  $('al-px').value = refV(g.ref, g.kind==='vol'?400:g.kind==='pc'?300:g.kind==='lap'||g.kind==='esc'?350:200);
 }
 function croissance(){
   const g = GROW.find(x=>x.id===$('al-prod').value);
@@ -4109,16 +4787,92 @@ RATIONS.push(
   ["Truie gestante","2 à 2,5 kg par jour d'un aliment riche en fibres (maïs 50 %, son 30 %, tourteau 15 %, CMV 5 %)","Ni maigre ni grasse à la mise-bas ; fibres contre la constipation"],
   ["Truie allaitante","2 kg + 0,4 kg par porcelet allaité, soit 4 à 6 kg par jour, en 2 ou 3 repas","15 à 30 litres d'eau par jour ; augmenter progressivement après la mise-bas"],
   ["Verrat","2,5 à 3 kg par jour d'aliment truie gestante","Garder le verrat en bon état, ni trop gras ni maigre"]);
+
+RATIONS.push(
+  ["Escargots (pour 100)","Le soir : 1 à 2 kg de feuilles fraîches (papayer, patate douce, taro) et de fruits abîmés, 100 à 200 g d'aliment composé (son, maïs, tourteau + 25 % de calcium)","Calcium à volonté ; retirer les restes chaque matin"],
+  ["Lapin à l'engraissement","Herbe fanée ou foin à volonté + légumineuses + 100 à 150 g de granulés ou de son et tourteau","Jamais d'herbe mouillée ; eau à volonté"],
+  ["Lapine allaitante","Fourrage de qualité à volonté + 200 à 250 g de concentré","1 à 2 litres d'eau par jour"],
+  ["Agouti adulte","Herbe de Guinée ou herbe à éléphant à volonté (1 à 1,5 kg) + 50 à 100 g de maïs, son ou granulés","Tiges dures à ronger, sel et minéraux, eau propre"]);
 function alStatic(){
   $('al-rations').innerHTML = `<table><thead><tr><th>Animaux</th><th>Ration journalière</th><th>Précaution</th></tr></thead><tbody>${RATIONS.map(r=>`<tr><td><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td><td class="note">${esc(r[2])}</td></tr>`).join('')}</tbody></table>`;
   $('al-res').innerHTML = `<table><thead><tr><th>Ressource</th><th>Apport</th><th>Pour</th><th>Remarque</th></tr></thead><tbody>${RESSOURCES.map(r=>`<tr><td><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td><td>${esc(r[2])}</td><td class="note">${esc(r[3])}</td></tr>`).join('')}</tbody></table>`;
 }
 function alInit(){
-  $('al-prod').innerHTML = `<optgroup label="Volailles">${GROW.filter(g=>g.kind==='vol').map(g=>`<option value="${g.id}">${esc(g.l)}</option>`).join('')}</optgroup><optgroup label="Ruminants">${GROW.filter(g=>g.kind==='ru').map(g=>`<option value="${g.id}">${esc(g.l)}</option>`).join('')}</optgroup><optgroup label="Porcs">${GROW.filter(g=>g.kind==='pc').map(g=>`<option value="${g.id}">${esc(g.l)}</option>`).join('')}</optgroup>`;
+  $('al-prod').innerHTML = `<optgroup label="Volailles">${GROW.filter(g=>g.kind==='vol').map(g=>`<option value="${g.id}">${esc(g.l)}</option>`).join('')}</optgroup><optgroup label="Ruminants">${GROW.filter(g=>g.kind==='ru').map(g=>`<option value="${g.id}">${esc(g.l)}</option>`).join('')}</optgroup><optgroup label="Lapins et escargots">${GROW.filter(g=>g.kind==='lap'||g.kind==='esc').map(g=>`<option value="${g.id}">${esc(g.l)}</option>`).join('')}</optgroup><optgroup label="Porcs">${GROW.filter(g=>g.kind==='pc').map(g=>`<option value="${g.id}">${esc(g.l)}</option>`).join('')}</optgroup>`;
   $('al-d').value = isoOf(todayUTC()); alSetDefaults(); alStatic(); foInit();
 }
 $('al-prod').addEventListener('change', ()=>{ alSetDefaults(); croissance(); });
 ['al-p1','al-p2','al-n','al-d','al-gmq','al-ic','al-px'].forEach(id=>$(id).addEventListener('input', croissance));
+
+
+/* =====================================================================
+   FICHES TECHNIQUES ILLUSTRÉES
+   ===================================================================== */
+const FT = {
+ esc:{n:"Élevage d'escargots (achatiniculture)", intro:"Élever les gros escargots africains (Achatina achatina, Archachatina marginata) demande peu d'argent et peu de place. L'activité convient au sud forestier et humide, près d'un point d'eau.",
+  chiffres:[["Ponte","2 à 3 fois par an, en saison des pluies"],["Œufs par ponte","100 à 400 (A. achatina), 5 à 20 gros œufs (A. marginata)"],["Éclosion","2 à 4 semaines"],["Vente","200 à 300 g en 12 à 18 mois"],["Densité","5 à 10 reproducteurs, 20 à 30 en croissance, 100 naissains par m²"],["Climat","22 à 30 °C, air humide, ombre"]],
+  sec:[
+   {t:"1. Choisir le site", items:["Endroit ombragé, humide, à l'abri du vent, près d'un point d'eau","Loin des champs traités aux pesticides et des routes","Terre meuble, riche en humus, sans argile collante"]},
+   {t:"2. Construire l'escargotière", fig:["escargotierePlan","escargotiereCoupe"], items:["Parcs de 1 m × 2 m, murets de 60 cm dont 20 cm enterrés","Rebord en tôle tourné vers l'intérieur : les escargots ne sortent pas","Grillage fin sur le dessus contre rats, oiseaux, lézards et serpents","Caniveau d'eau tout autour contre les fourmis magnans","20 à 30 cm de terre meuble, retournée ou changée tous les 6 mois"]},
+   {t:"3. Reproduction", fig:["escargotPonte"], items:["Reproducteurs de plus de 2 ans et 200 g, coquille intacte","Pondoir : coin de terre meuble de 10 à 15 cm, arrosé légèrement","Ne pas déranger les œufs ; les petits sortent en 2 à 4 semaines","Mettre les naissains dans un parc à part, avec feuilles tendres et calcium"]},
+   {t:"4. Alimentation", picts:["feuille","calcium","sac","eau"], items:["Le soir (l'escargot mange la nuit) : feuilles de papayer, patate douce, taro, chou, laitue","Fruits abîmés : papaye, banane, mangue","Aliment composé : son, maïs, tourteau + 20 à 30 % de calcium","Calcium à volonté : coquilles d'huîtres broyées, os calcinés, coquilles d'œufs","Abreuvoir plat avec des cailloux pour que les petits ne se noient pas","Retirer les restes chaque matin"]},
+   {t:"5. Santé", picts:["nettoyer","ombre","eau"], items:["Coquille molle : manque de calcium","Escargot fermé par un voile blanc : trop sec, arroser et ombrager","Morts qui sentent mauvais, bave mousseuse : infection, changer la terre et réduire la densité","Coquilles trouées : prédateurs, vérifier le caniveau et le grillage","Le diagnostic détaillé est dans l'onglet Diagnostic (bouton Escargots)"]},
+   {t:"6. Vente", items:["Gros escargot : 300 à 1 000 FCFA selon la taille (prix indicatifs à vérifier)","Vendre en saison sèche, quand l'escargot sauvage manque","Clients : maquis, restaurants, revendeuses d'Abidjan","Devis et rentabilité : onglet Devis (Escargots)"]}]},
+ lap:{n:"Élevage de lapins (cuniculture)", intro:"Le lapin grandit vite, se reproduit beaucoup et mange des fourrages. Bien logé à l'ombre et au frais, il donne une viande très demandée en ville.",
+  chiffres:[["Maturité","4 à 5 mois (femelle de 3 kg)"],["Gestation","31 jours"],["Portée","6 à 8 lapereaux"],["Sevrage","4 à 5 semaines"],["Vente","2 à 2,5 kg vers 11 à 13 semaines"],["Mâle","1 pour 8 à 10 lapines"]],
+  sec:[
+   {t:"1. Le bâtiment", fig:["clapierBatiment"], items:["Bâtiment ombragé, aéré, sans soleil direct ni pluie","Murets bas et grillage : l'air circule","Au-dessus de 30 °C, le lapin souffre : toit isolé, arbres autour"]},
+   {t:"2. Les cages", fig:["clapierFace"], items:["Cage de lapine : 80 × 60 cm, 45 cm de haut, avec boîte à nid de 40 × 30 cm","Cage de mâle : 60 × 50 cm","Engraissement : 4 à 6 lapins par cage de 80 × 60 cm","Cages surélevées à 80 cm : les crottes tombent à travers le grillage","Grillage de fil épais au sol, repose-pattes pour les reproducteurs"]},
+   {t:"3. Reproduction", fig:["lapinCycle"], items:["Toujours porter la lapine chez le mâle, jamais l'inverse","Palpation à 12 jours : petites boules = lapine pleine","Boîte à nid avec paille 4 jours avant la mise-bas","Ne pas toucher le nid les premiers jours","Remise au mâle 10 jours après la mise-bas, ou au sevrage si la lapine est maigre"]},
+   {t:"4. Alimentation", picts:["feuille","sac","eau"], items:["Fourrage fané (jamais mouillé) : herbe de Guinée, Brachiaria, feuilles de patate douce","Légumineuses : Stylosanthes, Centrosema, Pueraria, pois d'Angole","Concentré : granulés lapin ou son + tourteau, 100 à 150 g par jour","Eau propre à volonté : une lapine allaitante boit 1 à 2 litres par jour","Changer d'aliment progressivement sur une semaine"]},
+   {t:"5. Santé", picts:["nettoyer","thermo","seringue"], items:["Diarrhée, ventre gonflé après le sevrage : coccidiose ou entérite","Croûtes dans les oreilles : gale","Écoulement du nez, éternuements : coryza, aérer","Morts subites avec sang au nez : prévenir les services vétérinaires","Calendrier des soins : onglet Prophylaxie (Lapins)"]},
+   {t:"6. Vente", items:["Lapin vif : 4 000 à 5 000 FCFA (prix indicatifs à vérifier)","Clients : maquis, restaurants, hôtels d'Abidjan","Devis et rentabilité : onglet Devis (Lapins)"]}]},
+ agt:{n:"Élevage d'agoutis (aulacodiculture)", intro:"L'agouti (aulacode) est une viande très appréciée en Côte d'Ivoire. L'élever en enclos donne une viande régulière, sans braconnage. C'est un animal calme mais craintif : le stress peut le tuer.",
+  chiffres:[["Maturité","6 à 8 mois (femelle de 2,5 kg)"],["Gestation","environ 150 jours (5 mois)"],["Portée","4 petits en moyenne (2 à 9)"],["Mises-bas","1,5 à 2 par an"],["Sevrage","6 semaines"],["Vente","3,5 à 5 kg vers 8 à 12 mois"]],
+  sec:[
+   {t:"1. L'enclos", fig:["enclosAgouti"], items:["Loges en dur de 2 m × 1,5 m, sol cimenté","Murs lisses de 1 m : l'agouti saute et ronge le bois","Un abri dans chaque loge, contre le soleil et la pluie","Couloir de service avec portes grillagées","Loin du bruit et des passages"]},
+   {t:"2. Manipuler sans blesser", fig:["agoutiManip"], items:["Jamais par la queue : la peau s'arrache","Cage-trappe ou sac, puis tenir par le dos","Transport tôt le matin, en caisse aérée et sombre"]},
+   {t:"3. Reproduction", items:["Groupe : 1 mâle pour 4 à 6 femelles","Gestation de 5 mois : ne pas manipuler les femelles pleines","Les petits naissent avec des poils et les yeux ouverts","Sevrage à 6 semaines, puis loge d'engraissement par sexe","Changer le mâle tous les 2 ans (autre lignée)"]},
+   {t:"4. Alimentation", picts:["feuille","sac","calcium","eau"], items:["Herbe de Guinée (Panicum) fraîche à volonté, fauchée sans rosée","Tiges d'herbe à éléphant et de canne à sucre : elles usent les dents","Complément : 50 à 100 g de maïs, son, manioc séché ou granulés par jour","Sel et minéraux, eau propre tous les jours"]},
+   {t:"5. Santé", picts:["nettoyer","seringue"], items:["Morts après capture ou transport : stress, réduire les manipulations","Diarrhée : herbe mouillée ou changement brutal d'aliment","Dents trop longues : manque de tiges dures","Déparasiter tous les 3 mois"]},
+   {t:"6. Vente", items:["Agouti vif : 15 000 à 25 000 FCFA selon le poids (prix indicatifs à vérifier)","Clients : maquis, restaurants, particuliers ; vente de reproducteurs","Devis et rentabilité : onglet Devis (Agoutis)"]}]},
+ pc:{n:"Élevage de porcs", intro:"Le porc grandit vite et valorise les sous-produits, mais la peste porcine africaine impose une biosécurité stricte.",
+  chiffres:[["Gestation","114 jours"],["Portée","8 à 12 porcelets"],["Sevrage","4 à 6 semaines"],["Vente","90 à 110 kg vers 6 mois"],["Verrat","1 pour 15 à 20 truies"],["Densité","0,6 à 1 m² par porc à l'engraissement"]],
+  sec:[{t:"1. La porcherie", fig:["porcherie"], items:["Maternité avec barres contre l'écrasement et coin chauffé","Aire de couchage sèche séparée de l'aire de déjection","Pédiluve à l'entrée, porcherie clôturée, porcs toujours enfermés","Jamais de restes de cuisine sans 30 minutes d'ébullition"]},
+   {t:"2. Repères", items:["Fer injectable aux porcelets entre le 2e et le 4e jour","Calendrier complet : onglet Prophylaxie (Porcs)","Diagnostic : onglet Diagnostic (Porcs)","Rentabilité : onglet Devis (Porcs)"]}]},
+ vol:{n:"Élevage de volailles", intro:"Le poulailler doit être sec, aéré et protégé. La plupart des maladies se préviennent par la vaccination et le vide sanitaire.",
+  chiffres:[["Poulet de chair","1,7 à 2 kg en 6 semaines"],["Pondeuse","entrée en ponte vers 18 à 20 semaines"],["Densité chair","8 à 10 par m² en finition"],["Densité ponte au sol","4 à 5 par m²"],["Vide sanitaire","2 à 3 semaines"],["Litière","5 à 10 cm"]],
+  sec:[{t:"1. Le poulailler", fig:["poulailler"], items:["Orientation est-ouest, débord de toit d'1 m","Grillage et rideaux sur les longs côtés","Mangeoires à hauteur du dos, abreuvoirs surélevés","Bande unique : un seul âge par bâtiment"]},
+   {t:"2. Repères", items:["Vaccins : onglet Prophylaxie","Ponte et incubation : onglets Ponte et Incubation","Fabriquer son aliment : onglet Alimentation"]}]},
+ pr:{n:"Élevage de moutons et chèvres", intro:"Les petits ruminants valorisent les pâturages et les résidus de culture. La bergerie surélevée garde les animaux au sec.",
+  chiffres:[["Gestation","150 jours"],["Maturité","8 à 12 mois"],["Bélier ou bouc","1 pour 25 à 30 femelles"],["Surface","1 à 1,5 m² par adulte"],["Vaccin PPR","dès 3 mois"],["Déparasitage","début et fin de saison des pluies"]],
+  sec:[{t:"1. La bergerie", fig:["bergerie"], items:["Plancher en lattes surélevé de 80 cm à 1 m","Râtelier pour le fourrage, abreuvoir propre, pierre à lécher","Fumier ramassé sous le plancher pour le compost"]},
+   {t:"2. Repères", items:["Vaccins et déparasitage : onglet Prophylaxie","Embouche et Tabaski : onglet Devis","Rations : onglet Alimentation"]}]}};
+const FT_ORDER=[["esc","Escargots"],["lap","Lapins"],["agt","Agoutis"],["pc","Porcs"],["vol","Volailles"],["pr","Moutons et chèvres"]];
+let FT_SEL = load('se-ft','esc'); if(!FT[FT_SEL]) FT_SEL='esc';
+function ftHTML(k, forPrint){
+  const F=FT[k], I=window.ILLUS_ELEV||{};
+  const li=a=>a.map(x=>`<li>${esc(x)}</li>`).join('');
+  return `<h2 style="margin:0 0 6px">${esc(F.n)}</h2><p style="margin:0 0 12px">${esc(F.intro)}</p>
+    <div class="ft-chiffres">${F.chiffres.map(([a,b])=>`<div><span>${esc(a)}</span><b>${esc(b)}</b></div>`).join('')}</div>
+    ${F.sec.map(s=>`<section class="ft-sec"><h3>${esc(s.t)}</h3>
+      ${(s.fig||[]).map(f=>I[f]?`<figure class="ft-fig">${I[f]()}</figure>`:'').join('')}
+      ${s.picts&&I.pict?`<div class="ft-picts">${s.picts.map(p=>I.pict(p)).join('')}</div>`:''}
+      <ul>${li(s.items)}</ul></section>`).join('')}
+    <p class="note">Repères techniques indicatifs, à adapter avec votre technicien d'élevage. Prix à vérifier sur le marché local.</p>`;
+}
+function ftRender(){
+  $('ft-sp').innerHTML = FT_ORDER.map(([k,l])=>`<button class="esp" data-ft="${k}" aria-pressed="${k===FT_SEL}">${esc(l)}</button>`).join('');
+  $('ft-out').innerHTML = ftHTML(FT_SEL,false);
+}
+$('ft-sp').addEventListener('click', e=>{ const b=e.target.closest('[data-ft]'); if(!b) return; FT_SEL=b.dataset.ft; store('se-ft',FT_SEL); ftRender(); });
+$('ft-print').addEventListener('click', ()=>{
+  const css='body{font:14px/1.5 Arial,sans-serif;color:#1E2B22;margin:20px}h2{color:#17694A}h3{margin:18px 0 6px;border-bottom:2px solid #17694A;padding-bottom:2px}.ft-chiffres{display:grid;grid-template-columns:1fr 1fr;gap:6px}.ft-chiffres div{border:1px solid #DDD;border-radius:8px;padding:6px 8px}.ft-chiffres span{display:block;font-size:12px;color:#5B6A60}figure{margin:8px 0;page-break-inside:avoid}svg{max-width:640px}.ft-picts svg{width:34px;height:34px}.note{font-size:12px;color:#5B6A60}section{page-break-inside:avoid}';
+  const html=`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>${esc(FT[FT_SEL].n)}</title><style>${css}</style></head><body><p style="font-size:12px;color:#5B6A60">AKA AgroDiag CI · Fiche technique</p>${ftHTML(FT_SEL,true)}</bo`+`dy></html>`;
+  if(window.AgroDiagAndroid && window.AgroDiagAndroid.printHtml){ window.AgroDiagAndroid.printHtml(html, 'Fiche '+FT[FT_SEL].n); return; }
+  const w=window.open('','_blank'); if(w){ w.document.open(); const BE='</bo'+'dy>'; w.document.write(html.replace(BE,'<scr'+'ipt>setTimeout(function(){window.print()},400)<\/scr'+'ipt>'+BE)); w.document.close(); }
+});
+ftRender();
 
 /* ---------- boot ---------- */
 dgSignsUI(); drawMap(); renderFarms(); analyse(); dgAnalyse(); dgHistory(); shInit(); evPresets(); evHypUI(); devis(); mkInit(); marche(); cbRender(); renderReleves(); prophylaxie(); alInit(); croissance(); catRender(); sampleInit(); densite(); ponte(); incubation(); gestation(); ratio(); consang();

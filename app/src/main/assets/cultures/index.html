@@ -27,6 +27,181 @@
 .mtab .neg{color:var(--bad)} .mtab .pos{color:var(--good)}
 .mtab-wrap{grid-column:1/-1;overflow-x:auto}
 </style>
+<script>
+/* Illustrations des fiches techniques des cultures (SVG générés à partir de l'itinéraire). */
+(function(){
+  'use strict';
+  const C={ink:'#1E2B22',mut:'#5B6A60',green:'#17694A',leaf:'#3F8E4E',leafD:'#2E6B3A',soil:'#8A6A45',soilL:'#B08E62',soilD:'#6E5233',paper:'#FBF8F1',ochre:'#E0A526',water:'#5EA3D6',straw:'#E8C76A',white:'#fff',wood:'#8C6A42',red:'#C8372D'};
+  const T=(x,y,s,o={})=>`<text x="${x}" y="${y}" font-family="Source Sans 3,Segoe UI,Arial,sans-serif" font-size="${o.fs||14}" font-weight="${o.fw||600}" fill="${o.c||C.ink}" text-anchor="${o.a||'middle'}">${s}</text>`;
+  const svg=(w,h,b,t)=>`<figure class="illus" style="margin:10px 0 14px;overflow-x:auto;-webkit-overflow-scrolling:touch"><svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${t}" style="width:100%;min-width:540px;max-width:640px;height:auto;display:block;background:${C.paper};border-radius:12px;border:1px solid #E4DDCC">${b}</svg></figure>`;
+  let uid=0;
+  const dim=(x1,y1,x2,y2,lab,o={})=>{ const id='ac'+(++uid); const vert=Math.abs(x1-x2)<1, mx=(x1+x2)/2, my=(y1+y2)/2;
+    return `<defs><marker id="${id}" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="${C.green}"/></marker></defs><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${C.green}" stroke-width="2" marker-start="url(#${id})" marker-end="url(#${id})"/>${vert?T(mx+(o.dx??8),my+5,lab,{c:C.green,a:o.a||'start',fw:700}):T(mx,my+(o.dy??-8),lab,{c:C.green,fw:700})}`; };
+  const callout=(x,y,tx,ty,lab,a='start')=>`<line x1="${x}" y1="${y}" x2="${tx}" y2="${ty}" stroke="${C.mut}" stroke-width="1.3"/><circle cx="${x}" cy="${y}" r="3" fill="${C.mut}"/>${T(tx+(a==='start'?4:a==='end'?-4:0),ty+(a==='middle'?16:5),lab,{a,fs:13})}`;
+
+  function kind(c){ const f=(c.fam||'').toLowerCase(), n=(c.nom||'').toLowerCase();
+    if (/bananier|banane/.test(f+n)) return 'banane';
+    if (/palmier|cocotier/.test(n)) return 'palmier';
+    if (c.per) return 'arbre';
+    if (/riz|maïs|sorgho|mil|céréale/.test(f+n)) return 'cereale';
+    if (/tubercul|manioc|igname|taro|patate/.test(f+n)) return 'tubercule';
+    if (/ananas/.test(n)) return 'ananas';
+    return 'legume'; }
+  // pictogramme de plante vu de dessus (rayon r)
+  function plantTop(x,y,k,r){ r=Math.max(5,Math.min(r,26));
+    if (k==='arbre'||k==='palmier'||k==='banane'){ const n=k==='palmier'?9:k==='banane'?6:0;
+      if(n) return `<g transform="translate(${x} ${y})">${Array.from({length:n},(_,i)=>`<path d="M0 0 L${(r*Math.cos(i*6.283/n)).toFixed(1)} ${(r*Math.sin(i*6.283/n)).toFixed(1)}" stroke="${C.leaf}" stroke-width="${k==='banane'?r*0.35:3}" stroke-linecap="round"/>`).join('')}<circle r="${r*0.22}" fill="${C.wood}"/></g>`;
+      return `<g transform="translate(${x} ${y})"><circle r="${r}" fill="${C.leaf}" opacity=".85"/><circle r="${r*0.62}" fill="${C.leafD}" opacity=".55"/><circle r="${r*0.18}" fill="${C.wood}"/></g>`; }
+    if (k==='cereale') return `<g transform="translate(${x} ${y})" stroke="${C.leaf}" stroke-width="2.5" stroke-linecap="round">${[0,1,2,3,4].map(i=>`<path d="M0 0 L${(r*Math.cos(i*1.256+.3)).toFixed(1)} ${(r*Math.sin(i*1.256+.3)).toFixed(1)}"/>`).join('')}</g>`;
+    if (k==='tubercule') return `<g transform="translate(${x} ${y})"><circle r="${r}" fill="${C.soilL}"/>${[0,1,2,3,4].map(i=>`<ellipse cx="${(r*0.5*Math.cos(i*1.256)).toFixed(1)}" cy="${(r*0.5*Math.sin(i*1.256)).toFixed(1)}" rx="${r*0.4}" ry="${r*0.22}" fill="${C.leaf}" transform="rotate(${i*72} ${(r*0.5*Math.cos(i*1.256)).toFixed(1)} ${(r*0.5*Math.sin(i*1.256)).toFixed(1)})"/>`).join('')}</g>`;
+    if (k==='ananas') return `<g transform="translate(${x} ${y})" stroke="${C.leafD}" stroke-width="2">${Array.from({length:8},(_,i)=>`<path d="M0 0 L${(r*Math.cos(i*0.785)).toFixed(1)} ${(r*Math.sin(i*0.785)).toFixed(1)}"/>`).join('')}</g>`;
+    return `<g transform="translate(${x} ${y})">${[0,1,2,3].map(i=>`<ellipse cx="${(r*0.45*Math.cos(i*1.571)).toFixed(1)}" cy="${(r*0.45*Math.sin(i*1.571)).toFixed(1)}" rx="${r*0.5}" ry="${r*0.3}" fill="${C.leaf}" transform="rotate(${i*90} ${(r*0.45*Math.cos(i*1.571)).toFixed(1)} ${(r*0.45*Math.sin(i*1.571)).toFixed(1)})"/>`).join('')}<circle r="${r*0.2}" fill="${C.leafD}"/></g>`; }
+
+  // « 80 cm × 40 cm », « 3 m × 2,5 m », « 1 m × 0,5 m », « 80 × 40 cm », « 9 m en triangle »
+  function parseEcart(s){ s=String(s||'').replace(/,/g,'.');
+    let m=s.match(/(\d+(?:\.\d+)?)\s*(cm|m)?\s*[×x]\s*(\d+(?:\.\d+)?)\s*(cm|m)?/i);
+    if (m){ const u2=(m[4]||m[2]||'cm').toLowerCase(), u1=(m[2]||u2).toLowerCase(); const v=(n,u)=>u==='m'?+n*100:+n; return {a:v(m[1],u1), b:v(m[3],u2), tri:false}; }
+    m=s.match(/(\d+(?:\.\d+)?)\s*m\s*en\s*triangle/i); if (m) return {a:+m[1]*100, b:+m[1]*100*0.866, tri:true};
+    m=s.match(/lignes?\s*à\s*(\d+(?:\.\d+)?)\s*cm/i); if (m) return {a:+m[1], b:Math.max(5,+m[1]/4), tri:false, rows:true};
+    return null; }
+  const fmtL=(cm)=> cm>=100 ? (Math.round(cm/10)/10).toString().replace('.',',')+' m' : Math.round(cm)+' cm';
+
+  function schemaPlantation(c, it){
+    const e=parseEcart(it.ecart); if(!e) return '';
+    const k=kind(c), W=640, H=330, nx=6, ny=4;
+    const sx=86, sy=Math.max(40,Math.min(70, 86*e.b/e.a));
+    const x0=100, y0=70;
+    let b=T(W/2,28,`Schéma de plantation (vue de dessus) : ${it.ecart.length>48?it.ecart.slice(0,48)+'…':it.ecart}`,{fs:16,fw:700});
+    b+=`<rect x="40" y="44" width="560" height="${ny*sy+46}" rx="10" fill="#E9DFC9"/>`;
+    for(let j=0;j<ny;j++){ b+=`<path d="M60 ${y0+j*sy} H580" stroke="#D3C3A2" stroke-width="2" stroke-dasharray="6 6"/>`;
+      for(let i=0;i<nx;i++){ const off=e.tri&&j%2?sx/2:0; b+=plantTop(x0+i*sx+off, y0+j*sy, k, Math.min(sx,sy)*0.38); } }
+    b+=dim(x0, y0+ny*sy-8, x0+sx, y0+ny*sy-8, fmtL(e.a), {dy:18});
+    b+=dim(66, y0, 66, y0+sy, fmtL(e.b), {dx:-6, a:'end'});
+    const dens = it.dens ? `Densité : ${it.dens}` : '';
+    const grains = (String(it.ecart).match(/\d[^,;]*(grains?|graines?|plants?)[^,;]*(poquet|touffe)/i)||[])[0];
+    b+=T(W/2, y0+ny*sy+48, [e.tri?'Plantation en triangle (quinconce)':'', dens, grains?grains.trim():''].filter(Boolean).join(' · '),{fs:14,c:C.mut,fw:600});
+    return svg(W, y0+ny*sy+62, b, 'Schéma de plantation');
+  }
+
+  function trou(it){ const m=String(it.prep||'').match(/(\d+)\s*[×x]\s*(\d+)\s*[×x]\s*(\d+)\s*cm/); const d=m?+m[1]:60;
+    let b=T(320,28,'Trou de plantation',{fs:16,fw:700});
+    b+=`<rect x="20" y="90" width="600" height="190" fill="${C.soil}"/><rect x="20" y="80" width="600" height="14" fill="#7B9E4E"/>`;
+    b+=`<path d="M230 94 L230 250 L410 250 L410 94 Z" fill="${C.soilD}"/>`;
+    b+=`<path d="M232 94 L232 170 L408 170 L408 94 Z" fill="${C.soilL}"/><path d="M232 170 L232 248 L408 248 L408 170 Z" fill="#7A5A38"/>`;
+    b+=`<g fill="#5B3F22">${Array.from({length:14},(_,i)=>`<circle cx="${245+(i*37)%150}" cy="${185+(i*23)%55}" r="3"/>`).join('')}</g>`;
+    b+=`<path d="M320 94 V40" stroke="${C.wood}" stroke-width="5"/>`+`<path d="M320 70 q-30 -20 -40 0 q20 10 40 0 q30 -20 40 0 q-20 10 -40 0" fill="${C.leaf}"/>`;
+    b+=`<path d="M120 80 q20 -24 60 -16 q30 6 30 16z" fill="${C.soilL}"/>`;
+    b+=dim(230,268,410,268,`${d} cm`,{dy:18})+dim(205,94,205,250,`${m?+m[3]:d} cm`,{dx:-6,a:'end'});
+    b+=callout(380,130,440,130,'Terre de surface + compost','start')+callout(380,215,440,215,'Terre du fond','start');
+    b+=callout(150,70,40,52,'Bonne terre mise de côté','start');
+    b+=callout(322,52,420,52,'Collet au niveau du sol','start');
+    return svg(640,300,b,'Trou de plantation'); }
+
+  function butte(c){ const bill=/patate|billon|coton/i.test(c.nom);
+    let b=T(320,28,bill?'Billons (coupe)':'Buttes (coupe)',{fs:16,fw:700});
+    b+=`<rect x="20" y="220" width="600" height="60" fill="${C.soil}"/>`;
+    const xs=[120,320,520];
+    xs.forEach(x=>{ b+=`<path d="M${x-90} 222 Q${x} ${bill?150:110} ${x+90} 222 Z" fill="${C.soilL}"/>`;
+      b+=`<path d="M${x} ${bill?160:120} v-50" stroke="${C.leafD}" stroke-width="4"/><path d="M${x} ${bill?140:100} q-30 -14 -40 6 M${x} ${bill?128:88} q30 -14 40 6" stroke="${C.leaf}" stroke-width="7" fill="none" stroke-linecap="round"/>`;
+      if(/igname/i.test(c.nom)) b+=`<path d="M${x} ${bill?120:80} L${x+20} 30" stroke="${C.wood}" stroke-width="3"/>`;
+      b+=`<ellipse cx="${x-14}" cy="200" rx="24" ry="10" fill="#C59B6B"/>`; });
+    b+=dim(30,240,210,240,bill?'1 m (de billon à billon)':'1 m',{dy:18});
+    b+=dim(220,110,220,222,bill?'30 à 40 cm':'40 à 60 cm');
+    if(/igname/i.test(c.nom)) b+=callout(540,40,600,60,'Tuteur','end');
+    b+=T(320,300,'La butte garde la terre meuble et évite l\'eau stagnante au pied.',{fs:13,c:C.mut,fw:400});
+    return svg(640,310,b,'Buttes ou billons'); }
+
+  function planche(){
+    let b=T(320,28,'Planche surélevée (coupe)',{fs:16,fw:700});
+    b+=`<rect x="20" y="230" width="600" height="50" fill="${C.soil}"/>`;
+    b+=`<path d="M140 232 L160 170 L480 170 L500 232 Z" fill="${C.soilL}"/><rect x="160" y="160" width="320" height="12" fill="${C.straw}"/>`;
+    [200,260,320,380,440].forEach(x=>b+=`<path d="M${x} 160 v-26" stroke="${C.leafD}" stroke-width="3"/><ellipse cx="${x-8}" cy="140" rx="10" ry="6" fill="${C.leaf}"/><ellipse cx="${x+8}" cy="136" rx="10" ry="6" fill="${C.leaf}"/>`);
+    b+=`<path d="M60 232 h70 M510 232 h70" stroke="#C9B48F" stroke-width="10"/>`;
+    b+=dim(160,104,480,104,'1 m à 1,2 m de large');
+    b+=dim(520,170,520,230,'15 à 20 cm');
+    b+=callout(95,230,80,200,'Allée 40 à 50 cm','middle').replace(/text-anchor="middle"/,'text-anchor="middle"');
+    b+=callout(300,165,300,128,'Paillage','middle');
+    b+=T(320,300,'Longueur libre (souvent 10 m). On ne marche jamais sur la planche.',{fs:13,c:C.mut,fw:400});
+    return svg(640,310,b,'Planche maraîchère'); }
+
+  function diguettes(){
+    let b=T(320,28,'Casiers et diguettes (vue de dessus)',{fs:16,fw:700});
+    b+=`<rect x="40" y="50" width="560" height="220" fill="#C7B48A"/>`;
+    [[56,66],[236,66],[416,66],[56,170],[236,170],[416,170]].forEach(([x,y])=>{ b+=`<rect x="${x}" y="${y}" width="168" height="88" fill="#9CC5DE"/>`; for(let i=0;i<6;i++) for(let j=0;j<3;j++) b+=`<g transform="translate(${x+16+i*27} ${y+18+j*26})" stroke="${C.leaf}" stroke-width="2"><path d="M0 0 l-5 -8 M0 0 l0 -10 M0 0 l5 -8"/></g>`; });
+    b+=`<path d="M20 160 H40" stroke="${C.water}" stroke-width="10"/><path d="M600 120 H620" stroke="${C.water}" stroke-width="10"/>`;
+    b+=callout(230,110,230,282,'Diguette tassée de 30 cm','middle');
+    b+=callout(30,160,60,40,'Entrée d\'eau','start');
+    b+=T(320,326,'Lame d\'eau de 5 à 10 cm, vidange avant la récolte.',{fs:13,c:C.mut,fw:400});
+    return svg(640,336,b,'Casiers rizicoles'); }
+
+  function lignesCourbes(){
+    let b=T(320,28,'Préparer le sol : lignes en courbes de niveau',{fs:16,fw:700});
+    b+=`<path d="M20 280 L20 140 Q320 40 620 120 L620 280 Z" fill="${C.soilL}"/>`;
+    for(let i=0;i<6;i++){ const y=150+i*22; b+=`<path d="M30 ${y+10-i*2} Q320 ${y-80+i*16} 610 ${y-10+i*3}" stroke="${C.soilD}" stroke-width="5" fill="none" opacity=".7"/>`; }
+    b+=`<path d="M60 250 Q330 160 600 230" stroke="${C.leaf}" stroke-width="12" fill="none" opacity=".8"/>`;
+    b+=callout(330,192,330,272,'Bande enherbée tous les 20 à 30 m','start');
+    b+=`<path d="M560 70 l-60 40" stroke="#2D6E9E" stroke-width="3" stroke-dasharray="6 4"/>`+T(560,62,'pente',{fs:13,c:'#2D6E9E'});
+    b+=T(320,300,'Lignes perpendiculaires à la pente : l\'eau s\'infiltre au lieu d\'emporter la terre.',{fs:13,c:C.mut,fw:400});
+    return svg(640,310,b,'Lignes en courbes de niveau'); }
+
+  function prepFigure(c,it){ const t=(it.prep||'')+' '+(it.plant||'');
+    if (/diguette/i.test(t) || /bas-fond|irrigué/i.test(c.nom)) return diguettes();
+    if (c.per && /trou/i.test(t)) return trou(it);
+    if (/butte|billon/i.test(t) && !/planche/i.test(t)) return butte(c);
+    if (/planche/i.test(t) || (c.fam||'').startsWith('Maraîch')) return planche();
+    if (/butte|billon/i.test(t)) return butte(c);
+    return lignesCourbes(); }
+
+  function fertFigure(c){
+    if (c.per){ let b=T(320,28,'Où mettre l\'engrais : en couronne',{fs:16,fw:700});
+      b+=`<rect x="20" y="40" width="600" height="250" fill="#E9DFC9"/>`;
+      b+=`<circle cx="320" cy="165" r="110" fill="${C.leaf}" opacity=".35"/><circle cx="320" cy="165" r="110" fill="none" stroke="${C.leafD}" stroke-width="2" stroke-dasharray="6 5"/>`;
+      b+=`<circle cx="320" cy="165" r="80" fill="none" stroke="${C.ochre}" stroke-width="22" opacity=".85"/>`;
+      b+=`<circle cx="320" cy="165" r="12" fill="${C.wood}"/>`;
+      b+=callout(320,165,450,70,'Rien contre le tronc','start');
+      b+=callout(400,165,450,240,'Engrais en couronne','start');
+      b+=callout(250,90,40,60,'Bord du feuillage','start');
+      b+=T(320,282,'Gratter légèrement, épandre après une pluie, recouvrir de terre ou de paillage.',{fs:13,c:C.mut,fw:400});
+      return svg(640,300,b,'Engrais en couronne'); }
+    let b=T(320,28,'Où mettre l\'engrais : en ligne, à côté des plants (coupe)',{fs:16,fw:700});
+    b+=`<rect x="20" y="170" width="600" height="110" fill="${C.soil}"/>`;
+    [140,320,500].forEach(x=>{ b+=`<path d="M${x} 170 v-80" stroke="${C.leafD}" stroke-width="5"/><path d="M${x} 130 q-34 -20 -44 6 M${x} 112 q34 -20 44 6 M${x} 150 q-28 -10 -36 8" stroke="${C.leaf}" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M${x} 170 q-10 30 -4 60 M${x} 170 q12 26 6 56" stroke="#D9C2A0" stroke-width="3" fill="none"/>`;
+      b+=`<g fill="${C.ochre}">${[0,1,2,3,4].map(i=>`<circle cx="${x+40+i*5}" cy="${188+(i%2)*4}" r="3.5"/>`).join('')}</g>`; });
+    b+=dim(320,248,370,248,'5 à 10 cm',{dy:18});
+    b+=callout(370,190,420,110,'Enfoui à 5 cm de profondeur','start');
+    b+=T(320,292,'Jamais sur les feuilles ni collé à la tige. Épandre sur sol humide, puis recouvrir.',{fs:13,c:C.mut,fw:400});
+    return svg(640,302,b,'Engrais en ligne'); }
+
+  function postFigure(c,it){ const p=it.post||'';
+    if (/ferment/i.test(p) && /cacao/i.test(c.nom)){
+      let b=T(320,28,'Après la récolte du cacao',{fs:16,fw:700});
+      const step=(x,n,lab,inner)=>`<g transform="translate(${x} 50)"><rect width="190" height="220" rx="14" fill="#fff" stroke="#E0D8C6"/><circle cx="24" cy="24" r="15" fill="${C.ochre}"/>${T(24,30,n,{fw:700})}${inner}${T(95,204,lab,{fs:13})}</g>`;
+      b+=step(20,'1','Écabosser sous 5 jours',`<ellipse cx="95" cy="110" rx="46" ry="26" fill="#C9822F"/><path d="M60 110 h70" stroke="#8A4E14" stroke-width="3"/><g fill="#F3E8D4">${[0,1,2,3,4,5].map(i=>`<ellipse cx="${66+i*12}" cy="160" rx="6" ry="9"/>`).join('')}</g>`);
+      b+=step(225,'2','Fermenter 6 jours, 2 brassages',`<path d="M40 170 Q95 70 150 170 Z" fill="#E8D6B4"/><path d="M30 172 Q95 50 160 172" stroke="${C.leaf}" stroke-width="12" fill="none"/>${T(95,70,'feuilles de bananier',{fs:12,c:C.green})}`);
+      b+=step(430,'3','Sécher 7 à 10 jours sur claie',`<path d="M30 150 h130" stroke="${C.wood}" stroke-width="6"/><path d="M40 150 v30 M150 150 v30" stroke="${C.wood}" stroke-width="5"/><g fill="#7A4A22">${Array.from({length:14},(_,i)=>`<ellipse cx="${40+i*8.5}" cy="144" rx="4" ry="3"/>`).join('')}</g><circle cx="150" cy="70" r="16" fill="#F4C24E"/>`);
+      return svg(640,290,b,'Post-récolte du cacao'); }
+    let b=T(320,28,'Sécher et bien stocker la récolte',{fs:16,fw:700});
+    b+=`<rect x="40" y="150" width="250" height="16" fill="#3A3A3A" opacity=".8"/><g fill="${C.straw}">${Array.from({length:22},(_,i)=>`<circle cx="${55+i*10.5}" cy="${144+(i%3)}" r="5"/>`).join('')}</g><circle cx="250" cy="70" r="20" fill="#F4C24E"/>`;
+    b+=callout(160,150,160,210,'Sécher sur bâche ou claie, jamais à même le sol','middle');
+    b+=`<path d="M360 210 h230" stroke="${C.wood}" stroke-width="12"/><path d="M370 222 v14 M480 222 v14 M580 222 v14" stroke="${C.wood}" stroke-width="8"/>`;
+    [380,450,520].forEach(x=>b+=`<path d="M${x} 206 v-70 q0 -14 14 -14 h32 q14 0 14 14 v70z" fill="#E7DCC4" stroke="#B9A68A" stroke-width="2"/><path d="M${x+8} 130 h44" stroke="#9A8A6A" stroke-width="3"/>`);
+    b+=callout(480,150,600,84,'Sacs hermétiques sur palettes','end');
+    b+=T(320,282,'Magasin sec, aéré, sans rats ; sacs à 50 cm du mur.',{fs:13,c:C.mut,fw:400});
+    return svg(640,296,b,'Séchage et stockage'); }
+
+  const STEPS=[['Préparer','<path d="M8 40 L30 18 M26 14 l10 10 l-6 6z" stroke="#6E5233" stroke-width="4" fill="#8C6A42"/><path d="M4 42 h40" stroke="#8A6A45" stroke-width="4"/>'],
+    ['Semer ou planter','<path d="M24 40 v-16" stroke="#2E6B3A" stroke-width="3"/><path d="M24 26 q-12 -10 -16 2 q10 6 16 -2 q12 -10 16 2 q-10 6 -16 -2" fill="#3F8E4E"/><path d="M6 42 h36" stroke="#8A6A45" stroke-width="4"/>'],
+    ['Fertiliser','<path d="M12 10 h24 l4 30 h-32z" fill="#E0A526"/><path d="M12 10 q12 -6 24 0" stroke="#9C6B12" stroke-width="2" fill="none"/>'],
+    ['Désherber','<path d="M10 40 L34 8" stroke="#8C6A42" stroke-width="4"/><path d="M28 6 l12 4 l-6 8z" fill="#7A8A82"/><path d="M6 42 q4 -10 8 0 q4 -8 8 0" stroke="#3F8E4E" stroke-width="3" fill="none"/>'],
+    ['Protéger','<path d="M24 4 l16 6 v12 c0 10 -8 18 -16 22 c-8 -4 -16 -12 -16 -22 v-12z" fill="#17694A"/><path d="M17 24 l5 5 l10 -11" stroke="#fff" stroke-width="3.5" fill="none"/>'],
+    ['Récolter','<path d="M8 22 h32 l-4 20 h-24z" fill="#C9A26B"/><circle cx="18" cy="18" r="6" fill="#E0A526"/><circle cx="30" cy="16" r="6" fill="#C8372D"/>'],
+    ['Sécher, stocker','<path d="M10 42 v-26 q0 -6 6 -6 h16 q6 0 6 6 v26z" fill="#E7DCC4" stroke="#B9A68A" stroke-width="2"/><path d="M14 16 h20" stroke="#9A8A6A" stroke-width="3"/>']];
+  function stepsStrip(){ return `<div class="illus-steps" style="display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 4px">${STEPS.map(([l,p],i)=>`<div style="flex:1 1 76px;min-width:76px;text-align:center;background:#FBF8F1;border:1px solid #E4DDCC;border-radius:10px;padding:6px 2px"><svg viewBox="0 0 48 48" width="34" height="34" aria-hidden="true">${p}</svg><div style="font-size:11px;font-weight:700;line-height:1.15">${i+1}. ${l}</div></div>`).join('')}</div>`; }
+
+  window.ILLUS_CULT = {schemaPlantation, prepFigure, fertFigure, postFigure, stepsStrip, parseEcart};
+})();
+
+</script>
 </head><body><div class="shell-bar"><a class="shell-back" href="../index.html" aria-label="Retour à l'accueil">&#8592; Accueil · AKA AgroDiag CI</a></div><title>AgroDiag CI</title>
 <style>
 /* Layout : barre d'onglets fixe en haut, une colonne sur téléphone, liste + fiche côte à côte sur grand écran */
@@ -1547,6 +1722,7 @@ function ficheHTML(F, forFile){
   return `
   ${forFile?'':`<div class="lab">${esc(c.fam)} · ${esc(loc.nom)} (${esc(loc.reg)})</div>`}
   <h2>Fiche technique : ${esc(c.nom)}</h2>
+  ${(window.ILLUS_CULT||{}).stepsStrip?ILLUS_CULT.stepsStrip():''}
   ${forFile?`<p><b>Localité :</b> ${esc(loc.nom)} (${esc(loc.reg)}) · <b>Surface :</b> ${fmt(surf,2)} ha</p>`:''}
   <div class="big"><span class="n">${e.score??'—'}</span><span class="muted">/ 100</span><span class="pill ${d.cls}">${d.lab}</span><span class="pill ${reliability(loc).cls}">${reliability(loc).lab}</span></div>
   <p class="small muted" style="margin:4px 0 0">Zone : ${esc(loc.zone)} · Sol : ${esc(loc.sol)}, pH ${fmt(loc.ph,1)}, MO ${fmt(loc.mo,1)} %, drainage ${esc((loc.drain||'').toLowerCase())} · Pluie : ${fmt(K.pluie)} mm/an, ${K.secs} mois sous 50 mm${loc.contr?` · Contraintes : ${esc(loc.contr)}`:''}.</p>
@@ -1564,13 +1740,16 @@ function ficheHTML(F, forFile){
 
   <h3>3. Préparation du terrain</h3>
   <ul>${li([it.prep])}</ul>
+  ${(window.ILLUS_CULT||{}).prepFigure?ILLUS_CULT.prepFigure(c,it):''}
   ${zn(F.prep)}
 
   <h3>4. Semis ou plantation</h3>
   <ul>${li([it.ecart && ('Écartement : '+it.ecart), it.dens && ('Densité : '+it.dens), it.plant])}</ul>
+  ${(window.ILLUS_CULT||{}).schemaPlantation?ILLUS_CULT.schemaPlantation(c,it):''}
 
   <h3>5. Fertilisation et amendements</h3>
   <ul>${li([it.fond && ('Fumure de fond : '+it.fond), it.couv && ('Fumure d\'entretien : '+it.couv)])}</ul>
+  ${(window.ILLUS_CULT||{}).fertFigure?ILLUS_CULT.fertFigure(c):''}
   ${zn(F.fert)}
 
   <h3>6. Gestion de l'eau</h3>
@@ -1587,6 +1766,7 @@ function ficheHTML(F, forFile){
 
   <h3>10. Récolte et post-récolte</h3>
   <ul>${li([it.recolte, it.post])}</ul>
+  ${(window.ILLUS_CULT||{}).postFigure?ILLUS_CULT.postFigure(c,it):''}
   ${F.rend?`<p style="margin:8px 0 0"><b>Rendement attendu dans cette zone :</b> ${esc(F.rend)}.</p>`:''}
 
   ${it.assoc?`<h3>11. Pratiques agroécologiques recommandées</h3><ul>${li([it.assoc])}</ul>`:''}
