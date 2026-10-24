@@ -1,0 +1,10 @@
+{
+  "versionCode": 15,
+  "version": "1.9.1",
+  "apk": "https://github.com/yaoakafrancois-code/AgroDiagCI/releases/download/test/AgroDiag-CI-test.apk",
+  "nouveautes": [
+    "Élevage d'escargots, de lapins et d'agoutis",
+    "Fiches techniques avec des images (élevage et cultures)",
+    "Avis automatique quand une nouvelle version sort"
+  ]
+}

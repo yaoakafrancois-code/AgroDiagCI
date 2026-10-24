@@ -195,6 +195,17 @@ public class MainActivity extends Activity {
             });
         }
 
+        /** Numéro de version installé, pour l'avis de mise à jour. */
+        @JavascriptInterface
+        public String versionCode() {
+            try {
+                android.content.pm.PackageInfo pi = getPackageManager().getPackageInfo(getPackageName(), 0);
+                return Build.VERSION.SDK_INT >= 28 ? String.valueOf(pi.getLongVersionCode()) : String.valueOf(pi.versionCode);
+            } catch (PackageManager.NameNotFoundException e) {
+                return "0";
+            }
+        }
+
         @JavascriptInterface
         public String platform() {
             return "android";
