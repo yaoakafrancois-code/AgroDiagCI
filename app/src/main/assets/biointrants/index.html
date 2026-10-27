@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Biopesticides et compost · AKA AgroDiag CI</title>
+<link rel="stylesheet" href="../assets/fonts.css">
+<link rel="stylesheet" href="../assets/modules.css">
+<style id="shell-back">
+.shell-bar{position:relative;z-index:1000;background:#17694A;padding:6px 12px}
+.shell-back{display:inline-flex;align-items:center;gap:6px;min-height:36px;font:600 15px system-ui,sans-serif;text-decoration:none;color:#fff}
+@media print{.shell-bar{display:none}}
+</style></head>
+<body><div class="shell-bar"><a class="shell-back" href="../index.html" aria-label="Retour à l'accueil">&#8592; Accueil · AKA AgroDiag CI</a></div>
+<div class="wrap">
+<header class="app">
+  <svg width="44" height="44" viewBox="0 0 36 36" aria-hidden="true"><path d="M6 30h24" stroke="#17694A" stroke-width="2.4" stroke-linecap="round"/><path d="M9 30c0-7 4-11 9-11s9 4 9 11" fill="none" stroke="#8D6E4A" stroke-width="2.4"/><path d="M18 19V9m0 4c-4 0-6-3-6-6 4 0 6 2 6 6zm0-2c0-4 3-6 7-6 0 4-3 6-7 6z" fill="none" stroke="#17694A" stroke-width="2.2" stroke-linejoin="round"/></svg>
+  <div><h1>Biopesticides et compost</h1><p>Préparer soi-même : extraits de plantes, compost, bokashi, fertilisants liquides</p></div>
+</header>
+
+<nav class="tabs" aria-label="Rubriques"><div class="row" role="tablist">
+  <button role="tab" data-tab="t-bio">Biopesticides</button>
+  <button role="tab" data-tab="t-comp">Compost</button>
+  <button role="tab" data-tab="t-calc">Calcul du compost</button>
+  <button role="tab" data-tab="t-liq">Bokashi &amp; engrais liquides</button>
+  <button role="tab" data-tab="t-reg">Règles de sécurité</button>
+</div></nav>
+
+<!-- ============ BIOPESTICIDES ============ -->
+<section class="tab" id="t-bio">
+  <h2>Recettes de biopesticides</h2>
+  <p class="lead">Choisissez une recette et la quantité de bouillie à préparer : l'application calcule les ingrédients. Ces préparations agissent surtout en prévention et sur les jeunes insectes : traitez tôt, et recommencez.</p>
+  <div class="grid">
+    <div class="panel">
+      <label class="f">Recette<select id="b-rec"></select></label>
+      <label class="f">Je prépare pour<select id="b-mode"><option value="pulv">un nombre de pulvérisateurs</option><option value="surf">une surface</option></select></label>
+      <div id="b-pulv"><div class="two">
+        <label class="f">Pulvérisateurs<input type="number" id="b-np" value="1" min="1" step="1" inputmode="decimal"></label>
+        <label class="f">Contenance (L)<input type="number" id="b-cap" value="16" min="1" step="1" inputmode="decimal"></label>
+      </div></div>
+      <div id="b-surf" hidden><div class="two">
+        <label class="f">Surface (m²)<input type="number" id="b-m2" value="1000" min="1" step="50" inputmode="decimal"></label>
+        <label class="f">Bouillie (L / ha)<small>Petits plants 200, grands 400–600</small><input type="number" id="b-lha" value="400" min="50" step="50" inputmode="decimal"></label>
+      </div></div>
+      <label class="f">Cherchez par ravageur<input type="text" id="b-q" placeholder="ex. puceron, chenille, oïdium" data-nomem></label>
+      <div id="b-match" class="note"></div>
+    </div>
+    <div id="b-out"></div>
+  </div>
+</section>
+
+<!-- ============ COMPOST ============ -->
+<section class="tab" id="t-comp" hidden>
+  <div id="c-doc">
+  <h2>Faire un bon compost</h2>
+  <p class="lead">Le compost nourrit le sol, garde l'eau et réduit les achats d'engrais. Il faut 2 parts de matières sèches (brunes) pour 1 part de matières fraîches (vertes), de l'eau et de l'air.</p>
+  <div class="btns noprint"><button class="btn sec" type="button" id="c-print">Imprimer / enregistrer en PDF</button></div>
+  <figure class="ill" id="fig-tas"></figure>
+  <div class="cards">
+    <div class="card"><h3>Matières brunes (sèches) · 2 parts</h3><ul class="clean"><li>Paille de riz, tiges de maïs, de sorgho, de mil</li><li>Feuilles mortes, herbes sèches</li><li>Coques d'arachide, de cacao, son, rafles</li><li>Sciure (en petite quantité)</li></ul></div>
+    <div class="card"><h3>Matières vertes (fraîches) · 1 part</h3><ul class="clean"><li>Fumier de bovins, de porcs, de moutons, fientes de volailles</li><li>Herbes vertes, feuilles de légumineuses (gliricidia, leucaena, mucuna)</li><li>Épluchures, déchets de cuisine et de marché</li><li>Tourteaux, pulpe de café ou de cacao</li></ul></div>
+    <div class="card"><h3>À ne pas mettre</h3><ul class="clean"><li>Plastiques, verre, métal, piles</li><li>Plantes malades ou herbes avec graines mûres (sauf compost bien chaud)</li><li>Viande, os, huile en grande quantité (attirent les animaux)</li><li>Excréments humains, de chiens ou de chats</li></ul></div>
+  </div>
+
+  <h3>Les étapes du compost en tas</h3>
+  <ol class="steps">
+    <li><b>Choisir l'endroit</b> : à l'ombre, près d'un point d'eau, sur un sol plat qui ne s'inonde pas.</li>
+    <li><b>Monter le tas en couches</b> : 20 cm de brunes, 10 cm de vertes ou de fumier, une poignée de terre ou de vieux compost (il apporte les « microbes »), un peu de cendre. Arrosez chaque couche.</li>
+    <li><b>Taille</b> : 1,5 m de large, 1 à 1,5 m de haut, la longueur que vous voulez. Plus petit, il ne chauffe pas ; plus grand, il manque d'air.</li>
+    <li><b>Couvrir</b> avec des feuilles de bananier, des palmes ou une bâche : contre le soleil et la pluie.</li>
+    <li><b>Surveiller la chaleur</b> : enfoncez un bâton au milieu. Après 2 à 3 jours, il doit être chaud à la main (55 à 65 °C).</li>
+    <li><b>Retourner</b> le tas après 2 semaines, puis toutes les 2 à 3 semaines (3 à 4 fois). Arrosez si c'est sec.</li>
+    <li><b>Récolter</b> après 2 à 3 mois : brun foncé, odeur de terre de forêt, on ne reconnaît plus les matières. Tamisez pour la pépinière.</li>
+  </ol>
+
+  <h3>Le test de la poignée (humidité)</h3>
+  <figure class="ill" id="fig-main"></figure>
+
+  <h3>Compost en fosse (zones sèches ou saison sèche)</h3>
+  <figure class="ill" id="fig-fosse"></figure>
+  <p>Creusez 3 fosses côte à côte (1 m de profondeur, 1,5 m × 2 m). Remplissez la première en couches, comme pour le tas. Tous les mois, faites passer le compost dans la fosse voisine : c'est le retournement. La fosse garde mieux l'humidité, mais il ne faut pas qu'elle se remplisse d'eau de pluie (petit talus autour et toit de palmes).</p>
+
+  <h3>Problèmes et solutions</h3>
+  <div class="tblw"><table><thead><tr><th>Ce que je vois</th><th>Cause</th><th>Solution</th></tr></thead><tbody>
+    <tr><td>Odeur d'œuf pourri, tas collant</td><td>Trop d'eau, pas assez d'air</td><td>Retourner, ajouter des matières brunes sèches, couvrir contre la pluie</td></tr>
+    <tr><td>Odeur d'ammoniac (pipi)</td><td>Trop de fumier ou de fientes</td><td>Ajouter des matières brunes (paille), retourner</td></tr>
+    <tr><td>Le tas ne chauffe pas</td><td>Trop sec, trop petit ou manque de vertes</td><td>Arroser, ajouter fumier ou herbes vertes, agrandir le tas</td></tr>
+    <tr><td>Fourmis, termites, moisissure blanche</td><td>Tas trop sec</td><td>Arroser en retournant</td></tr>
+    <tr><td>Rats, chiens, porcs qui fouillent</td><td>Restes de nourriture visibles</td><td>Enfouir les déchets au milieu, couvrir, clôturer</td></tr>
+    <tr><td>Grosses morceaux après 3 mois</td><td>Matières trop grosses</td><td>Hacher les tiges à 10–20 cm la prochaine fois ; tamiser et remettre les morceaux dans un nouveau tas</td></tr>
+  </tbody></table></div>
+
+  <h3>Doses de compost conseillées</h3>
+  <div class="tblw"><table><thead><tr><th>Culture</th><th>Dose</th><th>Comment</th></tr></thead><tbody>
+    <tr><td>Maraîchage (tomate, chou, piment…)</td><td class="n">2 à 3 kg/m² (20–30 t/ha)</td><td>Enfoui dans la planche avant le repiquage</td></tr>
+    <tr><td>Maïs, riz, céréales</td><td class="n">5 à 10 t/ha</td><td>Épandu et enfoui au labour, ou en poquet (200–300 g)</td></tr>
+    <tr><td>Manioc, igname</td><td class="n">5 à 10 t/ha</td><td>Dans la butte ou le trou de plantation</td></tr>
+    <tr><td>Arbres (cacao, fruitiers, plants forestiers)</td><td class="n">3 à 10 kg/trou</td><td>Mélangé à la terre du trou de plantation</td></tr>
+    <tr><td>Pépinière (sachets)</td><td class="n">1 part compost tamisé pour 2 à 3 parts de terre</td><td>Bien mélanger avant le remplissage</td></tr>
+  </tbody></table></div>
+  </div>
+</section>
+
+<!-- ============ CALCUL DU COMPOST ============ -->
+<section class="tab" id="t-calc" hidden>
+  <h2>Combien de compost faire, et avec quoi ?</h2>
+  <p class="lead">Indiquez votre culture et votre surface : l'application calcule le compost nécessaire, le nombre de tas et les matières à rassembler.</p>
+  <div class="grid">
+    <div class="panel">
+      <label class="f">Culture<select id="k-cul">
+        <option value="25">Maraîchage (25 t/ha)</option>
+        <option value="8">Maïs, riz, céréales (8 t/ha)</option>
+        <option value="8">Manioc, igname (8 t/ha)</option>
+        <option value="tree">Arbres : par trou de plantation</option>
+        <option value="perso">Autre dose (je la choisis)</option></select></label>
+      <div id="k-surfw"><div class="two">
+        <label class="f">Surface<input type="number" id="k-s" value="1000" min="1" step="50" inputmode="decimal"></label>
+        <label class="f">Unité<select id="k-u"><option value="m2">m²</option><option value="ha">ha</option></select></label>
+      </div></div>
+      <div id="k-treew" hidden><div class="two">
+        <label class="f">Nombre de trous<input type="number" id="k-nt" value="400" min="1" step="10" inputmode="decimal"></label>
+        <label class="f">kg par trou<input type="number" id="k-kt" value="5" min="1" step="1" inputmode="decimal"></label>
+      </div></div>
+      <div id="k-persow" hidden><label class="f">Dose (t/ha)<input type="number" id="k-dose" value="10" min="1" step="1" inputmode="decimal"></label></div>
+      <label class="f">Matière verte principale<select id="k-vert">
+        <option value="bov">Fumier de bovins / moutons</option>
+        <option value="vol">Fientes de volailles</option>
+        <option value="porc">Fumier de porcs</option>
+        <option value="herbe">Herbes vertes et déchets de cuisine</option></select></label>
+    </div>
+    <div id="k-out"></div>
+  </div>
+</section>
+
+<!-- ============ BOKASHI & LIQUIDES ============ -->
+<section class="tab" id="t-liq" hidden>
+  <div id="l-doc">
+  <h2>Bokashi et engrais liquides</h2>
+  <p class="lead">Des fertilisants organiques rapides, à faire avec ce qu'on trouve au village.</p>
+  <div class="btns noprint"><button class="btn sec" type="button" id="l-print">Imprimer / enregistrer en PDF</button></div>
+  <div class="cards">
+    <div class="card"><h3>Bokashi (compost fermenté, prêt en 2 à 3 semaines)</h3>
+      <p class="note">Pour environ 500 kg :</p>
+      <ul class="clean"><li>4 sacs (≈ 100 kg) de terre fine</li><li>4 sacs (≈ 100 kg) de fumier sec ou fientes</li><li>4 sacs de son de riz ou de maïs</li><li>4 sacs de balle de riz ou de paille hachée</li><li>1 sac de charbon de bois écrasé</li><li>2 kg de levure de boulanger ou 5 L de vieux bokashi</li><li>2 L de mélasse ou 2 kg de sucre dans l'eau</li><li>Eau : jusqu'au test de la poignée</li></ul>
+      <ol class="steps"><li>Mélangez toutes les matières sèches à l'abri.</li><li>Arrosez avec l'eau sucrée + levure en retournant, jusqu'à ce qu'une poignée serrée reste en boule sans couler.</li><li>Tas de 50 cm de haut maximum, couvert de sacs.</li><li>Retournez 2 fois par jour la 1re semaine (il chauffe vite), puis 1 fois par jour. Quand il ne chauffe plus (2–3 semaines), il est prêt.</li></ol>
+      <p class="note">Dose : 100 à 200 g par pied de légume, 1 à 2 kg/m² en planche.</p></div>
+    <div class="card"><h3>Jus de fumier (purin)</h3>
+      <ul class="clean"><li>1 sac (25 kg) de fumier frais dans un sac en toile</li><li>1 fût de 200 L rempli d'eau</li></ul>
+      <ol class="steps"><li>Faites tremper le sac comme un sachet de thé, fût couvert.</li><li>Remuez tous les 2 jours pendant 2 semaines.</li><li>Diluez : 1 litre de jus pour 5 litres d'eau.</li><li>Arrosez au pied (pas sur les feuilles), 1 fois par semaine, sur sol humide.</li></ol>
+      <p class="note">Le jus de fientes de volailles est plus fort : 1 litre pour 10 litres d'eau.</p></div>
+    <div class="card"><h3>Thé de compost</h3>
+      <ol class="steps"><li>1 seau de compost mûr dans un fût de 100 L d'eau.</li><li>Remuez fort matin et soir pendant 2 à 3 jours.</li><li>Filtrez et utilisez sans diluer, en arrosage au pied ou en pulvérisation légère sur les feuilles le soir.</li></ol></div>
+    <div class="card"><h3>Engrais foliaire de feuilles vertes</h3>
+      <ol class="steps"><li>Remplissez un fût à moitié de feuilles de gliricidia, de leucaena, de moringa ou de tithonia hachées.</li><li>Complétez avec de l'eau, couvrez, remuez tous les 2 jours pendant 2 à 3 semaines.</li><li>Filtrez, diluez 1 L pour 10 L d'eau, pulvérisez le soir sur les feuilles toutes les 2 semaines.</li></ol></div>
+  </div>
+  </div>
+</section>
+
+<!-- ============ RÈGLES ============ -->
+<section class="tab" id="t-reg" hidden>
+  <h2>Règles de sécurité et d'efficacité</h2>
+  <figure class="ill" id="fig-epi"></figure>
+  <ol class="steps">
+    <li><b>Essayez d'abord sur quelques plants</b> : attendez 2 jours. Si les feuilles brûlent, diluez davantage.</li>
+    <li><b>Traitez le soir</b> (après 16 h) ou tôt le matin : le soleil détruit les extraits et brûle les feuilles mouillées.</li>
+    <li><b>Mouillez bien le dessous des feuilles</b> : c'est là que vivent pucerons, aleurodes et acariens.</li>
+    <li><b>Préparez le jour même</b> : un extrait se garde au plus 1 à 2 jours, au frais et à l'ombre.</li>
+    <li><b>Recommencez</b> tous les 5 à 7 jours, et après une pluie.</li>
+    <li><b>Filtrez</b> dans un tissu fin pour ne pas boucher la buse du pulvérisateur.</li>
+    <li><b>Protégez-vous</b> : le piment et l'ail brûlent les yeux et la peau. Gants, lunettes, cache-nez, lavez-vous après.</li>
+    <li><b>Lavez les légumes</b> avant de les manger ; attendez au moins 3 jours entre le traitement et la récolte.</li>
+    <li><b>Alternez</b> les recettes et gardez les auxiliaires (coccinelles, araignées, guêpes) : ce sont vos alliés.</li>
+    <li><b>N'utilisez pas le tabac</b> : la nicotine est un poison dangereux pour l'homme et les animaux.</li>
+  </ol>
+  <div class="msg warn">Si l'attaque est très forte ou si la culture est en danger, demandez conseil à votre agronome : un produit homologué peut être nécessaire.</div>
+</section>
+
+<p class="foot">Recettes et repères issus des pratiques agroécologiques courantes en Afrique de l'Ouest. Leur efficacité dépend de la qualité des plantes utilisées et du moment du traitement.</p>
+</div>
+
+<script src="../assets/modules.js"></script>
+<script>
+(function(){
+var $=MOD.$, fmt=MOD.fmt, num=MOD.num, esc=MOD.esc;
+
+/* Recettes : ingrédients pour 10 L de bouillie prête à pulvériser
+   u: g, ml, l, kg, cs (cuillère à soupe) ; q = quantité pour 10 L */
+var REC = {
+  neemg: {n:'Graines de neem (extrait aqueux)', cible:'chenilles, pucerons, aleurodes, criquets jeunes, teignes du chou, thrips', ing:[['Graines de neem sèches, pilées',500,'g'],['Eau',10,'l'],['Savon (savon noir ou liquide vaisselle)',10,'g']],
+    etapes:['Pilez les graines sèches (sans la pulpe) en poudre grossière.','Mettez la poudre dans un tissu ou un seau avec l\'eau. Laissez tremper toute la nuit (12 heures), à l\'ombre.','Le matin, pressez le tissu, filtrez, puis ajoutez le savon (il aide le produit à coller aux feuilles).','Pulvérisez le soir, sans diluer, sur tout le feuillage, dessous des feuilles compris.'],
+    freq:'Tous les 5 à 7 jours ; après chaque pluie.', note:'C\'est la recette la plus efficace. Ramassez les graines tombées sous les neems (mars à juillet), séchez-les à l\'ombre et gardez-les au sec.'},
+  neemf: {n:'Feuilles de neem', cible:'chenilles, pucerons, aleurodes, criquets, termites (arrosage au pied)', ing:[['Feuilles fraîches de neem',1,'kg'],['Eau',10,'l'],['Savon',10,'g']],
+    etapes:['Pilez les feuilles fraîches.','Faites tremper dans l\'eau 1 à 2 nuits, couvert, à l\'ombre.','Filtrez dans un tissu et ajoutez le savon.','Pulvérisez sans diluer le soir.'],
+    freq:'Tous les 5 à 7 jours.', note:'Moins fort que les graines : utilisez-le en prévention.'},
+  pim:   {n:'Piment + ail', cible:'pucerons, chenilles, thrips, acariens, punaises', ing:[['Piment fort frais',100,'g'],['Ail (gousses)',100,'g'],['Oignon (facultatif)',100,'g'],['Eau',10,'l'],['Savon',10,'g']],
+    etapes:['Pilez le piment, l\'ail et l\'oignon (gants et lunettes !).','Faites tremper dans 1 litre d\'eau pendant 24 heures, couvert.','Filtrez, puis complétez avec le reste de l\'eau et ajoutez le savon.','Pulvérisez le soir.'],
+    freq:'Tous les 5 à 7 jours.', note:'Brûle les yeux et la peau : protégez-vous et tenez les enfants à l\'écart.'},
+  pap:   {n:'Feuilles de papayer', cible:'pucerons, chenilles, et certaines maladies des feuilles (taches, rouille)', ing:[['Feuilles de papayer fraîches',1,'kg'],['Eau',10,'l'],['Savon',10,'g']],
+    etapes:['Hachez et pilez les feuilles.','Faites tremper dans l\'eau une nuit.','Filtrez, ajoutez le savon.','Pulvérisez le soir.'],
+    freq:'Tous les 7 jours.', note:'Peut être mélangé à l\'extrait de neem le jour du traitement.'},
+  savon: {n:'Eau savonneuse', cible:'pucerons, cochenilles, aleurodes, acariens', ing:[['Savon noir (ou savon de Marseille râpé)',200,'g'],['Eau tiède',10,'l']],
+    etapes:['Faites fondre le savon dans l\'eau tiède.','Laissez refroidir.','Pulvérisez directement sur les insectes (il faut les toucher).'],
+    freq:'Tous les 3 à 5 jours tant qu\'il y a des insectes.', note:'Ne pas utiliser de lessive en poudre ni d\'eau de Javel : elles brûlent les plantes.'},
+  lait:  {n:'Lait dilué', cible:'oïdium (poudre blanche sur les feuilles) des cucurbitacées, tomate, gombo', ing:[['Lait (frais ou en poudre reconstitué)',1,'l'],['Eau',9,'l']],
+    etapes:['Mélangez 1 volume de lait pour 9 volumes d\'eau.','Pulvérisez le matin au soleil sur les feuilles atteintes et voisines.'],
+    freq:'1 fois par semaine, dès les premières taches.', note:'Agit en prévention et au début de la maladie.'},
+  bica:  {n:'Bicarbonate de soude', cible:'oïdium, taches et moisissures des feuilles', ing:[['Bicarbonate de soude',50,'g'],['Savon',10,'g'],['Eau',10,'l']],
+    etapes:['Dissolvez le bicarbonate et le savon dans l\'eau.','Pulvérisez le soir sur tout le feuillage.'],
+    freq:'Tous les 7 à 10 jours.', note:'Ne dépassez pas la dose : trop de bicarbonate brûle les feuilles.'},
+  cendre:{n:'Cendre de bois (poudrage)', cible:'pucerons, chenilles du chou, altises, et insectes des greniers', ing:[['Cendre de bois tamisée, bien froide',500,'g'],['Chaux éteinte (facultatif)',100,'g']],
+    etapes:['Tamisez la cendre (bois uniquement, pas de plastique brûlé).','Le matin, quand les feuilles ont encore la rosée, saupoudrez légèrement les plants avec une boîte percée.','Dans les greniers : mélangez 1 kg de cendre pour 10 kg de grains (niébé, maïs) avant le stockage.'],
+    freq:'Après chaque pluie.', note:'Quantité indiquée pour environ 100 m² de planches (le calcul suit la surface ou le nombre de pulvérisateurs).'},
+  piege: {n:'Pièges (plaques jaunes et bouteilles)', cible:'aleurodes, mouches blanches, mouches des fruits (mangue, agrumes, cucurbitacées)', ing:[['Plaques ou bidons jaunes enduits d\'huile ou de graisse',1,'pièce'],['Bouteille plastique percée de 4 trous',1,'pièce'],['Appât : eau + 1 cuillère de levure ou de jus de fruit fermenté',250,'ml']],
+    etapes:['Plaques jaunes : peignez en jaune vif, enduisez d\'huile de vidange propre ou de graisse, posez à hauteur des plants.','Bouteilles : percez 4 trous de 1 cm sur le côté, versez l\'appât, accrochez dans l\'arbre à 1,5 m.','Videz et changez l\'appât chaque semaine ; ramassez et enterrez les fruits tombés.'],
+    freq:'Toute la saison. Environ 20 plaques et 20 à 40 bouteilles par hectare.', note:'Les pièges montrent aussi quand les ravageurs arrivent : traitez à ce moment-là.'}
+};
+(function(){ $('#b-rec').innerHTML=Object.keys(REC).map(function(k){ return '<option value="'+k+'">'+esc(REC[k].n)+'</option>'; }).join(''); })();
+
+function qte(q,u){
+  if(u==='g') return MOD.g(q);
+  if(u==='kg') return MOD.g(q*1000);
+  if(u==='l') return q>=1 ? fmt(q, q<10?1:0)+' L' : fmt(q*1000,0)+' ml';
+  if(u==='ml') return q>=1000 ? fmt(q/1000,1)+' L' : fmt(q,0)+' ml';
+  if(u==='pièce') return '';
+  return fmt(q,1)+' '+u;
+}
+function bio(){
+  var k=$('#b-rec').value, r=REC[k], mode=$('#b-mode').value;
+  $('#b-pulv').hidden = mode!=='pulv'; $('#b-surf').hidden = mode!=='surf';
+  var L = mode==='pulv' ? num('b-np')*num('b-cap') : num('b-m2')/10000*num('b-lha');
+  if(k==='cendre') L = mode==='pulv' ? num('b-np')*num('b-cap') : num('b-m2')/100*10; // 10 « unités » par 100 m²
+  var f = L/10;
+  var h='<div class="panel" id="b-doc"><h3 style="margin-top:0">'+esc(r.n)+'</h3>';
+  h+='<div class="chips"><span class="chip g">Contre : '+esc(r.cible)+'</span></div>';
+  if(k==='piege'){
+    h+='<h3>Matériel</h3><ul class="clean">'+r.ing.map(function(i){ return '<li>'+esc(i[0])+(i[2]==='ml'?' : '+qte(i[1],'ml')+' par bouteille':'')+'</li>'; }).join('')+'</ul>';
+  } else {
+    h+='<div class="kpis"><div class="kpi"><span>'+(k==='cendre'?'Pour':'Bouillie à préparer')+'</span><b>'+(k==='cendre'?(mode==='surf'?fmt(num('b-m2'))+' m²':fmt(L,0)+' L'):fmt(L, L<10?1:0)+' L')+'</b></div>'+
+       (mode==='surf' && k!=='cendre' ? '<div class="kpi"><span>Pulvérisateurs de '+fmt(num('b-cap'))+' L</span><b>'+fmt(L/Math.max(num('b-cap'),1),1)+'</b></div>':'')+'</div>';
+    h+='<h3>Ingrédients</h3><div class="tblw"><table><tbody>'+r.ing.map(function(i){ return '<tr><td>'+esc(i[0])+'</td><td class="n"><b>'+qte(i[1]*f,i[2])+'</b></td></tr>'; }).join('')+'</tbody></table></div>';
+    if(k!=='cendre') h+='<p class="note">Pour un seul pulvérisateur de '+fmt(num('b-cap')||16)+' L : '+r.ing.filter(function(i){return i[0]!=='Eau' && i[0]!=='Eau tiède';}).map(function(i){ return qte(i[1]*(num('b-cap')||16)/10,i[2])+' '+esc(i[0].toLowerCase().split(' (')[0]); }).join(', ')+'.</p>';
+  }
+  h+='<h3>Préparation</h3><ol class="steps">'+r.etapes.map(function(e){ return '<li>'+esc(e)+'</li>'; }).join('')+'</ol>';
+  h+='<div class="msg info"><b>Fréquence :</b> '+esc(r.freq)+'</div>';
+  if(r.note) h+='<div class="msg warn">'+esc(r.note)+'</div>';
+  h+='<figure class="ill">'+figRecette(k)+'</figure>';
+  h+='<div class="btns"><button class="btn sec" type="button" id="b-print">Imprimer / PDF</button></div></div>';
+  $('#b-out').innerHTML=h;
+  $('#b-print').onclick=function(){ MOD.print($('#b-doc'),'Biopesticide '+r.n); };
+}
+function chercher(){
+  var q=($('#b-q').value||'').toLowerCase().trim();
+  if(!q){ $('#b-match').innerHTML=''; return; }
+  var m=Object.keys(REC).filter(function(k){ return (REC[k].cible+' '+REC[k].n).toLowerCase().indexOf(q.replace(/s$/,''))>=0; });
+  $('#b-match').innerHTML = m.length ? 'Recettes utiles : '+m.map(function(k){ return '<a href="#" data-k="'+k+'">'+esc(REC[k].n)+'</a>'; }).join(' · ') : 'Aucune recette trouvée pour « '+esc(q)+' ». Essayez : puceron, chenille, aleurode, oïdium, mouche.';
+  MOD.$$('#b-match a').forEach(function(a){ a.onclick=function(e){ e.preventDefault(); $('#b-rec').value=a.dataset.k; $('#b-rec').dispatchEvent(new Event('change')); bio(); }; });
+}
+
+/* ---------- Calcul du compost ---------- */
+var VERT = { bov:{n:'fumier de bovins ou de moutons', ratio:1}, vol:{n:'fientes de volailles', ratio:0.5}, porc:{n:'fumier de porcs', ratio:0.8}, herbe:{n:'herbes vertes et déchets de cuisine', ratio:1.2} };
+function compost(){
+  var c=$('#k-cul').value; $('#k-treew').hidden = c!=='tree'; $('#k-surfw').hidden = c==='tree'; $('#k-persow').hidden = c!=='perso';
+  var t;  // tonnes de compost mûr
+  var lbl;
+  if(c==='tree'){ t=num('k-nt')*num('k-kt')/1000; lbl=fmt(num('k-nt'))+' trous × '+fmt(num('k-kt'))+' kg'; }
+  else { var s=num('k-s'), ha= $('#k-u').value==='ha'? s : s/10000; var d = c==='perso'? num('k-dose') : +c; t=ha*d; lbl=(ha<1?fmt(ha*10000)+' m²':fmt(ha,2)+' ha')+' à '+fmt(d)+' t/ha'; }
+  // compost mûr ≈ 0,6 t/m3 ; matières fraîches de départ ≈ 2,2 fois le volume final ; tas 1,5 × 1,2 × 4 m = 7,2 m3 de départ
+  var m3fin=t/0.6, m3dep=m3fin*2.2, tasL=4, tas=Math.max(1,Math.ceil(m3dep/7.2-0.05));
+  var v=VERT[$('#k-vert').value], partV=v.ratio, brun=m3dep*2/(2+partV), vert=m3dep*partV/(2+partV);
+  var brouette=0.08; // m3 par brouette
+  var h='<div class="panel" id="k-doc"><h3 style="margin-top:0">Compost pour '+esc(lbl)+'</h3>';
+  h+='<div class="kpis"><div class="kpi"><span>Compost mûr nécessaire</span><b>'+MOD.kg(t*1000)+'</b></div><div class="kpi"><span>Soit environ</span><b>'+fmt(t*1000/40,0)+' sacs</b><span>de 40 kg</span></div><div class="kpi"><span>Tas à monter</span><b>'+tas+'</b><span>de 1,5 × 1,2 × 4 m</span></div></div>';
+  h+='<h3>Matières à rassembler (au départ)</h3><div class="tblw"><table><thead><tr><th>Matière</th><th class="n">Volume</th><th class="n">Brouettes</th></tr></thead><tbody>'+
+    '<tr><td>Matières brunes sèches (paille, tiges, feuilles mortes)</td><td class="n">'+fmt(brun,1)+' m³</td><td class="n">'+fmt(brun/brouette,0)+'</td></tr>'+
+    '<tr><td>Matières vertes : '+esc(v.n)+'</td><td class="n">'+fmt(vert,1)+' m³</td><td class="n">'+fmt(vert/brouette,0)+'</td></tr>'+
+    '<tr><td>Terre ou vieux compost (une poignée par couche)</td><td class="n">'+fmt(m3dep*0.03,1)+' m³</td><td class="n">'+fmt(m3dep*0.03/brouette,0)+'</td></tr>'+
+    '<tr><td>Eau (pendant la montée du tas)</td><td class="n">'+fmt(m3dep*100,0)+' L</td><td class="n">≈ '+fmt(m3dep*100/20,0)+' seaux de 20 L</td></tr>'+
+    '<tr class="tot"><td>Total à entasser</td><td class="n">'+fmt(m3dep,1)+' m³</td><td class="n">'+fmt(m3dep/brouette,0)+'</td></tr></tbody></table></div>';
+  if($('#k-vert').value==='vol') h+='<div class="msg warn">Les fientes sont très riches : 1 part de fientes pour 4 parts de brunes. Elles chauffent vite ; surveillez l\'humidité.</div>';
+  h+='<div class="msg info">Le tas perd plus de la moitié de son volume en 2 à 3 mois. Commencez <b>3 mois avant</b> la date de semis ou de plantation.</div>';
+  h+='<p class="note">Repères : 1 m³ de compost mûr pèse environ 600 kg ; 1 brouette ≈ 80 litres.</p>';
+  h+='<div class="btns"><button class="btn sec" type="button" onclick="MOD.print(document.getElementById(\'k-doc\'),\'Calcul du compost\')">Imprimer / PDF</button></div></div>';
+  $('#k-out').innerHTML=h;
+}
+
+/* ---------- Images ---------- */
+var INK='#17201A';
+function svg(w,h,b){ return '<svg viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg" font-family="Arial, sans-serif" role="img">'+b+'</svg>'; }
+function t(x,y,s,o){ o=o||{}; return '<text x="'+x+'" y="'+y+'" font-size="'+(o.fs||13)+'" fill="'+(o.c||INK)+'" text-anchor="'+(o.a||'middle')+'" font-weight="'+(o.b?'700':'400')+'">'+s+'</text>'; }
+function figTas(){
+  var s='<rect width="640" height="300" fill="#fff"/><rect x="0" y="250" width="640" height="50" fill="#C9A57A"/>';
+  var cols=['#D9B26B','#5E8C3A','#6B4B2E','#D9B26B','#5E8C3A','#6B4B2E','#D9B26B','#5E8C3A'];
+  var lab=['Brunes 20 cm','Vertes / fumier 10 cm','Terre + cendre','Brunes','Vertes','Terre','Brunes','Vertes'];
+  for(var i=0;i<8;i++){ var y=250-(i+1)*22, inset=i*10; s+='<path d="M'+(60+inset)+' '+(y+22)+' L'+(70+inset)+' '+y+' L'+(390-inset)+' '+y+' L'+(400-inset)+' '+(y+22)+'z" fill="'+cols[i]+'"/>'; if(i<3) s+='<line x1="'+(395-inset)+'" y1="'+(y+11)+'" x2="440" y2="'+(y+11)+'" stroke="#777"/>'+t(446,y+15,lab[i],{a:'start',fs:12}); }
+  s+='<path d="M120 74 q110 -40 220 0 l20 12 h-260z" fill="#3F7D2C"/>'+t(230,58,'Couverture : palmes ou feuilles de bananier',{fs:12,c:'#fff'});
+  s+='<rect x="225" y="20" width="6" height="200" fill="#8D6E4A" transform="rotate(8 228 120)"/>'+t(560,110,'Bâton : chaud',{fs:12,b:1})+t(560,126,'au toucher = ça marche',{fs:12});
+  s+='<path d="M470 150 q30 -30 60 0" fill="none" stroke="#B3261E" stroke-width="2"/>';
+  s+='<line x1="60" y1="270" x2="400" y2="270" stroke="'+INK+'"/>'+t(230,288,'1,5 m de large · 1 à 1,5 m de haut',{fs:12,b:1});
+  s+='<path d="M250 60 q8 -12 0 -24 q-8 12 0 24" fill="#E8833A" opacity="0"/>';
+  for(var k=0;k<3;k++) s+='<path d="M'+(170+k*60)+' 92 q6 -10 0 -20 q-6 -10 0 -20" fill="none" stroke="#B3261E" stroke-width="2" opacity=".6"/>';
+  return svg(640,300,s)+'<figcaption>Compost en tas : alterner les couches, arroser chaque couche, couvrir. La chaleur (flèches rouges) montre que le compost travaille.</figcaption>';
+}
+function hand(x,y,state){
+  var s='<path d="M'+(x-30)+' '+(y+40)+' q-6 -40 10 -56 q20 -14 40 0 q16 16 10 56z" fill="#C58C5C"/>';
+  if(state==='sec') s+='<circle cx="'+x+'" cy="'+(y+60)+'" r="3" fill="#6B4B2E"/><circle cx="'+(x+12)+'" cy="'+(y+72)+'" r="3" fill="#6B4B2E"/><circle cx="'+(x-10)+'" cy="'+(y+80)+'" r="3" fill="#6B4B2E"/>';
+  if(state==='bon') s+='<ellipse cx="'+x+'" cy="'+(y+8)+'" rx="22" ry="14" fill="#6B4B2E"/>';
+  if(state==='mouille') s+='<ellipse cx="'+x+'" cy="'+(y+8)+'" rx="22" ry="14" fill="#4E3A26"/><path d="M'+(x-6)+' '+(y+44)+' q-4 10 0 16 q4 -6 0 -16M'+(x+10)+' '+(y+48)+' q-4 10 0 16 q4 -6 0 -16" fill="#4a7fb5"/>';
+  return s;
+}
+function figMain(){
+  var s='<rect width="640" height="230" fill="#fff"/>';
+  [['sec','Trop sec','la poignée s\'effrite : arroser','#A8560F'],['bon','Bon','reste en boule, 1 ou 2 gouttes','#2C7A3F'],['mouille','Trop mouillé','l\'eau coule : ajouter du sec','#B3261E']].forEach(function(e,i){
+    var x=110+i*210; s+=hand(x,70,e[0])+t(x,190,e[1],{b:1,fs:15,c:e[3]})+t(x,210,e[2],{fs:12}); });
+  return svg(640,230,s)+'<figcaption>Serrez une poignée de compost dans la main : elle doit être humide comme une éponge pressée.</figcaption>';
+}
+function figFosse(){
+  var s='<rect width="640" height="240" fill="#fff"/><rect x="0" y="70" width="640" height="170" fill="#C9A57A"/>';
+  var f=[['Fosse 1','remplissage','#5E8C3A'],['Fosse 2','1 mois','#7a6040'],['Fosse 3','2–3 mois : prêt','#4E3A26']];
+  f.forEach(function(e,i){ var x=40+i*200; s+='<rect x="'+x+'" y="70" width="170" height="120" fill="#fff" stroke="'+INK+'" stroke-width="2"/><rect x="'+(x+4)+'" y="'+(i===0?90:110)+'" width="162" height="'+(i===0?96:76)+'" fill="'+e[2]+'"/>'+t(x+85,40,e[0],{b:1})+t(x+85,58,e[1],{fs:12}); if(i<2) s+='<path d="M'+(x+150)+' 130 q35 -40 70 0" fill="none" stroke="#fff" stroke-width="3" marker-end="url(#a3)"/>'; });
+  s+=t(320,216,'1 m de profondeur · 1,5 × 2 m · un petit talus autour pour arrêter l\'eau de pluie',{fs:12});
+  s='<defs><marker id="a3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#fff"/></marker></defs>'+s;
+  return svg(640,240,s)+'<figcaption>Compost en 3 fosses : chaque mois, le compost passe dans la fosse suivante (c\'est le retournement).</figcaption>';
+}
+function figRecette(k){
+  var s='<rect width="640" height="170" fill="#fff"/>';
+  var steps = k==='lait'||k==='bica'||k==='savon' ? [['mesurer','Doser'],['seau','Mélanger'],['pulv','Pulvériser']] : k==='cendre' ? [['tamis','Tamiser'],['boite','Saupoudrer le matin'],['plante','Feuilles couvertes']] : k==='piege' ? [['jaune','Plaque jaune'],['bout','Bouteille-piège'],['plante','Relever chaque semaine']] : [['pilon','Piler'],['seau','Tremper (nuit)'],['tissu','Filtrer + savon'],['pulv','Pulvériser le soir']];
+  var w=640/steps.length;
+  steps.forEach(function(st,i){ var x=w*i+w/2; s+=pict(st[0],x,70)+t(x,150,(i+1)+'. '+st[1],{b:1,fs:13}); if(i<steps.length-1) s+='<path d="M'+(x+w*0.32)+' 70 h'+(w*0.3)+'" stroke="#999" stroke-width="2" marker-end="url(#a4)"/>'; });
+  s='<defs><marker id="a4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#999"/></marker></defs>'+s;
+  return svg(640,170,s);
+}
+function pict(kind,x,y){
+  switch(kind){
+    case 'pilon': return '<path d="M'+(x-28)+' '+(y-10)+' h56 l-8 50 h-40z" fill="#8D6E4A"/><rect x="'+(x+2)+'" y="'+(y-60)+'" width="10" height="64" rx="5" fill="#6B4B2E" transform="rotate(18 '+x+' '+y+')"/><circle cx="'+(x-8)+'" cy="'+(y-14)+'" r="5" fill="#5E8C3A"/><circle cx="'+(x+6)+'" cy="'+(y-16)+'" r="5" fill="#5E8C3A"/>';
+    case 'seau': return '<path d="M'+(x-30)+' '+(y-30)+' h60 l-8 70 h-44z" fill="#4a7fb5"/><ellipse cx="'+x+'" cy="'+(y-30)+'" rx="30" ry="7" fill="#7a9a5a"/><path d="M'+(x-30)+' '+(y-30)+' q30 -40 60 0" fill="none" stroke="#555" stroke-width="2"/><path d="M'+(x+34)+' '+(y-40)+' a10 10 0 1 0 0.1 0" fill="none" stroke="#E2A846" stroke-width="2"/>';
+    case 'tissu': return '<path d="M'+(x-30)+' '+(y-40)+' h60 l-20 30 h-20z" fill="#eee" stroke="#999"/><path d="M'+x+' '+(y-8)+' v10" stroke="#7a9a5a" stroke-width="3" stroke-dasharray="3 3"/><path d="M'+(x-22)+' '+(y+6)+' h44 l-6 34 h-32z" fill="#4a7fb5" opacity=".8"/><rect x="'+(x+26)+'" y="'+(y+18)+'" width="16" height="12" rx="3" fill="#E9D6A8"/>';
+    case 'pulv': return '<rect x="'+(x-18)+'" y="'+(y-36)+'" width="36" height="58" rx="8" fill="#E2A846"/><path d="M'+(x+18)+' '+(y+10)+' q20 0 26 -30" fill="none" stroke="#555" stroke-width="3"/><path d="M'+(x+44)+' '+(y-24)+' l12 -10 M'+(x+46)+' '+(y-20)+' l14 -2 M'+(x+44)+' '+(y-16)+' l12 8" stroke="#4a7fb5" stroke-width="2"/><circle cx="'+(x-30)+'" cy="'+(y-40)+'" r="10" fill="#F2C14E"/><path d="M'+(x-36)+' '+(y-40)+' a10 10 0 0 0 12 8" fill="#fff" opacity=".0"/>';
+    case 'mesurer': return '<path d="M'+(x-16)+' '+(y-34)+' h32 l-4 66 h-24z" fill="#fff" stroke="#555"/><path d="M'+(x-14)+' '+(y-4)+' h28 l-2 34 h-24z" fill="#f4f1e8"/><path d="M'+(x+10)+' '+(y-24)+' h6M'+(x+10)+' '+(y-12)+' h6M'+(x+10)+' '+y+' h6" stroke="#555"/>';
+    case 'tamis': return '<ellipse cx="'+x+'" cy="'+(y-20)+'" rx="36" ry="10" fill="none" stroke="#8D6E4A" stroke-width="4"/><path d="M'+(x-30)+' '+(y-16)+' h60" stroke="#999" stroke-dasharray="2 2"/><path d="M'+(x-26)+' '+(y+30)+' q26 -30 52 0z" fill="#9e9e9e"/>';
+    case 'boite': return '<rect x="'+(x-14)+'" y="'+(y-46)+'" width="28" height="36" rx="4" fill="#bbb" transform="rotate(30 '+x+' '+(y-28)+')"/><circle cx="'+(x+4)+'" cy="'+(y-4)+'" r="2" fill="#777"/><circle cx="'+(x+12)+'" cy="'+(y+6)+'" r="2" fill="#777"/><circle cx="'+(x-2)+'" cy="'+(y+10)+'" r="2" fill="#777"/>'+pict('plante',x,y+40).replace(/scale/,'');
+    case 'plante': return '<path d="M'+x+' '+(y+38)+' v-50" stroke="#3E8A5A" stroke-width="3"/><path d="M'+x+' '+(y+4)+' c-24 -4 -30 -20 -30 -30 16 0 30 12 30 30zM'+x+' '+(y-8)+' c24 -4 30 -20 30 -30 -16 0 -30 12 -30 30z" fill="#7CB342"/>';
+    case 'jaune': return '<rect x="'+(x-26)+'" y="'+(y-40)+'" width="52" height="60" fill="#F5D90A" stroke="#999"/><rect x="'+(x-2)+'" y="'+(y+20)+'" width="4" height="22" fill="#8D6E4A"/><circle cx="'+(x-10)+'" cy="'+(y-20)+'" r="2.5" fill="#fff" stroke="#555"/><circle cx="'+(x+8)+'" cy="'+(y-6)+'" r="2.5" fill="#fff" stroke="#555"/><circle cx="'+(x+2)+'" cy="'+(y-28)+'" r="2.5" fill="#fff" stroke="#555"/>';
+    case 'bout': return '<path d="M'+(x-4)+' '+(y-56)+' v14 M'+(x-14)+' '+(y-40)+' h20 v-6 h-20z" stroke="#555" fill="#ddd"/><rect x="'+(x-16)+'" y="'+(y-40)+'" width="32" height="76" rx="10" fill="#cfe8f5" stroke="#777"/><rect x="'+(x-15)+'" y="'+(y+10)+'" width="30" height="25" rx="8" fill="#E2A846" opacity=".7"/><circle cx="'+(x-16)+'" cy="'+(y-10)+'" r="4" fill="#fff" stroke="#555"/><circle cx="'+(x+16)+'" cy="'+(y-10)+'" r="4" fill="#fff" stroke="#555"/>';
+  }
+  return '';
+}
+function figEpi(){
+  var s='<rect width="640" height="200" fill="#fff"/>';
+  // personne
+  s+='<circle cx="120" cy="50" r="22" fill="#C58C5C"/><rect x="104" y="44" width="32" height="10" rx="4" fill="#4a7fb5" opacity=".7"/><rect x="108" y="56" width="24" height="12" rx="4" fill="#fff" stroke="#999"/>';
+  s+='<rect x="96" y="76" width="48" height="70" rx="10" fill="#17694A"/><rect x="84" y="80" width="12" height="54" rx="6" fill="#17694A"/><rect x="144" y="80" width="12" height="54" rx="6" fill="#17694A"/><circle cx="90" cy="140" r="8" fill="#F2C14E"/><circle cx="150" cy="140" r="8" fill="#F2C14E"/>';
+  s+='<rect x="100" y="146" width="16" height="40" fill="#333"/><rect x="124" y="146" width="16" height="40" fill="#333"/>';
+  var L=[['Lunettes',210,50],['Cache-nez',210,72],['Gants',210,140],['Bottes',210,180]];
+  L.forEach(function(l){ s+=t(l[1],l[2],l[0],{a:'start',fs:13,b:1}); });
+  s+='<line x1="140" y1="49" x2="205" y2="46" stroke="#999"/><line x1="134" y1="62" x2="205" y2="68" stroke="#999"/><line x1="158" y1="140" x2="205" y2="136" stroke="#999"/><line x1="142" y1="180" x2="205" y2="176" stroke="#999"/>';
+  // soleil couchant
+  s+='<circle cx="480" cy="120" r="34" fill="#E8833A"/><rect x="380" y="120" width="220" height="60" fill="#fff"/><line x1="380" y1="120" x2="600" y2="120" stroke="#8D6E4A" stroke-width="3"/>'+t(490,150,'Traiter le soir, après 16 h',{b:1})+t(490,170,'sans vent, sans pluie annoncée',{fs:12});
+  return svg(640,200,s)+'<figcaption>Se protéger et traiter au bon moment.</figcaption>';
+}
+$('#fig-tas').innerHTML=figTas(); $('#fig-main').innerHTML=figMain(); $('#fig-fosse').innerHTML=figFosse(); $('#fig-epi').innerHTML=figEpi();
+$('#c-print').onclick=function(){ MOD.print($('#c-doc'),'Faire un bon compost'); };
+$('#l-print').onclick=function(){ MOD.print($('#l-doc'),'Bokashi et engrais liquides'); };
+
+MOD.remember('agrodiag.bio');
+MOD.$$('#t-bio input,#t-bio select').forEach(function(e){ if(e.id!=='b-q') e.addEventListener('input', bio); });
+$('#b-q').addEventListener('input', chercher);
+MOD.$$('#t-calc input,#t-calc select').forEach(function(e){ e.addEventListener('input', compost); });
+bio(); compost(); MOD.tabs();
+})();
+</script>
+</body>
+</html>

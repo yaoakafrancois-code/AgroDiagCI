@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Engrais chimiques · AKA AgroDiag CI</title>
+<link rel="stylesheet" href="../assets/fonts.css">
+<link rel="stylesheet" href="../assets/modules.css">
+<style id="shell-back">
+.shell-bar{position:relative;z-index:1000;background:#17694A;padding:6px 12px}
+.shell-back{display:inline-flex;align-items:center;gap:6px;min-height:36px;font:600 15px system-ui,sans-serif;text-decoration:none;color:#fff}
+@media print{.shell-bar{display:none}}
+</style></head>
+<body><div class="shell-bar"><a class="shell-back" href="../index.html" aria-label="Retour à l'accueil">&#8592; Accueil · AKA AgroDiag CI</a></div>
+<div class="wrap">
+<header class="app">
+  <svg width="44" height="44" viewBox="0 0 36 36" aria-hidden="true"><rect x="9" y="7" width="18" height="24" rx="3" fill="none" stroke="#17694A" stroke-width="2.4"/><path d="M12 7l2-3h8l2 3" fill="none" stroke="#17694A" stroke-width="2.4" stroke-linejoin="round"/><text x="18" y="23" text-anchor="middle" font-size="7.5" font-weight="700" fill="#17694A" font-family="Arial">NPK</text></svg>
+  <div><h1>Formulation d'engrais chimiques</h1><p>Faire son mélange, doses par culture, lire un sac, bonnes pratiques</p></div>
+</header>
+
+<nav class="tabs" aria-label="Rubriques"><div class="row" role="tablist">
+  <button role="tab" data-tab="t-mel">Faire un mélange</button>
+  <button role="tab" data-tab="t-dose">Dose par culture</button>
+  <button role="tab" data-tab="t-sac">Lire un sac</button>
+  <button role="tab" data-tab="t-bp">Bonnes pratiques</button>
+  <button role="tab" data-tab="t-prix">Prix</button>
+</div></nav>
+
+<!-- ============ MÉLANGE ============ -->
+<section class="tab" id="t-mel">
+  <h2>Fabriquer une formule NPK avec des engrais simples</h2>
+  <p class="lead">Exemple : vous voulez du 15-15-15 mais vous avez de l'urée, du DAP et du chlorure de potassium. L'application calcule combien mettre de chaque engrais.</p>
+  <div class="grid">
+    <div class="panel">
+      <label class="f">Formule voulue (N – P₂O₅ – K₂O)
+        <small>Les 3 chiffres écrits sur le sac. Ex. : 15-15-15, 10-18-18, 20-10-10</small></label>
+      <div class="three">
+        <label class="f">N<input type="number" id="m-n" value="15" min="0" max="46" step="1" inputmode="decimal"></label>
+        <label class="f">P₂O₅<input type="number" id="m-p" value="15" min="0" max="52" step="1" inputmode="decimal"></label>
+        <label class="f">K₂O<input type="number" id="m-k" value="15" min="0" max="60" step="1" inputmode="decimal"></label>
+      </div>
+      <label class="f">Quantité à fabriquer (kg)<small>1 sac = 50 kg</small>
+        <input type="number" id="m-q" value="500" min="1" step="50" inputmode="decimal"></label>
+      <label class="f">Engrais pour l'azote (N)<select id="m-sn"></select></label>
+      <label class="f">Engrais pour le phosphore (P)<select id="m-sp"></select></label>
+      <label class="f">Engrais pour le potassium (K)<select id="m-sk"></select></label>
+      <label class="f">Produit de remplissage<small>Pour compléter le poids quand les engrais sont plus concentrés que la formule</small><select id="m-sf"></select></label>
+      <label class="f">Prix d'un sac de cette formule toute prête (FCFA, si vous le trouvez)<small>Pour comparer. Laissez 0 si vous ne savez pas.</small>
+        <input type="number" id="m-pc" value="0" min="0" step="500" inputmode="decimal"></label>
+    </div>
+    <div id="m-out"></div>
+  </div>
+</section>
+
+<!-- ============ DOSE PAR CULTURE ============ -->
+<section class="tab" id="t-dose" hidden>
+  <h2>Combien d'engrais pour ma culture ?</h2>
+  <p class="lead">Programmes de fumure courants en Côte d'Ivoire. Ils donnent la quantité pour votre surface, le nombre de sacs, la dose par pied et le coût.</p>
+  <div class="grid">
+    <div class="panel">
+      <label class="f">Culture<select id="d-cul"></select></label>
+      <div class="two">
+        <label class="f">Surface<input type="number" id="d-s" value="1" min="0" step="0.25" inputmode="decimal"></label>
+        <label class="f">Unité<select id="d-u"><option value="ha">hectare(s)</option><option value="m2">m²</option></select></label>
+      </div>
+      <label class="f">Nombre de pieds par hectare<small>Rempli selon l'écartement courant ; changez-le si votre écartement est différent</small>
+        <input type="number" id="d-dens" value="0" min="0" step="100" inputmode="decimal" data-nomem></label>
+      <label class="f">Fertilité du sol<select id="d-fert">
+        <option value="1.2">Sol pauvre, épuisé (+20 %)</option>
+        <option value="1" selected>Sol moyen</option>
+        <option value="0.8">Sol riche, ou beaucoup de fumier/compost (−20 %)</option></select></label>
+    </div>
+    <div id="d-out"></div>
+  </div>
+</section>
+
+<!-- ============ LIRE UN SAC ============ -->
+<section class="tab" id="t-sac" hidden>
+  <h2>Que contient mon sac ?</h2>
+  <p class="lead">Les 3 chiffres d'un sac (par exemple 15-15-15) donnent, pour 100 kg d'engrais, les kilos d'azote (N), de phosphore (P₂O₅) et de potassium (K₂O).</p>
+  <div class="grid">
+    <div class="panel">
+      <h3 style="margin-top:0">1. Ce que j'apporte</h3>
+      <div class="three">
+        <label class="f">N<input type="number" id="s-n" value="15" min="0" step="1" inputmode="decimal"></label>
+        <label class="f">P₂O₅<input type="number" id="s-p" value="15" min="0" step="1" inputmode="decimal"></label>
+        <label class="f">K₂O<input type="number" id="s-k" value="15" min="0" step="1" inputmode="decimal"></label>
+      </div>
+      <label class="f">Poids d'engrais (kg)<input type="number" id="s-q" value="50" min="0" step="1" inputmode="decimal"></label>
+      <div id="s-out1"></div>
+    </div>
+    <div class="panel">
+      <h3 style="margin-top:0">2. Combien d'engrais pour apporter une dose ?</h3>
+      <label class="f">Élément voulu<select id="s-el"><option value="N">Azote (N)</option><option value="P">Phosphore (P₂O₅)</option><option value="K">Potassium (K₂O)</option></select></label>
+      <label class="f">Dose voulue (kg par hectare)<input type="number" id="s-dose" value="60" min="0" step="5" inputmode="decimal"></label>
+      <label class="f">Engrais utilisé<select id="s-prod"></select></label>
+      <div id="s-out2"></div>
+      <p class="note">Si l'analyse de sol donne P ou K (et pas P₂O₅ ou K₂O) : P₂O₅ = P × 2,29 et K₂O = K × 1,20.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BONNES PRATIQUES ============ -->
+<section class="tab" id="t-bp" hidden>
+  <div id="bp-doc">
+  <h2>Bien utiliser les engrais chimiques</h2>
+  <p class="lead">Un engrais mal placé ou mal stocké est de l'argent perdu. Voici les règles simples.</p>
+  <div class="btns noprint"><button class="btn sec" type="button" id="bp-print">Imprimer / enregistrer en PDF</button></div>
+
+  <h3>Où mettre l'engrais</h3>
+  <figure class="ill" id="fig-place"></figure>
+
+  <h3>Comment faire un mélange</h3>
+  <figure class="ill" id="fig-mix"></figure>
+  <ol class="steps">
+    <li>Travaillez à l'ombre, sur une bâche propre et sèche, avec gants et cache-nez.</li>
+    <li>Pesez chaque engrais (une balance ou un seau étalonné une fois avec la balance).</li>
+    <li>Versez en couches : le plus gros tas d'abord, puis les autres, puis le remplissage.</li>
+    <li>Retournez le tas 3 fois à la pelle, jusqu'à une couleur régulière ; écrasez les mottes.</li>
+    <li>Mélangez le jour même de l'épandage si vous utilisez de l'urée avec du TSP ou du SSP (le mélange devient humide et collant).</li>
+    <li>Ensachez, fermez et écrivez la formule et la date sur le sac.</li>
+  </ol>
+  <div class="msg warn"><b>Mélanges à éviter :</b> urée + nitrate d'ammonium (le mélange fond) ; sulfate d'ammoniaque ou DAP + chaux, dolomie ou cendre (l'azote part en gaz). Des granulés de tailles très différentes se séparent dans le sac : remuez avant d'épandre.</div>
+
+  <h3>Reconnaître un manque d'élément sur les feuilles</h3>
+  <figure class="ill" id="fig-car"></figure>
+
+  <h3>Les 8 règles d'or</h3>
+  <ol class="steps">
+    <li>Épandez sur un sol humide (après une pluie), jamais avant une forte pluie annoncée.</li>
+    <li>Enfouissez l'urée (2 à 5 cm) ou couvrez-la de terre : au soleil, elle part en gaz.</li>
+    <li>Fractionnez l'azote : une partie au départ, le reste pendant la croissance.</li>
+    <li>Ne mettez pas l'engrais contre la tige ou le tronc, ni sur les feuilles mouillées : il brûle.</li>
+    <li>Désherbez avant d'épandre, sinon vous nourrissez les mauvaises herbes.</li>
+    <li>Associez toujours de la matière organique (fumier, compost) : l'engrais chimique seul fatigue et acidifie le sol.</li>
+    <li>Sur sol très acide (sud, bas-fonds), apportez de la dolomie ou de la chaux 2 à 4 semaines avant l'engrais.</li>
+    <li>Faites une analyse de sol tous les 3 à 5 ans pour ajuster les doses.</li>
+  </ol>
+
+  <h3>Sécurité et stockage</h3>
+  <figure class="ill" id="fig-stock"></figure>
+  <ul class="clean">
+    <li>Gants, cache-nez et bottes ; lavez-vous les mains avant de manger.</li>
+    <li>Stockez dans un magasin sec et aéré, sacs sur palettes, à 10 cm du mur.</li>
+    <li>Jamais dans la maison, près de la nourriture, des enfants ou des animaux.</li>
+    <li>Ne réutilisez pas les sacs d'engrais pour le riz, le maïs ou l'attiéké.</li>
+    <li>Nitrate d'ammonium : loin du feu, du gasoil et des produits inflammables.</li>
+  </ul>
+  </div>
+</section>
+
+<!-- ============ PRIX ============ -->
+<section class="tab" id="t-prix" hidden>
+  <h2>Prix des engrais dans votre zone</h2>
+  <p class="lead">Prix d'un sac de 50 kg en FCFA. Ce sont des prix indicatifs : mettez les prix de votre magasin. Ils servent dans tous les calculs.</p>
+  <div class="panel" id="prix-list"></div>
+  <div class="btns"><button class="btn sec" type="button" id="prix-reset">Remettre les prix indicatifs</button></div>
+</section>
+
+<p class="foot">Repères techniques indicatifs (programmes courants en Côte d'Ivoire). L'analyse de sol et le conseil de votre agronome restent la référence.</p>
+</div>
+
+<script src="../assets/modules.js"></script>
+<script>
+(function(){
+var $=MOD.$, fmt=MOD.fmt, num=MOD.num, esc=MOD.esc;
+
+/* ---------- Engrais simples et composés : teneurs en % ---------- */
+var PR = {
+  uree:  {n:'Urée 46 %',                    N:46, P:0,  K:0,  S:0,  prix:20000, role:'N'},
+  sa:    {n:'Sulfate d\'ammoniaque 21 %',     N:21, P:0,  K:0,  S:24, prix:16000, role:'N'},
+  dap:   {n:'DAP 18-46-0',                   N:18, P:46, K:0,  S:0,  prix:27000, role:'P'},
+  map:   {n:'MAP 11-52-0',                   N:11, P:52, K:0,  S:0,  prix:29000, role:'P'},
+  tsp:   {n:'Super triple (TSP) 0-46-0',     N:0,  P:46, K:0,  S:0,  prix:23000, role:'P'},
+  ssp:   {n:'Super simple (SSP) 0-18-0',     N:0,  P:18, K:0,  S:11, prix:14000, role:'P'},
+  kcl:   {n:'Chlorure de potassium (KCl) 0-0-60', N:0, P:0, K:60, S:0, prix:21000, role:'K'},
+  k2so4: {n:'Sulfate de potassium 0-0-50',   N:0,  P:0,  K:50, S:18, prix:30000, role:'K'},
+  dolo:  {n:'Dolomie (apporte calcium et magnésium)', N:0,P:0,K:0,S:0, prix:5000, role:'F'},
+  sable: {n:'Sable sec ou argile fine',      N:0,  P:0,  K:0,  S:0,  prix:0,     role:'F'},
+  npk:   {n:'NPK 15-15-15',                  N:15, P:15, K:15, S:0,  prix:22000, role:'C'},
+  npk2:  {n:'NPK 10-18-18',                  N:10, P:18, K:18, S:0,  prix:23000, role:'C'},
+  cacao: {n:'Engrais cacao 0-23-19 (+ Mg, Ca, S)', N:0, P:23, K:19, S:0, prix:21000, role:'C'}
+};
+var PRIX0 = {}; Object.keys(PR).forEach(function(k){ PRIX0[k]=PR[k].prix; });
+var KP='agrodiag.engrais.prix';
+function loadPrix(){ var p={}; try{ p=JSON.parse(localStorage.getItem(KP)||'{}'); }catch(e){} Object.keys(PR).forEach(function(k){ if(isFinite(p[k])) PR[k].prix=+p[k]; }); }
+function savePrix(){ var p={}; Object.keys(PR).forEach(function(k){ p[k]=PR[k].prix; }); try{ localStorage.setItem(KP, JSON.stringify(p)); }catch(e){} }
+function prixKg(k){ return PR[k].prix/50; }
+loadPrix();
+
+function opts(sel, role, def){
+  var el=$(sel); el.innerHTML = Object.keys(PR).filter(function(k){ return role.indexOf(PR[k].role)>=0; })
+    .map(function(k){ return '<option value="'+k+'"'+(k===def?' selected':'')+'>'+esc(PR[k].n)+'</option>'; }).join('');
+}
+opts('#m-sn','N','uree'); opts('#m-sp','P','dap'); opts('#m-sk','K','kcl'); opts('#m-sf','F','sable');
+opts('#s-prod','NPKC','uree');
+
+/* ---------- 1. Mélange ---------- */
+function melange(){
+  var N=num('m-n'), P=num('m-p'), K=num('m-k'), Q=num('m-q');
+  var sn=$('#m-sn').value, sp=$('#m-sp').value, sk=$('#m-sk').value, sf=$('#m-sf').value;
+  var out=$('#m-out'), h='';
+  if(Q<=0 || N+P+K<=0){ out.innerHTML='<div class="panel"><div class="msg info">Entrez une formule et une quantité.</div></div>'; return; }
+  // pour 100 kg de mélange
+  var aP = P>0 ? P/PR[sp].P*100 : 0;
+  var aK = K>0 ? K/PR[sk].K*100 : 0;
+  var nDeja = aP*PR[sp].N/100;
+  var nReste = N - nDeja;
+  var aN = nReste>0 ? nReste/PR[sn].N*100 : 0;
+  var somme = aP+aK+aN, rempl = 100-somme;
+  var lignes=[], msgs=[];
+  if(nReste < -0.25){
+    msgs.push('<div class="msg crit"><b>Trop d\'azote :</b> pour avoir '+fmt(P)+' de P₂O₅, le '+esc(PR[sp].n)+' apporte déjà '+fmt(nDeja,1)+' d\'azote, plus que les '+fmt(N)+' voulus. Choisissez le super triple (TSP) ou le super simple (SSP) comme source de phosphore.</div>');
+  }
+  if(rempl < -0.5){
+    var f=100/somme;
+    msgs.push('<div class="msg crit"><b>Formule impossible avec ces engrais :</b> ils sont trop peu concentrés (il faudrait '+fmt(somme,0)+' kg pour 100 kg). Avec eux, la formule la plus forte possible est environ <b>'+fmt(N*f,0)+'-'+fmt(P*f,0)+'-'+fmt(K*f,0)+'</b>. Prenez des engrais plus concentrés (urée, DAP ou TSP, KCl) ou baissez la formule.</div>');
+  }
+  if(msgs.length){ out.innerHTML='<div class="panel">'+msgs.join('')+'</div>'; return; }
+  if(aN>0) lignes.push([sn,aN]); if(aP>0) lignes.push([sp,aP]); if(aK>0) lignes.push([sk,aK]); if(rempl>0.05) lignes.push([sf,rempl]);
+  var tot=0, S=0, rows=lignes.map(function(l){
+    var kg=l[1]*Q/100, c=kg*prixKg(l[0]); tot+=c; S+=l[1]*PR[l[0]].S/100;
+    return '<tr><td>'+esc(PR[l[0]].n)+'</td><td class="n">'+fmt(kg, kg<10?1:0)+' kg</td><td class="n">'+fmt(kg/50,1)+'</td><td class="n">'+fmt(c)+'</td></tr>';
+  }).join('');
+  var cSac = tot/Q*50, pc=num('m-pc');
+  h+='<div class="panel" id="m-doc">';
+  h+='<h3 style="margin-top:0">Mélange '+fmt(N)+'-'+fmt(P)+'-'+fmt(K)+' · '+fmt(Q)+' kg ('+fmt(Q/50,1)+' sacs)</h3>';
+  h+='<div class="tblw"><table><thead><tr><th>Engrais</th><th class="n">Quantité</th><th class="n">Sacs de 50 kg</th><th class="n">Coût (FCFA)</th></tr></thead><tbody>'+rows+
+     '<tr class="tot"><td>Total</td><td class="n">'+fmt(Q)+' kg</td><td class="n">'+fmt(Q/50,1)+'</td><td class="n">'+fmt(tot)+'</td></tr></tbody></table></div>';
+  h+='<div class="kpis" style="margin-top:12px"><div class="kpi"><span>Coût d\'un sac de 50 kg du mélange</span><b>'+fmt(cSac)+' F</b></div>';
+  h+='<div class="kpi"><span>Pour 1 sac de 50 kg, peser</span><b style="font-size:1rem;line-height:1.35">'+lignes.map(function(l){ return fmt(l[1]/2, 1)+' kg '+esc(PR[l[0]].n.split(' (')[0].split(' 0-')[0].split(' 1')[0].split(' 4')[0].split(' 2')[0]); }).join('<br>')+'</b></div></div>';
+  if(pc>0){
+    var d=pc-cSac;
+    h+= d>0 ? '<div class="msg ok"><b>Économie :</b> '+fmt(d)+' F par sac, soit '+fmt(d*Q/50)+' F pour '+fmt(Q/50,1)+' sacs, par rapport à la formule toute prête.</div>'
+            : '<div class="msg warn">Le mélange coûte '+fmt(-d)+' F de plus par sac que la formule toute prête : achetez plutôt la formule toute prête.</div>';
+  }
+  h+='<div class="msg info">Contrôle : ce mélange contient bien <b>'+fmt(N,0)+' % N, '+fmt(P,0)+' % P₂O₅, '+fmt(K,0)+' % K₂O</b>'+(S>0.5?' et environ '+fmt(S,0)+' % de soufre (S)':'')+'.</div>';
+  var w=[];
+  if(sn==='uree' && (sp==='tsp'||sp==='ssp')) w.push('Urée + '+(sp==='tsp'?'TSP':'SSP')+' : le mélange prend l\'humidité et colle. Mélangez <b>le jour même</b> de l\'épandage.');
+  if(sf==='dolo' && (sn==='sa'||sp==='dap'||sp==='map'||sn==='uree')) w.push('Dolomie avec un engrais azoté ammoniacal (urée, sulfate d\'ammoniaque, DAP, MAP) : de l\'azote peut partir en gaz si le mélange est humide. Mélangez juste avant l\'épandage, ou prenez du sable sec comme remplissage et apportez la dolomie à part.');
+  if(sk==='kcl') w.push('Le chlorure (KCl) ne convient pas bien au tabac et réduit un peu la qualité de la pomme de terre et de l\'oignon : préférez le sulfate de potassium pour ces cultures.');
+  if(w.length) h+='<div class="msg warn">'+w.join('<br>')+'</div>';
+  h+='<div class="btns"><button class="btn sec" type="button" onclick="MOD.print(document.getElementById(\'m-doc\'),\'Mélange d\\\'engrais\')">Imprimer / PDF</button></div>';
+  h+='</div>';
+  out.innerHTML=h;
+}
+
+/* ---------- 2. Programmes par culture (kg/ha) ---------- */
+var CUL = {
+  mais:   {n:'Maïs', dens:53000, ec:'75 × 25 cm', prog:[
+    ['npk',200,'Au semis ou 10–15 jours après la levée','En poquet à 5–10 cm du plant, recouvrir de terre'],
+    ['uree',100,'30–40 jours après le semis (avant le buttage)','En ligne le long des plants, puis butter pour enfouir']]},
+  rizirr: {n:'Riz irrigué / bas-fond (repiqué)', dens:250000, ec:'20 × 20 cm', prog:[
+    ['npk',250,'Fumure de fond : avant le repiquage ou 7 jours après','À la volée sur sol boueux, bien répartir'],
+    ['uree',75,'Tallage : 20–25 jours après le repiquage','À la volée sur une lame d\'eau faible, fermer entrées et sorties d\'eau 3 jours'],
+    ['uree',75,'Initiation paniculaire : 50–60 jours après le repiquage','Même méthode']]},
+  rizpl:  {n:'Riz pluvial', dens:250000, ec:'20 × 20 cm', prog:[
+    ['npk',200,'Au semis ou 15 jours après la levée','En ligne ou à la volée après désherbage'],
+    ['uree',50,'Tallage : 25–30 jours après le semis','Sur sol humide, après désherbage'],
+    ['uree',50,'Initiation paniculaire : 50–60 jours après le semis','Sur sol humide']]},
+  tomate: {n:'Tomate', dens:20000, ec:'100 × 50 cm', prog:[
+    ['npk',300,'Au repiquage ou 7 jours après (avec 20 t/ha de fumier ou compost au fond)','En couronne à 10 cm du pied, enfouir légèrement'],
+    ['uree',50,'3 semaines après le repiquage','En couronne, puis arroser'],
+    ['k2so4',100,'Début de la floraison','En couronne, puis arroser (améliore la qualité des fruits)']]},
+  piment: {n:'Piment', dens:25000, ec:'80 × 50 cm', prog:[
+    ['npk',300,'Au repiquage ou 7 jours après (avec fumier ou compost au fond)','En couronne à 10 cm du pied'],
+    ['uree',50,'3–4 semaines après le repiquage','En couronne, puis arroser'],
+    ['npk',100,'Début de la floraison','En couronne, puis arroser']]},
+  aub:    {n:'Aubergine', dens:13300, ec:'100 × 75 cm', prog:[
+    ['npk',300,'Au repiquage ou 7 jours après (avec fumier ou compost au fond)','En couronne à 10 cm du pied'],
+    ['uree',50,'3 semaines après le repiquage','En couronne, puis arroser'],
+    ['npk',100,'Début des récoltes','En couronne, pour prolonger la production']]},
+  gombo:  {n:'Gombo', dens:41600, ec:'60 × 40 cm', prog:[
+    ['npk',200,'Au semis ou 15 jours après la levée','En poquet à 5–10 cm du plant'],
+    ['uree',50,'30 jours après le semis','En ligne, puis arroser ou après une pluie']]},
+  chou:   {n:'Chou', dens:33300, ec:'60 × 50 cm', prog:[
+    ['npk',400,'Au repiquage (avec fumier ou compost au fond)','En couronne à 10 cm du pied'],
+    ['uree',75,'3 semaines après le repiquage','En couronne, puis arroser'],
+    ['uree',75,'Début de la pommaison','En couronne, puis arroser']]},
+  oignon: {n:'Oignon', dens:400000, ec:'20 × 12,5 cm', prog:[
+    ['npk',300,'Au repiquage','À la volée sur la planche, griffer légèrement'],
+    ['uree',50,'3 semaines après le repiquage','Entre les lignes, puis arroser'],
+    ['uree',50,'6 semaines après le repiquage (plus d\'azote ensuite : mauvaise conservation)','Entre les lignes, puis arroser']]},
+  laitue: {n:'Laitue', dens:111000, ec:'30 × 30 cm', prog:[
+    ['npk',200,'Au repiquage (avec compost)','À la volée sur la planche'],
+    ['uree',50,'2 semaines après le repiquage','Entre les plants, puis arroser']]},
+  manioc: {n:'Manioc', dens:10000, ec:'1 × 1 m', prog:[
+    ['npk',200,'1 à 2 mois après la plantation','En couronne à 10–15 cm de la tige, enfouir'],
+    ['kcl',100,'3 à 4 mois après la plantation','En couronne, enfouir (grossit les tubercules)']]},
+  igname: {n:'Igname', dens:10000, ec:'1 × 1 m', prog:[
+    ['npk',200,'1 à 2 mois après la levée','En couronne à 15 cm de la tige, sur la butte, enfouir'],
+    ['kcl',100,'3 mois après la levée','En couronne, enfouir']]},
+  plant:  {n:'Banane plantain', dens:1667, ec:'3 × 2 m', prog:[
+    ['npk',300,'1 mois après la plantation','En couronne à 30–50 cm du pied'],
+    ['uree',75,'3 mois après la plantation','En couronne'],
+    ['kcl',150,'3 mois après la plantation','En couronne'],
+    ['uree',75,'5 mois après la plantation','En couronne'],
+    ['kcl',150,'5 mois après la plantation','En couronne']]},
+  cacao:  {n:'Cacao (verger en production)', dens:1111, ec:'3 × 3 m', prog:[
+    ['cacao',150,'Début de la grande saison des pluies (avril–mai)','En couronne de 50 cm à 1 m autour du tronc, sur sol désherbé'],
+    ['cacao',150,'Début de la petite saison des pluies (septembre–octobre)','Même méthode']]},
+  palm:   {n:'Palmier à huile (en production)', dens:143, ec:'9 m en triangle', prog:[
+    ['uree',100,'Début de la saison des pluies (≈ 0,7 kg par arbre)','En couronne de 1 à 2 m autour du stipe, sur la zone désherbée'],
+    ['kcl',250,'En 2 fois pendant la saison des pluies (≈ 1,75 kg par arbre)','En couronne, ou sur les palmes coupées entassées']]}
+};
+(function(){ var el=$('#d-cul'); el.innerHTML=Object.keys(CUL).map(function(k){ return '<option value="'+k+'">'+esc(CUL[k].n)+'</option>'; }).join(''); })();
+
+function dose(){
+  var c=CUL[$('#d-cul').value]; if(!c) return;
+  var s=num('d-s'); var ha = $('#d-u').value==='m2' ? s/10000 : s;
+  var dens=num('d-dens')||c.dens, f=+$('#d-fert').value||1;
+  var pieds=dens*ha, tot=0, tN=0,tP=0,tK=0, parProd={};
+  var rows=c.prog.map(function(p,i){
+    var kgha=p[1]*f, kg=kgha*ha, cost=kg*prixKg(p[0]), gp = dens>0 ? kgha*1000/dens : 0;
+    tot+=cost; tN+=kgha*PR[p[0]].N/100; tP+=kgha*PR[p[0]].P/100; tK+=kgha*PR[p[0]].K/100;
+    parProd[p[0]]=(parProd[p[0]]||0)+kg;
+    return '<tr><td><b>'+(i+1)+'. '+esc(p[2])+'</b><br><span class="note">'+esc(p[3])+'</span></td><td>'+esc(PR[p[0]].n)+'</td>'+
+      '<td class="n">'+fmt(kgha,0)+'</td><td class="n">'+MOD.kg(kg)+'</td><td class="n">'+(dens>0?MOD.g(gp):'–')+'</td></tr>';
+  }).join('');
+  var achats=Object.keys(parProd).map(function(k){ var sacs=Math.ceil(parProd[k]/50 - 1e-9); return '<li><b>'+esc(PR[k].n)+'</b> : '+MOD.kg(parProd[k])+' → '+sacs+' sac'+(sacs>1?'s':'')+' de 50 kg</li>'; }).join('');
+  var h='<div class="panel" id="d-doc">';
+  h+='<h3 style="margin-top:0">'+esc(c.n)+' · '+(ha<1?fmt(ha*10000,0)+' m²':fmt(ha,2)+' ha')+'</h3>';
+  h+='<div class="kpis"><div class="kpi"><span>Coût total des engrais</span><b>'+fmt(tot)+' F</b></div><div class="kpi"><span>Coût par hectare</span><b>'+fmt(ha>0?tot/ha:0)+' F</b></div><div class="kpi"><span>Nombre de pieds</span><b>'+fmt(pieds)+'</b></div></div>';
+  h+='<div class="tblw"><table><thead><tr><th>Quand et comment</th><th>Engrais</th><th class="n">kg/ha</th><th class="n">Pour votre surface</th><th class="n">Par pied</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  h+='<h3>À acheter</h3><ul class="clean">'+achats+'</ul>';
+  h+='<div class="msg info">Le programme apporte par hectare : <b>'+fmt(tN,0)+' kg N, '+fmt(tP,0)+' kg P₂O₅, '+fmt(tK,0)+' kg K₂O</b>. Écartement de référence : '+esc(c.ec)+'. Pour 100 m² (une planche de 1 m × 100 m), divisez les kg/ha par 100.</div>';
+  h+='<p class="note">Astuce : pour la dose par pied, pesez une fois la quantité dans une petite boîte ou un bouchon, puis utilisez toujours la même mesure.</p>';
+  h+='<div class="btns"><button class="btn sec" type="button" onclick="MOD.print(document.getElementById(\'d-doc\'),\'Fumure '+esc(c.n).replace(/'/g,'')+'\')">Imprimer / PDF</button></div></div>';
+  $('#d-out').innerHTML=h;
+}
+$('#d-cul').addEventListener('change', function(){ $('#d-dens').value=CUL[this.value].dens; dose(); });
+
+/* ---------- 3. Lire un sac ---------- */
+function sac(){
+  var q=num('s-q'), n=num('s-n'), p=num('s-p'), k=num('s-k');
+  $('#s-out1').innerHTML='<div class="kpis"><div class="kpi"><span>Azote N</span><b>'+fmt(q*n/100,1)+' kg</b></div><div class="kpi"><span>Phosphore P₂O₅</span><b>'+fmt(q*p/100,1)+' kg</b></div><div class="kpi"><span>Potassium K₂O</span><b>'+fmt(q*k/100,1)+' kg</b></div></div>'+
+    '<p class="note">Le reste du poids ('+fmt(q*(100-n-p-k)/100,1)+' kg) est la partie qui porte les éléments (et parfois du soufre, du calcium ou du magnésium).</p>';
+  var el=$('#s-el').value, pr=PR[$('#s-prod').value], d=num('s-dose'), t=pr[el];
+  $('#s-out2').innerHTML = t>0 ? '<div class="kpis"><div class="kpi"><span>Engrais à apporter</span><b>'+fmt(d/t*100,0)+' kg/ha</b></div><div class="kpi"><span>Soit</span><b>'+fmt(d/t*100/50,1)+' sacs/ha</b></div></div>'
+    + ((pr.N&&el!=='N')||(pr.P&&el!=='P')||(pr.K&&el!=='K') ? '<p class="note">Cette quantité apporte aussi : '+['N','P','K'].filter(function(e){return e!==el&&pr[e];}).map(function(e){ return fmt(d/t*pr[e],0)+' kg '+(e==='N'?'N':e==='P'?'P₂O₅':'K₂O'); }).join(', ')+'.</p>':'')
+    : '<div class="msg warn">Cet engrais ne contient pas cet élément.</div>';
+}
+
+/* ---------- Prix ---------- */
+function prixUI(){
+  $('#prix-list').innerHTML='<div class="two">'+Object.keys(PR).filter(function(k){return k!=='sable';}).map(function(k){
+    return '<label class="f">'+esc(PR[k].n)+'<input type="number" min="0" step="500" inputmode="decimal" data-nomem data-pk="'+k+'" value="'+PR[k].prix+'"></label>'; }).join('')+'</div>';
+  MOD.$$('#prix-list input').forEach(function(i){ i.addEventListener('input', function(){ PR[i.dataset.pk].prix=Math.max(0,parseFloat(i.value)||0); savePrix(); melange(); dose(); }); });
+}
+$('#prix-reset').addEventListener('click', function(){ Object.keys(PRIX0).forEach(function(k){ PR[k].prix=PRIX0[k]; }); savePrix(); prixUI(); melange(); dose(); });
+
+/* ---------- Images ---------- */
+var INK='#17201A', G='#3E8A5A', GL='#7CB342', BR='#8D6E4A', SOIL='#C9A57A', GR='#F2C14E';
+function svg(w,h,body){ return '<svg viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg" font-family="Arial, sans-serif" role="img">'+body+'</svg>'; }
+function t(x,y,s,o){ o=o||{}; return '<text x="'+x+'" y="'+y+'" font-size="'+(o.fs||13)+'" fill="'+(o.c||INK)+'" text-anchor="'+(o.a||'middle')+'" font-weight="'+(o.b?'700':'400')+'">'+s+'</text>'; }
+function grains(cx,cy,r,n,col){ var s=''; for(var i=0;i<n;i++){ var a=i*2.399, d=r*Math.sqrt((i+.5)/n); s+='<circle cx="'+(cx+d*Math.cos(a)).toFixed(1)+'" cy="'+(cy+d*Math.sin(a)*.45).toFixed(1)+'" r="2.2" fill="'+(col||'#fff')+'" stroke="#888" stroke-width=".6"/>'; } return s; }
+function plantule(x,y,h){ return '<path d="M'+x+' '+y+'v-'+h+'" stroke="'+G+'" stroke-width="3"/><path d="M'+x+' '+(y-h*.6)+'c-14 -4 -18 -14 -18 -22 10 0 18 8 18 22zM'+x+' '+(y-h*.75)+'c14 -4 18 -14 18 -22 -10 0 -18 8 -18 22z" fill="'+GL+'"/>'; }
+function figPlace(){
+  var s='<rect width="640" height="300" fill="#fff"/>';
+  // 1 poquet
+  s+='<rect x="10" y="190" width="200" height="90" fill="'+SOIL+'"/>'+plantule(90,190,70)+'<path d="M128 190 q8 14 0 22 q-8 -8 0 -22" fill="#8a6a45"/>'+grains(128,203,7,7);
+  s+='<path d="M92 175 h34" stroke="#B3261E" stroke-width="1.5" marker-end="url(#ar)"/>'+t(110,168,'5–10 cm',{fs:11,c:'#B3261E'});
+  s+=t(110,30,'1. En poquet',{b:1,fs:15})+t(110,50,'Maïs, gombo, légumes :',{fs:12})+t(110,66,'un petit trou à côté du plant,',{fs:12})+t(110,82,'puis recouvrir de terre',{fs:12});
+  // 2 couronne
+  s+='<rect x="220" y="190" width="200" height="90" fill="'+SOIL+'"/>';
+  s+='<rect x="314" y="110" width="12" height="80" fill="'+BR+'"/><ellipse cx="320" cy="100" rx="80" ry="38" fill="'+G+'"/>';
+  s+='<ellipse cx="320" cy="200" rx="70" ry="12" fill="none" stroke="#fff" stroke-width="9" stroke-dasharray="3 3"/>'+'<line x1="250" y1="138" x2="250" y2="196" stroke="#B3261E" stroke-dasharray="4 3"/><line x1="390" y1="138" x2="390" y2="196" stroke="#B3261E" stroke-dasharray="4 3"/>';
+  s+=t(320,30,'2. En couronne',{b:1,fs:15})+t(320,50,'Arbres, bananier, cacao :',{fs:12})+t(320,66,'sous le bord du feuillage,',{fs:12})+t(320,82,'jamais contre le tronc',{fs:12})+t(320,266,'zone où sont les racines',{fs:11,c:'#fff',b:1});
+  // 3 bande/volée
+  s+='<rect x="430" y="190" width="200" height="90" fill="'+SOIL+'"/>';
+  for(var i=0;i<5;i++) s+=plantule(455+i*38,190,38);
+  s+='<line x1="445" y1="198" x2="620" y2="198" stroke="#fff" stroke-width="5" stroke-dasharray="2 3"/>';
+  s+=t(530,30,'3. En ligne ou à la volée',{b:1,fs:15})+t(530,50,'Riz, oignon, planches :',{fs:12})+t(530,66,'bien répartir sur sol humide,',{fs:12})+t(530,82,'griffer pour enfouir',{fs:12});
+  s='<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#B3261E"/></marker></defs>'+s;
+  return svg(640,300,s)+'<figcaption>Les 3 façons de placer l\'engrais. Les points blancs représentent les granulés.</figcaption>';
+}
+function figMix(){
+  var s='<rect width="640" height="230" fill="#fff"/><ellipse cx="320" cy="190" rx="300" ry="26" fill="#4a7fb5" opacity=".25"/>';
+  var items=[['Urée','#fff',90],['DAP','#6d5a4a',200],['KCl','#d98b6a',310]];
+  items.forEach(function(it){ s+='<path d="M'+(it[2]-45)+' 182 q45 -70 90 0z" fill="'+it[1]+'" stroke="#999"/>'+t(it[2],205,it[0],{b:1}); });
+  s+='<path d="M372 150 h40" stroke="'+INK+'" stroke-width="3" marker-end="url(#ar2)"/>';
+  s+='<path d="M430 182 q75 -100 150 0z" fill="#b7a089" stroke="#999"/>'+grains(505,160,40,40,'#fff')+grains(505,165,40,25,'#6d5a4a')+grains(505,170,40,20,'#d98b6a')+t(505,205,'Mélange régulier',{b:1});
+  s+='<path d="M560 60 l40 70" stroke="'+BR+'" stroke-width="5"/><path d="M590 120 l26 22 -14 12 -22 -24z" fill="#777"/>'+t(505,40,'Retourner 3 fois à la pelle',{fs:13});
+  s+=t(200,40,'Sur une bâche, à l\'ombre, peser chaque engrais',{fs:13});
+  s='<defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="'+INK+'"/></marker></defs>'+s;
+  return svg(640,230,s)+'<figcaption>Faire son mélange : les engrais pesés sont versés en tas puis retournés jusqu\'à une couleur régulière.</figcaption>';
+}
+function leaf(x,y,kind){
+  var base='#4E9A3F', p='M'+x+' '+(y+70)+' C'+(x-38)+' '+(y+40)+' '+(x-34)+' '+(y-10)+' '+x+' '+(y-40)+' C'+(x+34)+' '+(y-10)+' '+(x+38)+' '+(y+40)+' '+x+' '+(y+70)+'z';
+  var s='';
+  if(kind==='N') s+='<path d="'+p+'" fill="#D8D25A"/>';
+  else if(kind==='P') s+='<path d="'+p+'" fill="#3F6E3A"/><path d="'+p+'" fill="#7B3F8C" opacity=".45"/>';
+  else if(kind==='K') s+='<path d="'+p+'" fill="'+base+'"/><path d="'+p+'" fill="none" stroke="#8B5A2B" stroke-width="9"/><path d="'+p+'" fill="none" stroke="#D9B44A" stroke-width="3" transform="translate(0,0)"/>';
+  else if(kind==='Mg'){ s+='<path d="'+p+'" fill="#E2D96A"/>'; }
+  else s+='<path d="'+p+'" fill="'+base+'"/>';
+  // nervures
+  var nerv='<path d="M'+x+' '+(y+70)+'V'+(y-36)+'" stroke="'+(kind==='Mg'?'#3D8B3D':'#2E5E2A')+'" stroke-width="'+(kind==='Mg'?5:2)+'"/>';
+  for(var i=0;i<4;i++){ var yy=y+46-i*22; nerv+='<path d="M'+x+' '+yy+' l-22 -14M'+x+' '+yy+' l22 -14" stroke="'+(kind==='Mg'?'#3D8B3D':'#2E5E2A')+'" stroke-width="'+(kind==='Mg'?4:1.5)+'"/>'; }
+  return s+nerv;
+}
+function figCar(){
+  var s='<rect width="640" height="260" fill="#fff"/>';
+  var L=[['ok','Feuille saine','vert foncé','régulier'],['N','Manque d\'azote','vieilles feuilles','jaune clair'],['P','Manque de P','feuilles foncées,','violacées'],['K','Manque de K','bords brûlés','(vieilles feuilles)'],['Mg','Manque de Mg','jaune entre','les nervures']];
+  L.forEach(function(l,i){ var x=64+i*128; s+=leaf(x,90,l[0])+t(x,195,l[1],{b:1,fs:12})+t(x,213,l[2],{fs:11})+(l[3]?t(x,229,l[3],{fs:11}):''); });
+  return svg(640,260,s)+'<figcaption>Signes de carence les plus courants. Confirmez avec l\'agronome ou une analyse : une maladie ou un sol trop mouillé peuvent donner des signes proches.</figcaption>';
+}
+function figStock(){
+  var s='<rect width="640" height="220" fill="#fff"/><path d="M60 70 L320 20 L580 70 V200 H60z" fill="#EFEAE0" stroke="'+INK+'" stroke-width="2"/>';
+  s+='<rect x="100" y="178" width="300" height="12" fill="'+BR+'"/>';
+  for(var r=0;r<3;r++) for(var c=0;c<5;c++) s+='<rect x="'+(104+c*58)+'" y="'+(146-r*32)+'" width="54" height="30" rx="5" fill="#fff" stroke="#777"/>'+t(131+c*58,166-r*32,'50 kg',{fs:10});
+  s+='<line x1="410" y1="190" x2="410" y2="80" stroke="#B3261E" stroke-dasharray="4 3"/>'+t(470,110,'10 cm du mur',{fs:12,c:'#B3261E'})+t(250,210,'Palettes : les sacs ne touchent pas le sol',{fs:12});
+  s+='<rect x="470" y="130" width="70" height="40" fill="#bfe3f5" stroke="'+INK+'"/>'+t(505,185,'Aération',{fs:12});
+  s+='<g transform="translate(560,40)"><circle r="22" fill="#fff" stroke="#B3261E" stroke-width="4"/><path d="M-15 15L15 -15" stroke="#B3261E" stroke-width="4"/><path d="M-8 6c0-8 8-6 8-14 4 6 8 8 8 14 0 6-16 6-16 0z" fill="#E8833A"/></g>';
+  return svg(640,220,s)+'<figcaption>Magasin sec et aéré, sacs sur palettes, loin du feu, de la nourriture et des enfants.</figcaption>';
+}
+$('#fig-place').innerHTML=figPlace(); $('#fig-mix').innerHTML=figMix(); $('#fig-car').innerHTML=figCar(); $('#fig-stock').innerHTML=figStock();
+$('#bp-print').addEventListener('click', function(){ MOD.print($('#bp-doc'),'Bonnes pratiques engrais'); });
+
+/* ---------- Démarrage ---------- */
+MOD.remember('agrodiag.engrais');
+if(!num('d-dens')) $('#d-dens').value=CUL[$('#d-cul').value].dens;
+prixUI();
+MOD.$$('#t-mel input,#t-mel select').forEach(function(e){ e.addEventListener('input', melange); });
+MOD.$$('#t-dose input,#t-dose select').forEach(function(e){ e.addEventListener('input', dose); });
+MOD.$$('#t-sac input,#t-sac select').forEach(function(e){ e.addEventListener('input', sac); });
+melange(); dose(); sac(); MOD.tabs();
+})();
+</script>
+</body>
+</html>

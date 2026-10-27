@@ -1,10 +1,10 @@
 {
-  "versionCode": 15,
-  "version": "1.9.1",
+  "versionCode": 16,
+  "version": "1.10.0",
   "apk": "https://github.com/yaoakafrancois-code/AgroDiagCI/releases/download/test/AgroDiag-CI-test.apk",
   "nouveautes": [
-    "Élevage d'escargots, de lapins et d'agoutis",
-    "Fiches techniques avec des images (élevage et cultures)",
-    "Avis automatique quand une nouvelle version sort"
+    "Formulation d'engrais chimiques : mélanges NPK, doses par culture, coût",
+    "Biopesticides et compost : recettes avec quantités calculées",
+    "Agroforesterie : fiches de diagnostic, cartographie GPS du champ et superficie réelle, fiche PDF"
   ]
 }

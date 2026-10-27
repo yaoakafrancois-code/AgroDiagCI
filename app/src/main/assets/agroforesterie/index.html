@@ -1,0 +1,961 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Agroforesterie · AKA AgroDiag CI</title>
+<link rel="stylesheet" href="../assets/fonts.css">
+<link rel="stylesheet" href="../assets/modules.css">
+<style>
+.kb-new{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin:6px 0 18px}
+.kb-new button{display:flex;gap:12px;align-items:center;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;font:inherit;color:inherit;cursor:pointer}
+.kb-new button b{display:block;font:700 1.15rem/1.15 var(--display)}
+.kb-new button span.s{color:var(--muted);font-size:.88rem}
+.kb-new .ic{flex:none;width:48px;height:48px;border-radius:12px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font:700 1.6rem var(--display)}
+.rec{display:flex;gap:10px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:8px 0}
+.rec .meta{font-size:.86rem;color:var(--muted)}
+.rec .acts{display:flex;gap:6px;flex-wrap:wrap}
+.rec .acts .btn{min-height:38px;padding:6px 12px;font-size:.92rem}
+.btn.danger{border-color:var(--crit);color:var(--crit);background:transparent}
+.wiz-top{position:sticky;top:0;z-index:6;background:var(--bg);padding:10px 0 8px;border-bottom:1px solid var(--line);margin:0 -16px;padding-inline:16px}
+.wiz-top .bar{height:6px;background:var(--sunk);border-radius:3px;overflow:hidden;margin-top:8px}
+.wiz-top .bar i{display:block;height:100%;background:var(--accent)}
+.wiz-top .ttl{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.wiz-top select{max-width:60%;margin:0;padding:6px 8px;font-size:.92rem}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:10px 0}
+.q > .lb{display:block;font-weight:700;margin-bottom:4px}
+.q > .lb .req{color:var(--crit)}
+.q .hint{display:block;font-size:.85rem;color:var(--muted);margin:-2px 0 6px}
+.q.err{border-color:var(--crit);box-shadow:0 0 0 1px var(--crit)}
+.q textarea{display:block;width:100%;min-height:90px;font:inherit;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.q input[type=date],.q input[type=tel]{display:block;width:100%;font:inherit;padding:10px 11px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts label{display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);cursor:pointer;font-weight:400}
+.opts label:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.opts input{width:20px;height:20px;accent-color:var(--accent);margin:0}
+.rep table td{padding:4px}
+.rep input{margin:0}
+.wiz-nav{display:flex;gap:8px;justify-content:space-between;margin:16px 0 8px;flex-wrap:wrap}
+.calc{background:var(--sunk);border-radius:9px;padding:10px 12px;font-size:.95rem}
+.mapbox svg{display:block;width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:9px}
+.gpsmsg{font-size:.92rem;margin:8px 0;min-height:1.4em}
+.sigpad{display:block;width:100%;height:170px;background:#fff;border:1px dashed var(--muted);border-radius:8px;touch-action:none}
+.photos{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.photos figure{margin:0;position:relative}
+.photos img{width:110px;height:110px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+.photos button{position:absolute;top:4px;right:4px;width:28px;height:28px;border-radius:50%;border:0;background:rgba(0,0,0,.65);color:#fff;font-size:16px;line-height:28px;padding:0}
+.big-btn{width:100%;min-height:54px;font-size:1.1rem}
+.walking{animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.75}}
+</style>
+<style id="shell-back">
+.shell-bar{position:relative;z-index:1000;background:#17694A;padding:6px 12px}
+.shell-back{display:inline-flex;align-items:center;gap:6px;min-height:36px;font:600 15px system-ui,sans-serif;text-decoration:none;color:#fff}
+@media print{.shell-bar{display:none}}
+</style></head>
+<body><div class="shell-bar"><a class="shell-back" href="../index.html" aria-label="Retour à l'accueil">&#8592; Accueil · AKA AgroDiag CI</a></div>
+<div class="wrap">
+<header class="app">
+  <svg width="44" height="44" viewBox="0 0 36 36" aria-hidden="true"><path d="M12 31V19m12 12V15" stroke="#8D6E4A" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="14" r="6" fill="none" stroke="#17694A" stroke-width="2.4"/><circle cx="24" cy="10" r="7" fill="none" stroke="#17694A" stroke-width="2.4"/><path d="M4 31h28" stroke="#17694A" stroke-width="2.4" stroke-linecap="round"/></svg>
+  <div><h1>Agroforesterie</h1><p>Collecte de terrain, cartographie GPS des parcelles, fiches imprimables</p></div>
+</header>
+
+<nav class="tabs" aria-label="Rubriques" id="mainnav"><div class="row" role="tablist">
+  <button role="tab" data-tab="t-col">Collecte</button>
+  <button role="tab" data-tab="t-plants">Calcul des plants</button>
+  <button role="tab" data-tab="t-guide">Guide technique</button>
+  <button role="tab" data-tab="t-esp">Essences</button>
+</div></nav>
+
+<!-- ============ COLLECTE (type Kobo) ============ -->
+<section class="tab" id="t-col">
+  <div id="col-home">
+    <h2>Nouvelle fiche</h2>
+    <div class="kb-new">
+      <button type="button" data-new="diag"><span class="ic">D</span><span><b>Diagnostic de plantation</b><span class="s">Producteur, verger cacao, sol, essences présentes, cartographie, besoins en plants</span></span></button>
+      <button type="button" data-new="regarn"><span class="ic">R</span><span><b>Visite avant regarnissage</b><span class="s">Parcelle de restauration : état, plants vivants et morts, besoins, travaux à prévoir</span></span></button>
+      <button type="button" data-new="carto"><span class="ic">C</span><span><b>Cartographie seule</b><span class="s">Faire le tour d'un champ pour connaître sa superficie réelle</span></span></button>
+    </div>
+    <h2>Mes fiches</h2>
+    <div id="col-sum" class="kpis"></div>
+    <label class="f" style="max-width:420px">Rechercher (producteur, village)<input type="text" id="col-q" data-nomem placeholder="Tapez un nom"></label>
+    <div id="col-list"></div>
+    <h3>Exporter toutes les fiches</h3>
+    <p class="note">Pour Excel, pour un ordinateur ou pour le superviseur. Les cartes s'ouvrent dans Google Earth (KML) ou dans QGIS (GeoJSON).</p>
+    <div class="btns">
+      <button class="btn sec" type="button" data-exp="csv-diag">Excel : diagnostics (.csv)</button>
+      <button class="btn sec" type="button" data-exp="csv-regarn">Excel : visites regarnissage (.csv)</button>
+      <button class="btn sec" type="button" data-exp="csv-carto">Excel : cartographies (.csv)</button>
+      <button class="btn sec" type="button" data-exp="kml">Cartes Google Earth (.kml)</button>
+      <button class="btn sec" type="button" data-exp="geojson">Cartes SIG (.geojson)</button>
+      <button class="btn sec" type="button" data-exp="json">Sauvegarde complète (.json)</button>
+      <label class="btn sec" style="cursor:pointer">Importer une sauvegarde<input type="file" id="imp" accept=".json,application/json" hidden></label>
+    </div>
+    <p class="gpsmsg" id="exp-msg"></p>
+    <details class="acc"><summary>Réglages des fiches</summary><div>
+      <label class="f">Nom du projet ou de la structure (en haut des fiches imprimées)<input type="text" id="cfg-projet" data-nomem placeholder="ex. Projet de restauration – Région de l'Agnéby-Tiassa"></label>
+      <label class="f">Nom de l'agent de terrain (rempli automatiquement)<input type="text" id="cfg-agent" data-nomem></label>
+    </div></details>
+  </div>
+  <div id="col-form" hidden></div>
+</section>
+
+<!-- ============ CALCUL DES PLANTS ============ -->
+<section class="tab" id="t-plants" hidden>
+  <h2>Combien de plants commander ?</h2>
+  <p class="lead">Selon la surface, l'écartement et la disposition, avec une marge pour remplacer les plants qui meurent.</p>
+  <div class="grid">
+    <div class="panel">
+      <label class="f">Type de plantation<select id="p-type">
+        <option value="20x20">Arbres d'ombrage dans le cacao (20 × 20 m)</option>
+        <option value="5x5">Restauration forestière (5 × 5 m, 400/ha)</option>
+        <option value="3x3">Cacao (3 × 3 m)</option>
+        <option value="8x8">Fruitiers (8 × 8 m)</option>
+        <option value="4x1">Haie de fertilité en couloirs (lignes à 4 m, plants à 1 m)</option>
+        <option value="perso">Autre écartement</option></select></label>
+      <div class="two"><label class="f">Surface (ha)<input type="number" id="p-s" value="1" min="0" step="0.1" inputmode="decimal"></label>
+      <label class="f">Disposition<select id="p-disp"><option value="carre">En carré</option><option value="quinc">En quinconce (triangle)</option></select></label></div>
+      <div class="two"><label class="f">Écart entre lignes (m)<input type="number" id="p-x" value="20" min="0.2" step="0.5" inputmode="decimal"></label>
+      <label class="f">Écart sur la ligne (m)<input type="number" id="p-y" value="20" min="0.2" step="0.5" inputmode="decimal"></label></div>
+      <label class="f">Marge pour le remplacement (%)<small>10 à 20 % selon la saison et l'entretien</small><input type="number" id="p-m" value="15" min="0" max="100" step="5" inputmode="decimal"></label>
+      <label class="f">Plants en bordure (facultatif) : périmètre du champ (m)<small>Haie vive ou arbres de limite ; 0 si aucun</small><input type="number" id="p-per" value="0" min="0" step="10" inputmode="decimal"></label>
+      <label class="f">Espacement en bordure (m)<input type="number" id="p-pe" value="5" min="0.5" step="0.5" inputmode="decimal"></label>
+    </div>
+    <div id="p-out"></div>
+  </div>
+</section>
+
+<!-- ============ GUIDE ============ -->
+<section class="tab" id="t-guide" hidden>
+  <div id="g-doc">
+  <h2>L'agroforesterie : des arbres dans les champs</h2>
+  <p class="lead">Associer des arbres aux cultures protège le sol, garde l'humidité, ombrage le cacao, donne du bois, des fruits et des revenus en plus, et stocke du carbone.</p>
+  <div class="btns noprint"><button class="btn sec" type="button" id="g-print">Imprimer / enregistrer en PDF</button></div>
+  <h3>Un cacao agroforestier : les étages</h3>
+  <figure class="ill" id="fig-strates"></figure>
+  <h3>Les principaux systèmes</h3>
+  <div class="cards">
+    <div class="card"><h3>Cacao ou café sous ombrage</h3><p>18 à 25 arbres d'ombrage par hectare, tous les 20 à 25 m, pour environ 30 à 40 % d'ombre. Mélanger arbres forestiers (fraké, framiré, akpi) et fruitiers (avocatier, safoutier, agrumes).</p></div>
+    <div class="card"><h3>Cultures en couloirs</h3><p>Lignes de gliricidia ou d'acacia tous les 4 à 6 m, cultures vivrières entre les lignes. On coupe les arbustes 2 à 3 fois par an et les feuilles servent d'engrais vert.</p></div>
+    <div class="card"><h3>Haies vives et brise-vent</h3><p>Arbres en limite de parcelle : ils marquent la propriété, arrêtent le vent et le feu, et donnent du bois ou du fourrage.</p></div>
+    <div class="card"><h3>Jachère améliorée</h3><p>Planter acacia, pois d'Angole ou mucuna sur une terre fatiguée : en 2 à 3 ans le sol redevient fertile, au lieu de 8 à 10 ans.</p></div>
+    <div class="card"><h3>Restauration forestière</h3><p>Reboiser une parcelle dégradée avec des essences locales (souvent 400 plants/ha, 5 × 5 m), avec des cultures vivrières les premières années (taungya).</p></div>
+    <div class="card"><h3>Parcs arborés (centre et nord)</h3><p>Garder et protéger les karités, nérés, rôniers et baobabs dans les champs : fruits, beurre, ombre pour les animaux.</p></div>
+  </div>
+  <h3>Cultures en couloirs</h3>
+  <figure class="ill" id="fig-couloirs"></figure>
+  <h3>Bien planter un arbre</h3>
+  <figure class="ill" id="fig-plant"></figure>
+  <ol class="steps">
+    <li><b>Le bon moment</b> : au début de la saison des pluies, quand le sol est bien mouillé (sud : avril à juin et septembre–octobre ; centre : mai–juin ; nord : juin–juillet).</li>
+    <li><b>Le trou</b> : 40 × 40 × 40 cm (60 cm pour les fruitiers), creusé 2 semaines avant. Mettez la terre du dessus d'un côté, celle du fond de l'autre.</li>
+    <li><b>Remplir</b> : la terre du dessus mélangée à 3 à 5 kg de compost ou de fumier bien décomposé au fond du trou.</li>
+    <li><b>Enlever le sachet</b> plastique (sinon les racines s'enroulent et l'arbre meurt), sans casser la motte.</li>
+    <li><b>Le collet</b> (limite tige–racines) au niveau du sol. Tassez avec le pied, faites une cuvette pour garder l'eau.</li>
+    <li><b>Pailler</b> autour (sans toucher la tige), poser un tuteur, protéger des animaux si besoin.</li>
+    <li><b>Entretenir</b> : désherber un cercle de 1 m autour du plant 3 à 4 fois par an, pare-feu en saison sèche, remplacer les plants morts à la saison suivante.</li>
+  </ol>
+  <h3>Les erreurs à éviter</h3>
+  <ul class="clean">
+    <li>Planter en saison sèche ou à la fin des pluies.</li>
+    <li>Laisser le sachet plastique, ou enterrer le collet trop profond.</li>
+    <li>Brûler la parcelle pour la nettoyer : le feu tue les jeunes arbres.</li>
+    <li>Mettre dans le cacao des arbres hôtes du swollen shoot (fromager, colatier, poré-poré) ou très gourmands en eau (teck, eucalyptus).</li>
+    <li>Ne pas impliquer le propriétaire : sans accord écrit sur la propriété des arbres, ils sont souvent coupés.</li>
+  </ul>
+  </div>
+</section>
+
+<!-- ============ ESSENCES ============ -->
+<section class="tab" id="t-esp" hidden>
+  <h2>Les essences utiles</h2>
+  <p class="lead">Arbres courants en Côte d'Ivoire, classés comme dans les fiches de diagnostic. Touchez un filtre.</p>
+  <div class="opts" id="esp-f" style="margin-bottom:12px"></div>
+  <div class="tblw"><table id="esp-t"></table></div>
+</section>
+
+<p class="foot">Les fiches sont enregistrées dans ce téléphone. Exportez-les régulièrement (sauvegarde ou Excel) pour ne rien perdre.</p>
+</div>
+
+<script src="../assets/modules.js"></script>
+<script>
+(function(){
+'use strict';
+const $=MOD.$, $$=MOD.$$, fmt=MOD.fmt, esc=MOD.esc;
+
+/* =====================================================================
+   ESSENCES
+   ===================================================================== */
+// cat : o = œuvre / forestière, a = alimentaire, f = fertilitaire, n = nuisible au cacao
+const ESP = [
+  ['Fraké','Terminalia superba','o','Bois d\'œuvre, croissance rapide, bon ombrage du cacao','Sud, centre'],
+  ['Framiré','Terminalia ivorensis','o','Bois d\'œuvre de valeur, ombrage du cacao','Sud, centre'],
+  ['Akpi','Ricinodendron heudelotii','oa','Graines vendues (sauce), bois léger, ombrage du cacao','Sud, centre'],
+  ['Acajou','Khaya ivorensis / K. grandifoliola','o','Bois d\'œuvre de grande valeur','Sud, centre'],
+  ['Iroko','Milicia excelsa','o','Bois d\'œuvre de grande valeur, croissance lente','Sud, centre'],
+  ['Bété','Mansonia altissima','o','Bois d\'œuvre','Sud, centre'],
+  ['Samba (ayous)','Triplochiton scleroxylon','o','Bois d\'œuvre, croissance rapide (hôte possible du swollen shoot : à éloigner du cacao)','Sud, centre'],
+  ['Tiama','Entandrophragma angolense','o','Bois d\'œuvre','Sud'],
+  ['Kotibé','Nesogordonia papaverifera','o','Bois d\'œuvre','Sud, centre'],
+  ['Cedrela','Cedrela odorata','o','Bois d\'œuvre, croissance rapide','Sud, centre'],
+  ['Gmelina','Gmelina arborea','o','Bois de service, croissance très rapide (en bordure, pas dans le cacao)','Partout'],
+  ['Albizia','Albizia adianthifolia / A. zygia','of','Ombrage léger du cacao, fixe l\'azote','Sud, centre'],
+  ['Avocatier','Persea americana','a','Fruits, bon ombrage du cacao','Sud, centre'],
+  ['Safoutier','Dacryodes edulis','a','Fruits (safou), ombrage du cacao','Sud'],
+  ['Manguier','Mangifera indica','a','Fruits, ombre','Partout'],
+  ['Oranger, mandarinier, citronnier','Citrus spp.','a','Fruits, revenus réguliers','Sud, centre'],
+  ['Corossolier','Annona muricata','a','Fruits','Sud, centre'],
+  ['Cocotier','Cocos nucifera','a','Noix, bordure de parcelle','Littoral, sud'],
+  ['Bananier / plantain','Musa spp.','a','Ombrage temporaire des jeunes cacaoyers, nourriture','Sud, centre'],
+  ['Anacardier','Anacardium occidentale','a','Noix de cajou','Centre, nord'],
+  ['Karité','Vitellaria paradoxa','a','Amandes, beurre de karité (parcs arborés)','Nord'],
+  ['Néré','Parkia biglobosa','af','Soumbala, fixe l\'azote','Centre, nord'],
+  ['Moringa','Moringa oleifera','a','Feuilles très nutritives, haies','Partout'],
+  ['Gliricidia','Gliricidia sepium','f','Fixe l\'azote, haies, cultures en couloirs, tuteurs vivants','Partout'],
+  ['Acacia mangium','Acacia mangium','f','Fixe l\'azote, jachère améliorée, bois de chauffe (envahissant : ne pas planter près des forêts)','Sud, centre'],
+  ['Acacia auriculiformis','Acacia auriculiformis','f','Fixe l\'azote, jachère, bois de chauffe','Partout'],
+  ['Leucaena','Leucaena leucocephala','f','Fixe l\'azote, fourrage, couloirs (peut envahir : tailler)','Partout'],
+  ['Pois d\'Angole','Cajanus cajan','fa','Fixe l\'azote, graines comestibles, jachère courte','Partout'],
+  ['Erythrina','Erythrina spp.','f','Fixe l\'azote, tuteurs vivants, haies','Sud, centre'],
+  ['Fromager','Ceiba pentandra','n','Hôte du virus du swollen shoot du cacao : à éviter dans et autour des cacaoyères','Partout'],
+  ['Colatier','Cola nitida','na','Noix de cola, mais hôte du swollen shoot : à éviter dans les zones touchées','Sud, centre'],
+  ['Poré-poré','Sterculia tragacantha','n','Hôte du swollen shoot','Sud, centre'],
+  ['Teck','Tectona grandis','no','Bois d\'œuvre, mais concurrence forte (eau, ombre dense, sol nu) : pas dans le cacao','Centre, nord'],
+  ['Eucalyptus','Eucalyptus spp.','n','Consomme beaucoup d\'eau, rien ne pousse dessous : pas dans les cultures','Partout'],
+  ['Hévéa','Hevea brasiliensis','n','Concurrence le cacao (racines, ombre) : parcelles séparées','Sud']
+];
+const CATN={o:'Œuvre / forestière',a:'Alimentaire',f:'Fertilitaire',n:'Nuisible au cacao'};
+const CATC={o:'g',a:'o',f:'',n:'r'};
+function espUI(){
+  let sel='tout';
+  const f=$('#esp-f');
+  f.innerHTML=[['tout','Toutes']].concat(Object.entries(CATN)).map(([k,n])=>`<label><input type="radio" name="espf" value="${k}" ${k==='tout'?'checked':''}> ${n}</label>`).join('');
+  const draw=()=>{ $('#esp-t').innerHTML='<thead><tr><th>Nom</th><th>Catégorie</th><th>Usages et remarques</th><th>Zone</th></tr></thead><tbody>'+
+    ESP.filter(e=>sel==='tout'||e[2].includes(sel)).map(e=>`<tr><td><b>${esc(e[0])}</b><br><i class="note">${esc(e[1])}</i></td><td>${e[2].split('').map(c=>`<span class="chip ${CATC[c]}">${CATN[c]}</span>`).join(' ')}</td><td>${esc(e[3])}</td><td>${esc(e[4])}</td></tr>`).join('')+'</tbody>'; };
+  $$('input',f).forEach(i=>i.onchange=()=>{ sel=i.value; draw(); });
+  draw();
+}
+const DL = '<datalist id="dl-esp">'+ESP.map(e=>`<option value="${esc(e[0])}">`).join('')+'</datalist>';
+document.body.insertAdjacentHTML('beforeend', DL+'<datalist id="dl-reg">'+['Agnéby-Tiassa','Bafing','Bagoué','Bélier','Béré','Bounkani','Cavally','District d\'Abidjan','District de Yamoussoukro','Folon','Gbêkê','Gbôklé','Gôh','Gontougo','Grands-Ponts','Guémon','Hambol','Haut-Sassandra','Iffou','Indénié-Djuablin','Kabadougou','La Mé','Lôh-Djiboua','Marahoué','Moronou','Nawa','N\'Zi','Poro','San-Pédro','Sud-Comoé','Tchologo','Tonkpi','Worodougou'].map(r=>`<option value="${esc(r)}">`).join('')+'</datalist>');
+
+/* =====================================================================
+   GÉOMÉTRIE
+   ===================================================================== */
+function proj(pts){
+  const lat0=pts.reduce((s,p)=>s+p.lat,0)/pts.length, lon0=pts.reduce((s,p)=>s+p.lon,0)/pts.length;
+  const kx=111320*Math.cos(lat0*Math.PI/180), ky=110574;
+  return {lat0,lon0,xy:pts.map(p=>[(p.lon-lon0)*kx,(p.lat-lat0)*ky])};
+}
+function geoStats(pts){
+  if(!pts || pts.length<2) return {area:0,perim:0,n:pts?pts.length:0,sides:[]};
+  const {xy,lat0,lon0}=proj(pts); let a=0, per=0; const sides=[];
+  for(let i=0;i<xy.length;i++){ const p=xy[i], q=xy[(i+1)%xy.length]; a+=p[0]*q[1]-q[0]*p[1]; const d=Math.hypot(q[0]-p[0],q[1]-p[1]); sides.push(d); if(i<xy.length-1||xy.length>2) per+=d; }
+  const accs=pts.map(p=>p.acc).filter(x=>x>0), accM = accs.length? accs.reduce((s,x)=>s+x,0)/accs.length : 0;
+  const area = pts.length>2 ? Math.abs(a)/2 : 0;
+  // centre de gravité
+  let cx=0, cy=0; if(area>0){ let A=0; for(let i=0;i<xy.length;i++){ const p=xy[i], q=xy[(i+1)%xy.length], c=p[0]*q[1]-q[0]*p[1]; A+=c; cx+=(p[0]+q[0])*c; cy+=(p[1]+q[1])*c; } cx/=3*A; cy/=3*A; }
+  const kx=111320*Math.cos(lat0*Math.PI/180);
+  return {area, perim:per, n:pts.length, sides, accM, incert: pts.length>2 ? per*Math.min(accM||5, 30)*0.5 : 0,
+    centre:{lat:lat0+cy/110574, lon:lon0+cx/kx}, croise: pts.length>3 && selfCross(xy)};
+}
+function selfCross(xy){
+  const n=xy.length, seg=i=>[xy[i],xy[(i+1)%n]];
+  const ccw=(a,b,c)=>(c[1]-a[1])*(b[0]-a[0])>(b[1]-a[1])*(c[0]-a[0]);
+  const inter=(a,b,c,d)=>ccw(a,c,d)!==ccw(b,c,d) && ccw(a,b,c)!==ccw(a,b,d);
+  for(let i=0;i<n;i++) for(let j=i+2;j<n;j++){ if(i===0 && j===n-1) continue; const s=seg(i), t=seg(j); if(inter(s[0],s[1],t[0],t[1])) return true; }
+  return false;
+}
+function dist(a,b){ const {xy}=proj([a,b]); return Math.hypot(xy[1][0]-xy[0][0], xy[1][1]-xy[0][1]); }
+const fmtHa = m2 => fmt(m2/10000, m2<10000?3:2)+' ha';
+const fmtSurf = m2 => m2>=10000 ? fmtHa(m2) : `${fmt(m2/10000,3)} ha (${fmt(m2)} m²)`;
+
+function mapSVG(pts, opt){
+  opt=opt||{}; const W=640, H=opt.h||460, pad=46;
+  if(!pts || !pts.length) return `<svg viewBox="0 0 ${W} 150" xmlns="http://www.w3.org/2000/svg"><rect width="${W}" height="150" fill="#fff"/><text x="${W/2}" y="70" text-anchor="middle" font-size="15" fill="#566259" font-family="Arial">Le contour du champ apparaîtra ici.</text><text x="${W/2}" y="94" text-anchor="middle" font-size="13" fill="#566259" font-family="Arial">Placez-vous à un coin du champ et touchez « Marcher le contour ».</text></svg>`;
+  const all = opt.wp ? pts.concat([opt.wp]) : pts;
+  const {xy,lat0,lon0}=proj(all);
+  const xs=xy.map(p=>p[0]), ys=xy.map(p=>p[1]);
+  const minX=Math.min(...xs), maxX=Math.max(...xs), minY=Math.min(...ys), maxY=Math.max(...ys);
+  const sc=Math.min((W-2*pad)/Math.max(maxX-minX,20), (H-2*pad-34)/Math.max(maxY-minY,20));
+  const cx=(minX+maxX)/2, cy=(minY+maxY)/2;
+  const P=p=>[+(W/2+(p[0]-cx)*sc).toFixed(1), +((H-34)/2+(cy-p[1])*sc).toFixed(1)];
+  const sp=xy.slice(0,pts.length).map(P);
+  const st=geoStats(pts);
+  // grille et échelle
+  const target=(W*0.25)/sc, pw=Math.pow(10,Math.floor(Math.log10(target))), nice=[1,2,5,10].map(m=>m*pw).filter(v=>v<=target).pop()||pw, bar=nice*sc;
+  let grid=''; const g0x=Math.floor((minX-pad/sc)/nice)*nice, g0y=Math.floor((minY-pad/sc)/nice)*nice;
+  for(let gx=g0x; gx<=maxX+pad/sc; gx+=nice){ const X=P([gx,0])[0]; if(X>0&&X<W) grid+=`<line x1="${X}" y1="0" x2="${X}" y2="${H-34}" stroke="#E7EBE3"/>`; }
+  for(let gy=g0y; gy<=maxY+pad/sc; gy+=nice){ const Y=P([0,gy])[1]; if(Y>0&&Y<H-34) grid+=`<line x1="0" y1="${Y}" x2="${W}" y2="${Y}" stroke="#E7EBE3"/>`; }
+  const closed = pts.length>2 && !opt.open;
+  const shape = closed ? `<polygon points="${sp.map(p=>p.join(',')).join(' ')}" fill="${st.croise?'#F7E1DF':'#DCEDE3'}" fill-opacity=".85" stroke="${st.croise?'#B3261E':'#17694A'}" stroke-width="2.5" stroke-linejoin="round"/>`
+    : `<polyline points="${sp.map(p=>p.join(',')).join(' ')}" fill="none" stroke="#17694A" stroke-width="2.5" stroke-linejoin="round"/>` + (pts.length>2 ? `<line x1="${sp[sp.length-1][0]}" y1="${sp[sp.length-1][1]}" x2="${sp[0][0]}" y2="${sp[0][1]}" stroke="#17694A" stroke-width="2" stroke-dasharray="6 5"/>`:'');
+  const every = pts.length<=30 ? 1 : Math.ceil(pts.length/25);
+  const vtx = sp.map((p,i)=> (i%every===0) ? `<circle cx="${p[0]}" cy="${p[1]}" r="${pts.length<=30?12:9}" fill="#17694A"/><text x="${p[0]}" y="${p[1]+3.5}" font-size="${pts.length<=30?13:10}" text-anchor="middle" fill="#fff" font-weight="700" font-family="Arial">${i+1}</text>` : `<circle cx="${p[0]}" cy="${p[1]}" r="2.5" fill="#17694A"/>`).join('');
+  const side = closed && pts.length<=16 ? sp.map((p,i)=>{ const q=sp[(i+1)%sp.length]; return `<text x="${(p[0]+q[0])/2}" y="${(p[1]+q[1])/2-6}" font-size="14" text-anchor="middle" fill="#566259" font-family="Arial">${fmt(st.sides[i])} m</text>`; }).join('') : '';
+  let wp=''; if(opt.wp){ const w=P(xy[xy.length-1]); wp=`<path d="M${w[0]} ${w[1]} l-7 -16 a8 8 0 1 1 14 0z" fill="#B3261E"/><circle cx="${w[0]}" cy="${w[1]-19}" r="3" fill="#fff"/>`; }
+  let me=''; if(opt.me){ const m=proj(all.concat([opt.me])).xy.pop(); const M=P(m); me=`<circle cx="${M[0]}" cy="${M[1]}" r="${Math.max(6,Math.min(60,(opt.me.acc||5)*sc))}" fill="#4a7fb5" opacity=".18"/><circle cx="${M[0]}" cy="${M[1]}" r="7" fill="#4a7fb5" stroke="#fff" stroke-width="2"/>`; }
+  const start = sp.length ? `<text x="${sp[0][0]+12}" y="${sp[0][1]-10}" font-size="15" fill="#17694A" font-weight="700" font-family="Arial">Départ</text>` : '';
+  const foot = closed ? `Superficie : ${fmtSurf(st.area)} · périmètre ${fmt(st.perim)} m · ${pts.length} points` : `${pts.length} point${pts.length>1?'s':''} · ${fmt(st.perim)} m parcourus`;
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" font-family="Arial">
+  <rect width="${W}" height="${H}" fill="#fff"/>${grid}${shape}${side}${vtx}${start}${wp}${me}
+  <g transform="translate(${W-34},40)"><polygon points="0,-24 9,5 0,-2 -9,5" fill="#17201A"/><text x="0" y="23" font-size="17" text-anchor="middle" font-weight="700" fill="#17201A">N</text></g>
+  <g transform="translate(18,${H-58})"><rect x="0" y="-8" width="${bar}" height="8" fill="#17201A"/><rect x="${bar/2}" y="-8" width="${bar/2}" height="8" fill="#fff" stroke="#17201A"/><text x="0" y="13" font-size="14" fill="#17201A">0</text><text x="${bar}" y="13" font-size="14" text-anchor="middle" fill="#17201A">${fmt(nice)} m</text></g>
+  <rect x="0" y="${H-34}" width="${W}" height="34" fill="#17694A"/><text x="${W/2}" y="${H-11}" font-size="${foot.length>60?15:18}" text-anchor="middle" fill="#fff" font-weight="700">${foot}</text>
+  </svg>`;
+}
+
+/* =====================================================================
+   STOCKAGE (IndexedDB, repli localStorage)
+   ===================================================================== */
+const DB={ db:null, mem:null,
+  open(){ return new Promise(res=>{ try{ const r=indexedDB.open('agrodiag-agroforesterie',1); r.onupgradeneeded=()=>r.result.createObjectStore('fiches',{keyPath:'id'}); r.onsuccess=()=>{ DB.db=r.result; res(); }; r.onerror=()=>res(); }catch(e){ res(); } }); },
+  tx(mode){ return DB.db.transaction('fiches',mode).objectStore('fiches'); },
+  lsAll(){ try{ return JSON.parse(localStorage.getItem('agrodiag.agrof.fiches')||'[]'); }catch(e){ return []; } },
+  all(){ if(!DB.db) return Promise.resolve(DB.lsAll()); return new Promise((res,rej)=>{ const r=DB.tx('readonly').getAll(); r.onsuccess=()=>res(r.result||[]); r.onerror=()=>rej(r.error); }); },
+  put(rec){ if(!DB.db){ const a=DB.lsAll().filter(x=>x.id!==rec.id); a.push(rec); localStorage.setItem('agrodiag.agrof.fiches', JSON.stringify(a)); return Promise.resolve(); }
+    return new Promise((res,rej)=>{ const r=DB.tx('readwrite').put(rec); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); }); },
+  del(id){ if(!DB.db){ localStorage.setItem('agrodiag.agrof.fiches', JSON.stringify(DB.lsAll().filter(x=>x.id!==id))); return Promise.resolve(); }
+    return new Promise((res,rej)=>{ const r=DB.tx('readwrite').delete(id); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); }); }
+};
+const cfg = { get(k,d){ try{ return localStorage.getItem('agrodiag.agrof.'+k) ?? d; }catch(e){ return d; } }, set(k,v){ try{ localStorage.setItem('agrodiag.agrof.'+k,v); }catch(e){} } };
+function agentDefaut(){ const a=cfg.get('agent',''); if(a) return a; try{ const p=JSON.parse(localStorage.getItem('agrodiag.profil')||'null'); if(p) return [p.nom,p.prenoms].filter(Boolean).join(' '); }catch(e){} return ''; }
+
+/* =====================================================================
+   FORMULAIRES (définition type Kobo)
+   ===================================================================== */
+const today=()=>new Date().toISOString().slice(0,10);
+function campagne(dec){ const d=new Date(), y=d.getMonth()>=9?d.getFullYear():d.getFullYear()-1; const s=y-dec; return `${s}-${s+1}`; }
+const ON=['Oui','Non'], NO=['Non','Oui'];
+const yes = (d,k)=>d[k]==='Oui';
+const numv = v=>{ const n=parseFloat(String(v??'').replace(',','.')); return isFinite(n)?n:0; };
+const supHa = d=>{ const st=geoStats((d.carto&&d.carto.pts)||[]); return st.area>0 ? st.area/10000 : numv(d.sup_manuelle); };
+const repTot = r=>(r||[]).reduce((s,x)=>s+numv(x.q),0);
+
+const FORMS = {
+ diag: { titre:'Diagnostic de plantation – Agroforesterie', court:'Diagnostic', sections:[
+  {t:'I. Localisation', f:[
+    {k:'date', t:'date', l:'Date', req:1, def:today},
+    {k:'region', t:'text', l:'Région', list:'dl-reg', req:1},
+    {k:'departement', t:'text', l:'Département'},
+    {k:'sp', t:'text', l:'Sous-préfecture'},
+    {k:'village', t:'text', l:'Village / campement', req:1},
+    {k:'gps', t:'geopoint', l:'Coordonnées GPS de localisation', hint:'Placez-vous à l\'entrée de la parcelle ou au campement.'}]},
+  {t:'II. Identification du producteur', f:[
+    {k:'nom', t:'text', l:'Nom et prénoms du producteur', req:1},
+    {k:'sexe', t:'one', l:'Sexe du producteur', o:['Femme','Homme'], req:1},
+    {k:'naiss', t:'date', l:'Date de naissance'},
+    {k:'piece', t:'text', l:'Numéro de la pièce d\'identité'},
+    {k:'etude', t:'one', l:'Niveau d\'étude', o:['Non scolarisé','Primaire','Secondaire','Supérieur']},
+    {k:'tel', t:'tel', l:'Téléphone du producteur'}]},
+  {t:'III. Le verger – statistiques globales', f:[
+    {k:'nb_plant', t:'int', l:'Combien de plantations disposez-vous ?'},
+    {k:'sup_valeur', t:'dec', l:'Superficie totale mise en valeur', u:'ha'},
+    {k:'sup_cacao', t:'dec', l:'Superficie totale en production (cacao)', u:'ha'},
+    {k:'an_prem', t:'int', l:'Première année de création (cacao)', min:1950, max:2030},
+    {k:'an_der', t:'int', l:'Dernière année de création (cacao)', min:1950, max:2030},
+    {k:'rec1', t:'dec', l:()=>`Quantité récoltée en ${campagne(2)}`, u:'kg'},
+    {k:'rec2', t:'dec', l:()=>`Quantité récoltée en ${campagne(1)}`, u:'kg'},
+    {k:'rdt', t:'calc', l:'Rendement de la dernière campagne', v:d=>{ const s=numv(d.sup_cacao), r=numv(d.rec2); return s>0&&r>0 ? `<b>${fmt(r/s)} kg/ha</b>` + (r/s<400?' · faible (la moyenne nationale tourne autour de 400 à 500 kg/ha)':'') : 'Renseignez la superficie en production et la récolte.'; }},
+    {k:'titre', t:'many', l:'Titre de propriété des plantations : de quel document disposez-vous ?', o:['Titre foncier','Certificat foncier','Attestation villageoise et autres','Aucun document']}]},
+  {t:'III. État de la parcelle et du sol', f:[
+    {k:'sol', t:'one', l:'Type de sol', o:['Sableux','Argileux','Gravillonnaire','Limoneux'], autre:1},
+    {k:'pente', t:'one', l:'La parcelle est-elle en pente ?', o:['Non (plat)','Pente faible','Pente forte']},
+    {k:'eau', t:'one', l:'Avez-vous un point d\'eau (fleuve, rivière, barrage) ?', o:ON},
+    {k:'eau_p', t:'text', l:'Lequel ?', rel:d=>yes(d,'eau')},
+    {k:'org', t:'one', l:'Faites-vous des apports de fumier ou compost ?', o:ON},
+    {k:'org_q', t:'text', l:'Apport en quoi, et quelle quantité ?', rel:d=>yes(d,'org')},
+    {k:'amd', t:'one', l:'Faites-vous des amendements (chaux, dolomie…) ?', o:ON},
+    {k:'amd_q', t:'text', l:'Amendement en quoi, et quelle quantité ?', rel:d=>yes(d,'amd')},
+    {k:'fol', t:'one', l:'Utilisez-vous des engrais (sol ou foliaires) ?', o:ON},
+    {k:'fol_q', t:'text', l:'Lesquels, et quelle quantité ?', rel:d=>yes(d,'fol')},
+    {k:'trait', t:'many', l:'Traitements faits souvent', o:['Herbicides','Insecticides','Fongicides','Aucun']}]},
+  {t:'III. La parcelle cacaoyère', f:[
+    {k:'variete', t:'one', l:'Variété cultivée', o:['CNRA (Mercedes)','Française (amelonado)','Ghana','Tout-venant']},
+    {k:'densite', t:'one', l:'Densité par hectare', o:['1 000','1 320','1 500','Autre']},
+    {k:'densite_a', t:'int', l:'Densité (pieds/ha)', rel:d=>d.densite==='Autre'},
+    {k:'malades', t:'int', l:'Nombre de plants malades'},
+    {k:'nonprod', t:'int', l:'Nombre de plants qui ne produisent pas'},
+    {k:'mal', t:'one', l:'Êtes-vous confronté à des maladies ou ravageurs ?', o:ON},
+    {k:'mal_l', t:'many', l:'Lesquels ?', o:['Swollen shoot','Pourriture brune','Mirides (capsides)','Foreurs de tiges','Loranthus (gui)','Chenilles défoliatrices'], autre:1, rel:d=>yes(d,'mal')},
+    {k:'tv', t:'one', l:'Faites-vous des traitements de votre verger ?', o:ON},
+    {k:'tv_n', t:'int', l:'Combien de fois dans l\'année ?', rel:d=>yes(d,'tv')},
+    {k:'faible', t:'one', l:'Pensez-vous que votre production est faible ?', o:ON},
+    {k:'faible_r', t:'many', l:'Si oui, pour quelles raisons ?', o:['Vieux verger','Maladies','Manque d\'entretien','Pas d\'engrais','Sol pauvre','Trop ou pas assez d\'ombre','Sécheresse'], autre:1, rel:d=>yes(d,'faible')}]},
+  {t:'IV. Cartographie de la parcelle', f:[
+    {k:'carto', t:'geoshape', l:'Contour de la parcelle (mapping)', hint:'Faites le tour complet du champ en marchant le long de la limite. La superficie réelle est calculée automatiquement.'},
+    {k:'sup_manuelle', t:'dec', l:'Superficie (si le mapping n\'a pas pu être fait)', u:'ha', rel:d=>!(d.carto&&d.carto.pts&&d.carto.pts.length>2)},
+    {k:'sup_dec', t:'calc', l:'Comparaison avec la superficie déclarée', v:d=>{ const r=supHa(d), dcl=numv(d.sup_cacao); if(!(r>0&&dcl>0)) return 'Disponible après le mapping et la superficie déclarée (section III).'; const e=(r-dcl)/dcl*100; return `Déclarée ${fmt(dcl,2)} ha · réelle <b>${fmt(r,2)} ha</b> · écart <b>${e>0?'+':''}${fmt(e,0)} %</b>`; }}]},
+  {t:'IV. Essences présentes dans la parcelle', f:[
+    {k:'e_princ', t:'rep', l:'Essences principales (arbres forestiers)', list:'dl-esp'},
+    {k:'e_alim', t:'rep', l:'Essences alimentaires', list:'dl-esp'},
+    {k:'e_nuis', t:'rep', l:'Essences nuisibles', list:'dl-esp', hint:'Fromager, colatier, poré-poré (swollen shoot), teck, eucalyptus…'},
+    {k:'e_fert', t:'rep', l:'Essences fertilitaires', list:'dl-esp'},
+    {k:'e_tot', t:'calc', l:'Arbres associés', v:d=>{ const n=repTot(d.e_princ)+repTot(d.e_alim)+repTot(d.e_fert), s=supHa(d); return `<b>${fmt(n)}</b> arbres utiles` + (s>0 ? ` · <b>${fmt(n/s,1)} arbres/ha</b>` + (n/s<18 ? ' · en dessous du repère de 18 à 25 arbres/ha : à enrichir' : '') : '') + (repTot(d.e_nuis)?` · ${fmt(repTot(d.e_nuis))} arbres nuisibles`:''); }},
+    {k:'obs', t:'textarea', l:'Observation générale et conclusion'}]},
+  {t:'A. Besoins en plants', f:[
+    {k:'b_oeuvre', t:'rep', l:'Plants d\'œuvre', list:'dl-esp'},
+    {k:'b_alim', t:'rep', l:'Plants alimentaires', list:'dl-esp'},
+    {k:'b_fert', t:'rep', l:'Plants fertilitaires', list:'dl-esp'},
+    {k:'b_tot', t:'calc', l:'Total des plants demandés', v:d=>{ const o=repTot(d.b_oeuvre), a=repTot(d.b_alim), f=repTot(d.b_fert); return `Œuvre ${fmt(o)} · alimentaires ${fmt(a)} · fertilitaires ${fmt(f)} · <b>Total ${fmt(o+a+f)} plants</b>`; }}]},
+  {t:'Enquêteur, photos et signatures', f:[
+    {k:'date_int', t:'date', l:'Date de l\'interview', def:today},
+    {k:'agent', t:'text', l:'Nom de l\'agent collecteur', req:1, def:agentDefaut},
+    {k:'photos', t:'photo', l:'Photos de la parcelle', hint:'Prenez les photos avec l\'appareil photo du téléphone, puis choisissez-les ici (4 au maximum).'},
+    {k:'sig_agent', t:'sign', l:'Signature de l\'enquêteur'},
+    {k:'nom_rep', t:'text', l:'Nom du producteur ou de son représentant'},
+    {k:'sig_prod', t:'sign', l:'Signature du producteur ou de son représentant'}]}
+ ]},
+
+ regarn: { titre:'Fiche de visite et d\'état des lieux avant regarnissage', court:'Regarnissage', sections:[
+  {t:'Informations générales', f:[
+    {k:'date', t:'date', l:'Date de visite', req:1, def:today},
+    {k:'village', t:'text', l:'Localité / village', req:1},
+    {k:'campement', t:'text', l:'Campement / secteur'},
+    {k:'nom', t:'text', l:'Nom du producteur / propriétaire', req:1},
+    {k:'sup_rest', t:'dec', l:'Superficie restaurée déclarée', u:'ha'},
+    {k:'gps', t:'geopoint', l:'Coordonnées GPS (point de la parcelle)'},
+    {k:'date_plant', t:'date', l:'Date de plantation initiale'},
+    {k:'agents', t:'text', l:'Agents présents', def:agentDefaut},
+    {k:'present', t:'one', l:'Le producteur est-il présent ?', o:ON},
+    {k:'rencontre', t:'text', l:'Si non, personne rencontrée', rel:d=>d.present==='Non'}]},
+  {t:'Cartographie (facultatif)', f:[
+    {k:'carto', t:'geoshape', l:'Contour de la parcelle restaurée', hint:'Utile pour vérifier la superficie réelle et la densité de plants.'},
+    {k:'sup_cmp', t:'calc', l:'Superficie réelle', v:d=>{ const st=geoStats((d.carto&&d.carto.pts)||[]); if(!(st.area>0)) return 'Pas encore de mapping.'; const r=st.area/10000, dcl=numv(d.sup_rest); return `<b>${fmt(r,2)} ha</b>` + (dcl>0?` · déclarée ${fmt(dcl,2)} ha (écart ${fmt((r-dcl)/dcl*100,0)} %)`:''); }}]},
+  {t:'1. État général de la parcelle', f:[
+    {k:'acces', t:'one', l:'Accès à la parcelle', o:['Facile','Difficile','Très difficile'], prec:1},
+    {k:'entretien', t:'one', l:'Entretien actuel', o:['Bien entretenue','Moyen','Non entretenue'], prec:1},
+    {k:'concur', t:'one', l:'Végétation concurrente / mauvaises herbes', o:['Faible','Moyenne','Forte'], prec:1},
+    {k:'feu', t:'one', l:'Traces de feu', o:NO, prec:1},
+    {k:'herbi', t:'one', l:'Traces d\'herbicide', o:NO},
+    {k:'animaux', t:'one', l:'Dégâts d\'animaux / passage', o:NO, prec:1},
+    {k:'erosion', t:'one', l:'Érosion / sol dégradé / eau stagnante', o:NO, prec:1},
+    {k:'autres', t:'one', l:'Autres risques ou problèmes', o:NO, prec:1}]},
+  {t:'2. État des plants avant regarnissage', f:[
+    {k:'note2', t:'note', l:'Comptez les plants, ou utilisez des zones représentatives clairement identifiées. Inscrivez les nombres réellement observés : ne pas estimer automatiquement la densité à 400 plants/ha.'},
+    {k:'p_init', t:'int', l:'Nombre de plants initialement mis en terre (si connu)'},
+    {k:'p_viv', t:'int', l:'Nombre de plants vivants observés', req:1},
+    {k:'p_mort', t:'int', l:'Nombre de plants morts'},
+    {k:'p_manq', t:'int', l:'Nombre de plants manquants / emplacements vides'},
+    {k:'p_faib', t:'int', l:'Nombre de plants vivants mais faibles / malades'},
+    {k:'p_calc', t:'calc', l:'Taux de survie et densité', v:d=>{ const i=numv(d.p_init), v=numv(d.p_viv), m=numv(d.p_mort), q=numv(d.p_manq), s=supHa(d)||numv(d.sup_rest); let h=[];
+       if(i>0) h.push(`Taux de survie : <b>${fmt(v/i*100,0)} %</b>`); else if(v+m+q>0) h.push(`Taux de survie (vivants / emplacements comptés) : <b>${fmt(v/(v+m+q)*100,0)} %</b>`);
+       if(s>0 && v>0) h.push(`Densité observée : <b>${fmt(v/s)} plants vivants/ha</b>`);
+       if(i>0 && v+m+q>0 && Math.abs(v+m+q-i)>i*0.05) h.push(`<span style="color:var(--warn)">Attention : vivants + morts + manquants = ${fmt(v+m+q)}, différent des ${fmt(i)} plants mis en terre. Vérifiez le comptage.</span>`);
+       return h.join('<br>')||'Renseignez les nombres de plants.'; }},
+    {k:'esp_pres', t:'text', l:'Principales espèces encore présentes', list:'dl-esp'},
+    {k:'repart', t:'one', l:'Répartition des plants', o:['Assez régulière','Irrégulière','Zones vides importantes']},
+    {k:'causes', t:'many', l:'Causes probables des pertes', o:['Sécheresse','Feu','Mauvais entretien','Animaux','Inondation / ruissellement','Plants abîmés','Inconnue'], autre:1}]},
+  {t:'3. Besoins estimés de regarnissage', f:[
+    {k:'note3', t:'note', l:'À compléter après observation et échange avec le producteur. Les quantités doivent correspondre aux emplacements réellement à regarnir et aux espèces adaptées.'},
+    {k:'besoins', t:'rep', l:'Espèces à regarnir', list:'dl-esp', rem:1},
+    {k:'b_calc', t:'calc', l:'Total estimé', v:d=>{ const t=repTot(d.besoins), q=numv(d.p_manq)+numv(d.p_mort); return `<b>${fmt(t)} plants</b>` + (q>0 && t>0 && Math.abs(t-q)>q*0.25 ? ` · <span style="color:var(--warn)">${fmt(q)} emplacements vides ou morts comptés : vérifiez.</span>` : ''); }}]},
+  {t:'4. Travaux et mesures à prévoir', f:[
+    {k:'w_degag', t:'one', l:'Dégagement des emplacements', o:ON, prec:1},
+    {k:'w_desh', t:'one', l:'Entretien / désherbage préalable', o:ON, prec:1},
+    {k:'w_prot', t:'one', l:'Protection contre le feu ou les animaux', o:ON, prec:1},
+    {k:'w_acces', t:'one', l:'Mesure liée à l\'accès / au drainage', o:ON, prec:1},
+    {k:'w_sensi', t:'one', l:'Sensibilisation / consignes au producteur', o:ON, prec:1},
+    {k:'w_autre', t:'one', l:'Autre action', o:ON, prec:1}]},
+  {t:'5. Conclusion de la visite', f:[
+    {k:'reco', t:'one', l:'Regarnissage recommandé ?', o:['Oui','Non','À confirmer après vérification'], req:1},
+    {k:'q_tot', t:'int', l:'Quantité totale proposée (plants)', hint:'Laissez vide pour reprendre le total de la section 3.'},
+    {k:'date_prev', t:'date', l:'Date prévisionnelle de regarnissage'},
+    {k:'obs', t:'textarea', l:'Observations / réserves'},
+    {k:'photos', t:'photo', l:'Photos', hint:'4 photos au maximum.'},
+    {k:'photo_ref', t:'text', l:'Référence(s) des photos'},
+    {k:'agent', t:'text', l:'Agent de terrain', req:1, def:agentDefaut},
+    {k:'sig_agent', t:'sign', l:'Signature de l\'agent'},
+    {k:'nom_rep', t:'text', l:'Producteur / représentant'},
+    {k:'sig_prod', t:'sign', l:'Signature ou empreinte du producteur'},
+    {k:'superv', t:'text', l:'Superviseur ayant vérifié (si applicable)'},
+    {k:'date_sup', t:'date', l:'Date de vérification'}]}
+ ]},
+
+ carto: { titre:'Fiche de cartographie de parcelle', court:'Cartographie', sections:[
+  {t:'Parcelle', f:[
+    {k:'date', t:'date', l:'Date', req:1, def:today},
+    {k:'nom', t:'text', l:'Nom du producteur / propriétaire', req:1},
+    {k:'tel', t:'tel', l:'Téléphone'},
+    {k:'village', t:'text', l:'Village / campement', req:1},
+    {k:'region', t:'text', l:'Région', list:'dl-reg'},
+    {k:'culture', t:'text', l:'Culture ou usage de la parcelle', list:'dl-cult'},
+    {k:'sup_dec', t:'dec', l:'Superficie déclarée par le producteur', u:'ha'}]},
+  {t:'Cartographie', f:[
+    {k:'carto', t:'geoshape', l:'Contour du champ', req:1},
+    {k:'cmp', t:'calc', l:'Superficie réelle', v:d=>{ const st=geoStats((d.carto&&d.carto.pts)||[]); if(!(st.area>0)) return 'Faites le tour du champ.'; const r=st.area/10000, dcl=numv(d.sup_dec); return `<b>${fmt(r,2)} ha</b> · périmètre ${fmt(st.perim)} m` + (dcl>0?` · déclarée ${fmt(dcl,2)} ha (écart ${fmt((r-dcl)/dcl*100,0)} %)`:''); }},
+    {k:'obs', t:'textarea', l:'Observations (limites, voisins, litiges…)'},
+    {k:'photos', t:'photo', l:'Photos'},
+    {k:'agent', t:'text', l:'Agent', def:agentDefaut},
+    {k:'sig_prod', t:'sign', l:'Signature du producteur'}]}
+ ]}
+};
+document.body.insertAdjacentHTML('beforeend','<datalist id="dl-cult">'+['Cacao','Café','Hévéa','Palmier à huile','Anacarde','Riz','Maïs','Manioc','Igname','Banane plantain','Maraîchage','Restauration forestière','Jachère'].map(c=>`<option value="${c}">`).join('')+'</datalist>');
+
+/* =====================================================================
+   ÉDITEUR DE FICHE (assistant section par section)
+   ===================================================================== */
+let CUR=null, SEC=0, saveT=null;
+const fdef = ()=>FORMS[CUR.type];
+const fields = ()=>fdef().sections.flatMap(s=>s.f);
+const lbl = f=>typeof f.l==='function' ? f.l() : f.l;
+const visible = f=>!f.rel || f.rel(CUR.data);
+
+function newRec(type){
+  const rec={ id:'F'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), type, statut:'brouillon', cree:new Date().toISOString(), modifie:new Date().toISOString(), data:{} };
+  FORMS[type].sections.forEach(s=>s.f.forEach(f=>{ if(f.def){ const v=f.def(); if(v) rec.data[f.k]=v; } }));
+  return rec;
+}
+function autosave(){ clearTimeout(saveT); saveT=setTimeout(()=>{ CUR.modifie=new Date().toISOString(); DB.put(CUR).catch(e=>flash('Enregistrement impossible : mémoire du téléphone pleine ?', 'crit')); }, 400); }
+function flash(m,cls){ const el=$('#wiz-msg'); if(el){ el.className='msg '+(cls||'ok'); el.innerHTML=m; el.hidden=false; } }
+
+function openForm(rec, sec){
+  CUR=rec; SEC=sec||0; stopWalk();
+  $('#col-home').hidden=true; $('#col-form').hidden=false; $('#mainnav').hidden=true;
+  renderSection(); window.scrollTo(0,0);
+}
+function closeForm(){
+  stopWalk(); if(CUR){ clearTimeout(saveT); CUR.modifie=new Date().toISOString(); DB.put(CUR).then(renderList); }
+  CUR=null; $('#col-form').hidden=true; $('#col-home').hidden=false; $('#mainnav').hidden=false; window.scrollTo(0,0);
+}
+
+function renderSection(){
+  const F=fdef(), S=F.sections[SEC], n=F.sections.length;
+  let h=`<div class="wiz-top"><div class="ttl"><b style="font:700 1.05rem var(--display)">${esc(F.court)} · ${SEC+1}/${n}</b>
+    <select id="wiz-jump" aria-label="Aller à la section">${F.sections.map((s,i)=>`<option value="${i}" ${i===SEC?'selected':''}>${i+1}. ${esc(s.t)}</option>`).join('')}</select></div>
+    <div class="bar"><i style="width:${(SEC+1)/n*100}%"></i></div></div>`;
+  h+=`<h2 style="margin-top:14px">${esc(S.t)}</h2><div id="wiz-msg" class="msg" hidden></div>`;
+  h+=S.f.map(fieldHTML).join('');
+  h+=`<div class="wiz-nav"><button class="btn sec" type="button" id="wiz-prev" ${SEC===0?'disabled':''}>‹ Précédent</button>`+
+     (SEC<n-1 ? `<button class="btn" type="button" id="wiz-next">Suivant ›</button>` : `<button class="btn" type="button" id="wiz-fin">Finaliser la fiche ✓</button>`)+`</div>`;
+  h+=`<div class="btns"><button class="btn sec" type="button" id="wiz-close">Enregistrer le brouillon et fermer</button><button class="btn sec" type="button" id="wiz-pdf">Voir la fiche / PDF</button></div>`;
+  $('#col-form').innerHTML=h;
+  bindSection(S);
+}
+
+function fieldHTML(f){
+  const d=CUR.data, v=d[f.k];
+  const hid = visible(f) ? '' : ' hidden';
+  const req = f.req ? ' <span class="req">*</span>' : '';
+  const hint = f.hint ? `<span class="hint">${esc(f.hint)}</span>` : '';
+  const head = `<span class="lb">${esc(lbl(f))}${f.u?` (${f.u})`:''}${req}</span>${hint}`;
+  const wrap = inner => `<div class="q" data-q="${f.k}"${hid}>${head}${inner}</div>`;
+  switch(f.t){
+    case 'note': return `<div class="msg info" data-q="${f.k}"${hid}>${esc(lbl(f))}</div>`;
+    case 'text': return wrap(`<input type="text" data-k="${f.k}" value="${esc(v||'')}" ${f.list?`list="${f.list}"`:''} autocomplete="off">`);
+    case 'tel': return wrap(`<input type="tel" data-k="${f.k}" value="${esc(v||'')}" inputmode="tel">`);
+    case 'textarea': return wrap(`<textarea data-k="${f.k}">${esc(v||'')}</textarea>`);
+    case 'int': case 'dec': return wrap(`<input type="number" data-k="${f.k}" value="${esc(v??'')}" inputmode="decimal" step="${f.t==='int'?1:'any'}" ${f.min!=null?`min="${f.min}"`:'min="0"'} ${f.max!=null?`max="${f.max}"`:''}>`);
+    case 'date': return wrap(`<input type="date" data-k="${f.k}" value="${esc(v||'')}">`);
+    case 'one': case 'many': {
+      const vals = f.t==='many' ? (Array.isArray(v)?v:[]) : [v];
+      let s='<div class="opts">'+f.o.map(o=>`<label><input type="${f.t==='one'?'radio':'checkbox'}" name="r-${f.k}" data-k="${f.k}" value="${esc(o)}" ${vals.includes(o)?'checked':''}> ${esc(o)}</label>`).join('')+'</div>';
+      if(f.autre) s+=`<input type="text" data-k="${f.k}_autre" value="${esc(d[f.k+'_autre']||'')}" placeholder="Autre (précisez)" style="margin-top:8px">`;
+      if(f.prec) s+=`<input type="text" data-k="${f.k}_prec" value="${esc(d[f.k+'_prec']||'')}" placeholder="Précisions" style="margin-top:8px">`;
+      return wrap(s);
+    }
+    case 'calc': return wrap(`<div class="calc" data-calc="${f.k}">${f.v(d)}</div>`);
+    case 'rep': {
+      const rows = (Array.isArray(v)&&v.length?v:[{}]);
+      return wrap(`<div class="rep tblw"><table><thead><tr><th>Nom</th><th class="n">Quantité</th>${f.rem?'<th>Zones / remarques</th>':''}<th></th></tr></thead><tbody>`+
+        rows.map((r,i)=>`<tr><td><input type="text" data-rep="${f.k}" data-i="${i}" data-c="n" value="${esc(r.n||'')}" list="${f.list||''}" autocomplete="off"></td><td style="width:96px"><input type="number" data-rep="${f.k}" data-i="${i}" data-c="q" value="${esc(r.q??'')}" min="0" step="1" inputmode="numeric"></td>${f.rem?`<td><input type="text" data-rep="${f.k}" data-i="${i}" data-c="r" value="${esc(r.r||'')}"></td>`:''}<td style="width:40px"><button type="button" class="btn sec" data-repdel="${f.k}" data-i="${i}" aria-label="Supprimer la ligne" style="min-height:38px;padding:4px 10px">×</button></td></tr>`).join('')+
+        `</tbody><tfoot><tr><td><b>Total</b></td><td class="n"><b data-reptot="${f.k}">${fmt(repTot(v))}</b></td><td colspan="2"></td></tr></tfoot></table></div><button type="button" class="btn sec" data-repadd="${f.k}" style="margin-top:6px">+ Ajouter une essence</button>`);
+    }
+    case 'geopoint': {
+      const g=v||null;
+      return wrap(`<div class="calc" data-gp="${f.k}">${g?`Latitude <b>${g.lat.toFixed(6)}</b> · Longitude <b>${g.lon.toFixed(6)}</b> · précision ± ${Math.round(g.acc||0)} m`:'Aucun point enregistré.'}</div>
+        <div class="btns"><button type="button" class="btn" data-gpbtn="${f.k}">📍 Prendre le point GPS</button>${g?`<button type="button" class="btn sec" data-gpdel="${f.k}">Effacer</button>`:''}</div>
+        <p class="gpsmsg" data-gpmsg="${f.k}"></p>
+        <details><summary class="note">Saisir les coordonnées à la main</summary><div class="two" style="margin-top:8px"><input type="text" placeholder="Latitude (ex. 5.912345)" data-gplat="${f.k}" inputmode="decimal"><input type="text" placeholder="Longitude (ex. -4.312345)" data-gplon="${f.k}" inputmode="decimal"></div><button type="button" class="btn sec" data-gpman="${f.k}" style="margin-top:6px">Enregistrer ces coordonnées</button></details>`);
+    }
+    case 'geoshape': return wrap(mapperHTML(f.k));
+    case 'photo': {
+      const ph=Array.isArray(v)?v:[];
+      return wrap(`<label class="btn sec" style="cursor:pointer">📷 Ajouter des photos<input type="file" accept="image/*" multiple hidden data-photo="${f.k}"></label>
+        <div class="photos">${ph.map((p,i)=>`<figure><img src="${p}" alt="Photo ${i+1}"><button type="button" data-phdel="${f.k}" data-i="${i}" aria-label="Retirer la photo">×</button></figure>`).join('')}</div>`);
+    }
+    case 'sign': return wrap(`<canvas class="sigpad" data-sig="${f.k}" width="600" height="200"></canvas><div class="btns"><button type="button" class="btn sec" data-sigclr="${f.k}">Effacer la signature</button></div>`);
+  }
+  return '';
+}
+
+function refreshDyn(){
+  // pertinence (questions conditionnelles) et calculs
+  fdef().sections[SEC].f.forEach(f=>{ const el=$(`[data-q="${f.k}"]`); if(el) el.hidden=!visible(f); });
+  $$('[data-calc]').forEach(el=>{ const f=fields().find(x=>x.k===el.dataset.calc); if(f) el.innerHTML=f.v(CUR.data); });
+  $$('[data-reptot]').forEach(el=>{ el.textContent=fmt(repTot(CUR.data[el.dataset.reptot])); });
+}
+
+function bindSection(S){
+  const d=CUR.data;
+  $$('#col-form [data-k]').forEach(el=>{
+    const k=el.dataset.k;
+    const ev = (el.type==='radio'||el.type==='checkbox') ? 'change' : 'input';
+    el.addEventListener(ev, ()=>{
+      if(el.type==='radio'){ d[k]=el.value; }
+      else if(el.type==='checkbox'){ d[k]=$$(`#col-form input[data-k="${k}"]:checked`).map(x=>x.value); if(k==='trait'&&d[k].includes('Aucun')&&d[k].length>1){ d[k]=['Aucun']; $$(`#col-form input[data-k="${k}"]`).forEach(x=>x.checked=x.value==='Aucun'); } }
+      else d[k]=el.value;
+      const q=el.closest('.q'); if(q) q.classList.remove('err');
+      refreshDyn(); autosave();
+    });
+  });
+  // tableaux répétés
+  $$('#col-form [data-rep]').forEach(el=>el.addEventListener('input', ()=>{ const k=el.dataset.rep, i=+el.dataset.i; d[k]=Array.isArray(d[k])&&d[k].length?d[k]:[{}]; d[k][i]=d[k][i]||{}; d[k][i][el.dataset.c]=el.value; refreshDyn(); autosave(); }));
+  $$('#col-form [data-repadd]').forEach(b=>b.onclick=()=>{ const k=b.dataset.repadd; d[k]=Array.isArray(d[k])&&d[k].length?d[k]:[{}]; d[k].push({}); autosave(); renderKeep(); });
+  $$('#col-form [data-repdel]').forEach(b=>b.onclick=()=>{ const k=b.dataset.repdel; if(Array.isArray(d[k])) d[k].splice(+b.dataset.i,1); autosave(); renderKeep(); });
+  // point GPS
+  $$('#col-form [data-gpbtn]').forEach(b=>b.onclick=()=>{ const k=b.dataset.gpbtn, msg=$(`[data-gpmsg="${k}"]`);
+    msg.textContent='Recherche de la position… restez immobile à découvert (jusqu\'à 20 secondes).';
+    bestFix(r=>{ d[k]=r; autosave(); renderKeep(); }, m=>{ msg.textContent=m; msg.style.color='var(--crit)'; }, t=>{ msg.textContent=t; }); });
+  $$('#col-form [data-gpdel]').forEach(b=>b.onclick=()=>{ delete d[b.dataset.gpdel]; autosave(); renderKeep(); });
+  $$('#col-form [data-gpman]').forEach(b=>b.onclick=()=>{ const k=b.dataset.gpman, la=numv($(`[data-gplat="${k}"]`).value), lo=numv($(`[data-gplon="${k}"]`).value);
+    if(!(la>=4&&la<=11&&lo>=-9&&lo<=-2)){ const m=$(`[data-gpmsg="${k}"]`); m.textContent='Coordonnées hors de la Côte d\'Ivoire : latitude entre 4 et 11, longitude entre -9 et -2 (avec le signe moins).'; m.style.color='var(--crit)'; return; }
+    d[k]={lat:la,lon:lo,acc:0,manuel:1}; autosave(); renderKeep(); });
+  // photos
+  $$('#col-form [data-photo]').forEach(inp=>inp.onchange=async()=>{ const k=inp.dataset.photo; d[k]=Array.isArray(d[k])?d[k]:[];
+    for(const file of Array.from(inp.files||[])){ if(d[k].length>=4) break; try{ d[k].push(await shrink(file)); }catch(e){} }
+    autosave(); renderKeep(); });
+  $$('#col-form [data-phdel]').forEach(b=>b.onclick=()=>{ d[b.dataset.phdel].splice(+b.dataset.i,1); autosave(); renderKeep(); });
+  // signatures
+  $$('#col-form canvas[data-sig]').forEach(c=>sigPad(c, c.dataset.sig));
+  $$('#col-form [data-sigclr]').forEach(b=>b.onclick=()=>{ delete d[b.dataset.sigclr]; autosave(); renderKeep(); });
+  // cartographie
+  $$('#col-form [data-map]').forEach(el=>bindMapper(el.dataset.map));
+  // navigation
+  $('#wiz-jump').onchange=e=>{ SEC=+e.target.value; stopWalk(); autosave(); renderSection(); window.scrollTo(0,0); };
+  $('#wiz-prev').onclick=()=>{ if(SEC>0){ SEC--; stopWalk(); renderSection(); window.scrollTo(0,0); } };
+  if($('#wiz-next')) $('#wiz-next').onclick=()=>{ if(!checkReq(SEC)) return; SEC++; stopWalk(); autosave(); renderSection(); window.scrollTo(0,0); };
+  if($('#wiz-fin')) $('#wiz-fin').onclick=finalize;
+  $('#wiz-close').onclick=closeForm;
+  $('#wiz-pdf').onclick=()=>{ clearTimeout(saveT); DB.put(CUR); printRec(CUR); };
+}
+function renderKeep(){ const y=window.scrollY; renderSection(); window.scrollTo(0,y); }
+function missing(f){ const v=CUR.data[f.k]; if(f.t==='geoshape') return !(v&&v.pts&&v.pts.length>2); if(Array.isArray(v)) return !v.length; return v==null||String(v).trim()===''; }
+function checkReq(si){
+  const miss=fdef().sections[si].f.filter(f=>f.req && visible(f) && missing(f));
+  miss.forEach(f=>{ const q=$(`[data-q="${f.k}"]`); if(q) q.classList.add('err'); });
+  if(miss.length){ flash('Réponse obligatoire : '+miss.map(f=>esc(lbl(f))).join(', ')+'.', 'crit'); const q=$(`[data-q="${miss[0].k}"]`); if(q) q.scrollIntoView({block:'center'}); return false; }
+  return true;
+}
+function finalize(){
+  for(let i=0;i<fdef().sections.length;i++){
+    const miss=fdef().sections[i].f.filter(f=>f.req && visible(f) && missing(f));
+    if(miss.length){ SEC=i; renderSection(); checkReq(i); return; }
+  }
+  CUR.statut='finalise'; CUR.modifie=new Date().toISOString();
+  DB.put(CUR).then(()=>{ const r=CUR; closeForm(); renderList(); printOffer(r); });
+}
+function printOffer(r){ const m=$('#exp-msg'); m.innerHTML=`Fiche de <b>${esc(r.data.nom||'')}</b> finalisée. <a href="#" id="po">Imprimer / PDF</a>`; m.style.color='var(--ok)'; $('#po').onclick=e=>{ e.preventDefault(); printRec(r); }; }
+
+/* ---------- photo : réduction pour tenir dans la mémoire ---------- */
+function shrink(file){ return new Promise((res,rej)=>{ const fr=new FileReader(); fr.onload=()=>{ const im=new Image(); im.onload=()=>{ const M=1024, s=Math.min(1, M/Math.max(im.width,im.height)); const c=document.createElement('canvas'); c.width=Math.round(im.width*s); c.height=Math.round(im.height*s); c.getContext('2d').drawImage(im,0,0,c.width,c.height); res(c.toDataURL('image/jpeg',0.7)); }; im.onerror=rej; im.src=fr.result; }; fr.onerror=rej; fr.readAsDataURL(file); }); }
+
+/* ---------- signature ---------- */
+function sigPad(c,k){
+  const ctx=c.getContext('2d'); ctx.lineWidth=3; ctx.lineCap='round'; ctx.strokeStyle='#17201A';
+  if(CUR.data[k]){ const im=new Image(); im.onload=()=>ctx.drawImage(im,0,0); im.src=CUR.data[k]; }
+  else { ctx.fillStyle='#bbb'; ctx.font='16px Arial'; ctx.fillText('Signez ici avec le doigt',190,105); }
+  let draw=false, blank=!CUR.data[k];
+  const pos=e=>{ const r=c.getBoundingClientRect(); return [(e.clientX-r.left)*c.width/r.width,(e.clientY-r.top)*c.height/r.height]; };
+  c.addEventListener('pointerdown',e=>{ if(blank){ ctx.clearRect(0,0,c.width,c.height); blank=false; } draw=true; c.setPointerCapture(e.pointerId); const p=pos(e); ctx.beginPath(); ctx.moveTo(p[0],p[1]); });
+  c.addEventListener('pointermove',e=>{ if(!draw) return; const p=pos(e); ctx.lineTo(p[0],p[1]); ctx.stroke(); });
+  const end=()=>{ if(!draw) return; draw=false; CUR.data[k]=c.toDataURL('image/png'); autosave(); };
+  c.addEventListener('pointerup',end); c.addEventListener('pointercancel',end);
+}
+
+/* =====================================================================
+   GPS : point moyenné et marche du contour
+   ===================================================================== */
+const GPS={ watch:null, key:null, lock:null, me:null };
+function gpsErrText(e){ return e&&e.code===1 ? 'Accès à la position refusé. Autorisez la localisation pour AKA AgroDiag CI dans les paramètres du téléphone.' : e&&e.code===3 ? 'Le GPS ne répond pas : activez la localisation et placez-vous à découvert.' : 'Position introuvable : activez la localisation (GPS) du téléphone.'; }
+// Point précis : moyenne pondérée des meilleures mesures pendant 15 s au plus
+function bestFix(ok, bad, prog){
+  if(!navigator.geolocation) return bad('Localisation indisponible sur cet appareil.');
+  const fx=[]; let id=null, done=false;
+  const finish=()=>{ if(done) return; done=true; navigator.geolocation.clearWatch(id); clearTimeout(tm);
+    if(!fx.length) return bad('Pas de signal GPS assez précis. Placez-vous à découvert, loin des grands arbres, et réessayez.');
+    fx.sort((a,b)=>a.acc-b.acc); const best=fx.slice(0,Math.max(1,Math.ceil(fx.length/2)));
+    let w=0, la=0, lo=0; best.forEach(f=>{ const k=1/Math.max(f.acc,1)**2; w+=k; la+=f.lat*k; lo+=f.lon*k; });
+    ok({lat:la/w, lon:lo/w, acc:Math.max(1,best[0].acc), n:fx.length, t:Date.now()}); };
+  const tm=setTimeout(finish, 15000);
+  id=navigator.geolocation.watchPosition(p=>{ const c=p.coords; if(c.accuracy<=30){ fx.push({lat:c.latitude,lon:c.longitude,acc:c.accuracy}); prog&&prog(`Mesure ${fx.length}/6 · précision ± ${Math.round(c.accuracy)} m…`); if(fx.length>=6) finish(); } else prog&&prog(`Signal faible (± ${Math.round(c.accuracy)} m), patientez…`); },
+    e=>{ if(e.code===1){ done=true; clearTimeout(tm); navigator.geolocation.clearWatch(id); bad(gpsErrText(e)); } }, {enableHighAccuracy:true, maximumAge:0, timeout:20000});
+}
+function mapperHTML(k){
+  const acc=cfg.get('acc','15'), step=cfg.get('step','5');
+  return `<div data-map="${k}">
+    <div class="kpis" data-mapst="${k}"></div>
+    <div class="mapbox" data-mapsvg="${k}"></div>
+    <p class="gpsmsg" data-mapmsg="${k}"></p>
+    <button type="button" class="btn big-btn" data-walk="${k}">🚶 Marcher le contour</button>
+    <div class="btns" style="margin-top:8px">
+      <button type="button" class="btn sec" data-mpt="${k}">📍 Point à un coin</button>
+      <button type="button" class="btn sec" data-mundo="${k}">↶ Annuler le dernier point</button>
+      <button type="button" class="btn sec danger" data-mclr="${k}">Tout effacer</button>
+    </div>
+    <details class="acc"><summary>Comment faire le mapping</summary><div>
+      <ol class="steps">
+        <li>Activez la localisation (GPS) du téléphone. Mettez-vous à un coin du champ, à découvert, et attendez que la précision soit de ± 10 m ou mieux.</li>
+        <li><b>En marchant</b> : touchez « Marcher le contour » et faites le tour du champ en suivant la limite, lentement. Un point est ajouté automatiquement tous les ${step} m. Gardez l'écran allumé et l'application ouverte.</li>
+        <li><b>Ou coin par coin</b> (champ aux côtés droits) : à chaque coin, restez immobile et touchez « Point à un coin » ; la position est mesurée plusieurs fois et moyennée.</li>
+        <li>Revenez au point de départ, puis touchez « Terminer ». Le champ se ferme tout seul et la superficie s'affiche.</li>
+        <li>Vérifiez le dessin : s'il est en rouge, le contour se croise ; effacez les derniers points et recommencez cette partie.</li>
+      </ol>
+      <div class="two"><label class="f">Précision minimale acceptée<select data-mcfg="acc" data-nomem>${[['10','± 10 m (meilleure)'],['15','± 15 m'],['20','± 20 m'],['30','± 30 m (sous les arbres)']].map(o=>`<option value="${o[0]}" ${o[0]===acc?'selected':''}>${o[1]}</option>`).join('')}</select></label>
+      <label class="f">Un point tous les<select data-mcfg="step" data-nomem>${['3','5','10','20'].map(o=>`<option value="${o}" ${o===step?'selected':''}>${o} m</option>`).join('')}</select></label></div>
+      <p class="note">Ajouter un point à la main :</p>
+      <div class="two"><input type="text" placeholder="Latitude" data-mlat="${k}" inputmode="decimal"><input type="text" placeholder="Longitude" data-mlon="${k}" inputmode="decimal"></div>
+      <button type="button" class="btn sec" data-mman="${k}" style="margin-top:6px">Ajouter ce point</button>
+    </div></details>
+  </div>`;
+}
+function shape(k){ const d=CUR.data; d[k]=d[k]&&Array.isArray(d[k].pts)?d[k]:{pts:[]}; return d[k]; }
+function drawMap(k){
+  const sh=shape(k), st=geoStats(sh.pts), walking=GPS.watch!=null&&GPS.key===k;
+  const box=$(`[data-mapsvg="${k}"]`); if(!box) return;
+  box.innerHTML=mapSVG(sh.pts,{open:walking, wp:CUR.data.gps&&CUR.data.gps.lat?CUR.data.gps:null, me:walking?GPS.me:null});
+  const last=sh.pts[sh.pts.length-1];
+  $(`[data-mapst="${k}"]`).innerHTML = `<div class="kpi"><span>Superficie réelle</span><b>${st.area>0?fmt(st.area/10000,st.area<10000?3:2)+' ha':'–'}</b>${st.area>0&&st.area<10000?`<span>${fmt(st.area)} m²</span>`:''}</div>`+
+    `<div class="kpi"><span>Périmètre</span><b>${fmt(st.perim)} m</b></div><div class="kpi"><span>Points</span><b>${sh.pts.length}</b></div>`+
+    (st.area>0?`<div class="kpi"><span>Marge d'erreur (environ)</span><b>± ${fmt(st.incert/10000, 2)} ha</b></div>`:'');
+  if(st.croise) msgMap(k,'Le contour se croise (dessin rouge) : la superficie est fausse. Annulez les derniers points et refaites cette partie.', 'crit');
+  else if(sh.pts.length>2 && !walking && last && dist(last, sh.pts[0])>Math.max(30, st.perim*0.1)) msgMap(k,`Le dernier point est à ${fmt(dist(last, sh.pts[0]))} m du départ : vérifiez que vous avez bien fait tout le tour.`, 'warn');
+  const wb=$(`[data-walk="${k}"]`); if(wb){ wb.textContent = walking ? '⏹ Terminer (je suis revenu au départ)' : (sh.pts.length?'🚶 Continuer le contour en marchant':'🚶 Marcher le contour'); wb.classList.toggle('walking', walking); }
+  refreshDyn();
+}
+function msgMap(k,m,cls){ const el=$(`[data-mapmsg="${k}"]`); if(!el) return; el.innerHTML=m; el.style.color= cls==='crit'?'var(--crit)':cls==='warn'?'var(--warn)':cls==='ok'?'var(--ok)':'var(--muted)'; }
+function addPt(k,p){ shape(k).pts.push({lat:+p.lat.toFixed(7), lon:+p.lon.toFixed(7), acc:p.acc!=null?Math.round(p.acc*10)/10:null, t:Date.now()}); autosave(); drawMap(k); }
+async function wake(on){ try{ if(on && navigator.wakeLock) GPS.lock=await navigator.wakeLock.request('screen'); else if(!on && GPS.lock){ GPS.lock.release(); GPS.lock=null; } }catch(e){} }
+function stopWalk(){ if(GPS.watch!=null && navigator.geolocation) navigator.geolocation.clearWatch(GPS.watch); const k=GPS.key; GPS.watch=null; GPS.key=null; GPS.me=null; wake(false); if(k && CUR && $(`[data-map="${k}"]`)) drawMap(k); }
+function bindMapper(k){
+  drawMap(k);
+  $(`[data-walk="${k}"]`).onclick=()=>{
+    if(GPS.watch!=null){ stopWalk(); const st=geoStats(shape(k).pts); msgMap(k, st.area>0 ? `Contour terminé : <b>${fmtSurf(st.area)}</b>. Vous pouvez passer à la suite.` : 'Il faut au moins 3 points pour calculer une superficie.', st.area>0?'ok':'warn'); autosave(); return; }
+    if(!navigator.geolocation) return msgMap(k,'Localisation indisponible sur cet appareil.','crit');
+    const maxAcc=+cfg.get('acc','15'), step=+cfg.get('step','5');
+    GPS.key=k; wake(true);
+    msgMap(k,'Recherche du signal GPS… restez à découvert.');
+    GPS.watch=navigator.geolocation.watchPosition(p=>{
+      const c=p.coords, pts=shape(k).pts, last=pts[pts.length-1], here={lat:c.latitude, lon:c.longitude, acc:c.accuracy};
+      GPS.me=here;
+      if(c.accuracy>maxAcc){ msgMap(k,`Signal trop faible (± ${Math.round(c.accuracy)} m, il faut ± ${maxAcc} m). Arrêtez-vous un instant à découvert…`,'warn'); drawMap(k); return; }
+      if(!last || dist(last,here)>=step){ addPt(k,here); msgMap(k,`Enregistrement en cours · ${pts.length} points · précision ± ${Math.round(c.accuracy)} m. Marchez lentement le long de la limite.`,'ok'); }
+      else drawMap(k);
+    }, e=>{ if(e.code===1){ stopWalk(); msgMap(k,gpsErrText(e),'crit'); } else msgMap(k,'Signal GPS perdu un instant… continuez lentement, la mesure reprend toute seule.','warn'); },
+    {enableHighAccuracy:true, maximumAge:0, timeout:30000});
+    drawMap(k);
+  };
+  $(`[data-mpt="${k}"]`).onclick=()=>{ msgMap(k,'Mesure du coin… restez immobile (jusqu\'à 15 secondes).');
+    bestFix(r=>{ addPt(k,r); msgMap(k,`Coin ${shape(k).pts.length} enregistré (± ${Math.round(r.acc)} m, ${r.n} mesures). Marchez jusqu'au coin suivant.`,'ok'); }, m=>msgMap(k,m,'crit'), t=>msgMap(k,t)); };
+  $(`[data-mundo="${k}"]`).onclick=()=>{ shape(k).pts.pop(); autosave(); drawMap(k); msgMap(k,''); };
+  const clr=$(`[data-mclr="${k}"]`); clr.onclick=()=>{ if(clr.dataset.sure){ stopWalk(); shape(k).pts=[]; autosave(); drawMap(k); msgMap(k,'Contour effacé.'); delete clr.dataset.sure; clr.textContent='Tout effacer'; } else { clr.dataset.sure=1; clr.textContent='Touchez encore pour effacer'; setTimeout(()=>{ delete clr.dataset.sure; clr.textContent='Tout effacer'; },4000); } };
+  $$(`[data-map="${k}"] [data-mcfg]`).forEach(s=>s.onchange=()=>cfg.set(s.dataset.mcfg, s.value));
+  $(`[data-mman="${k}"]`).onclick=()=>{ const la=numv($(`[data-mlat="${k}"]`).value), lo=numv($(`[data-mlon="${k}"]`).value);
+    if(!(la>=4&&la<=11&&lo>=-9&&lo<=-2)) return msgMap(k,'Coordonnées hors de la Côte d\'Ivoire : latitude entre 4 et 11, longitude entre -9 et -2.','crit');
+    addPt(k,{lat:la,lon:lo,acc:null}); $(`[data-mlat="${k}"]`).value=''; $(`[data-mlon="${k}"]`).value=''; };
+}
+
+/* =====================================================================
+   LISTE DES FICHES
+   ===================================================================== */
+let ALL=[];
+async function renderList(){
+  try{ ALL=(await DB.all()).sort((a,b)=>String(b.modifie).localeCompare(String(a.modifie))); }catch(e){ ALL=[]; }
+  const q=($('#col-q').value||'').toLowerCase();
+  const L=ALL.filter(r=>!q || [r.data.nom,r.data.village,r.data.campement].join(' ').toLowerCase().includes(q));
+  const ha=ALL.reduce((s,r)=>s+supHa(r.data),0);
+  $('#col-sum').innerHTML=`<div class="kpi"><span>Fiches</span><b>${ALL.length}</b></div><div class="kpi"><span>Brouillons</span><b>${ALL.filter(r=>r.statut!=='finalise').length}</b></div><div class="kpi"><span>Finalisées</span><b>${ALL.filter(r=>r.statut==='finalise').length}</b></div><div class="kpi"><span>Superficie totale</span><b>${fmt(ha,2)} ha</b></div>`;
+  if(!L.length){ $('#col-list').innerHTML='<p class="note">'+(ALL.length?'Aucune fiche ne correspond.':'Aucune fiche pour l\'instant. Touchez un des boutons ci-dessus pour commencer.')+'</p>'; return; }
+  $('#col-list').innerHTML=L.map(r=>{ const s=supHa(r.data), st=geoStats((r.data.carto&&r.data.carto.pts)||[]);
+    return `<div class="rec"><div><b>${esc(r.data.nom||'(sans nom)')}</b> <span class="chip ${r.statut==='finalise'?'g':'o'}">${r.statut==='finalise'?'Finalisée':'Brouillon'}</span>
+      <div class="meta">${esc(FORMS[r.type].court)} · ${esc(r.data.village||'')}${r.data.date?' · '+new Date(r.data.date).toLocaleDateString('fr-FR'):''}</div>
+      <div class="meta">${st.area>0?`Superficie réelle <b>${fmt(st.area/10000,2)} ha</b> (${st.n} points)`:(s>0?`Superficie ${fmt(s,2)} ha (déclarée)`:'Pas de cartographie')}</div></div>
+      <div class="acts"><button class="btn" type="button" data-ed="${r.id}">${r.statut==='finalise'?'Modifier':'Continuer'}</button><button class="btn sec" type="button" data-pr="${r.id}">Fiche / PDF</button><button class="btn danger" type="button" data-dl="${r.id}">Supprimer</button></div></div>`; }).join('');
+  $$('[data-ed]').forEach(b=>b.onclick=()=>{ const r=ALL.find(x=>x.id===b.dataset.ed); if(r){ if(r.statut==='finalise') r.statut='brouillon'; openForm(r,0); } });
+  $$('[data-pr]').forEach(b=>b.onclick=()=>printRec(ALL.find(x=>x.id===b.dataset.pr)));
+  $$('[data-dl]').forEach(b=>b.onclick=()=>{ if(!b.dataset.sure){ b.dataset.sure=1; b.textContent='Confirmer ?'; setTimeout(()=>{ delete b.dataset.sure; b.textContent='Supprimer'; },4000); return; } DB.del(b.dataset.dl).then(renderList); });
+}
+
+/* =====================================================================
+   FICHE IMPRIMABLE
+   ===================================================================== */
+function valTxt(f,d){
+  const v=d[f.k];
+  switch(f.t){
+    case 'one': return esc(v||'')+(d[f.k+'_autre']?' – '+esc(d[f.k+'_autre']):'')+(d[f.k+'_prec']?' – '+esc(d[f.k+'_prec']):'');
+    case 'many': return esc((Array.isArray(v)?v:[]).join(', '))+(d[f.k+'_autre']?(Array.isArray(v)&&v.length?', ':'')+esc(d[f.k+'_autre']):'');
+    case 'date': return v?new Date(v).toLocaleDateString('fr-FR'):'';
+    case 'geopoint': return v&&v.lat?`Lat. ${v.lat.toFixed(6)} · Long. ${v.lon.toFixed(6)}${v.acc?` (± ${Math.round(v.acc)} m)`:''}`:'';
+    case 'calc': return f.v(d).replace(/<span[^>]*>/g,'').replace(/<\/span>/g,'');
+    case 'int': case 'dec': return v!=null&&v!==''?fmt(numv(v), f.t==='dec'?2:0)+(f.u?' '+f.u:''):'';
+    default: return esc(v||'').replace(/\n/g,'<br>');
+  }
+}
+function printRec(r){
+  if(!r) return;
+  const F=FORMS[r.type], d=r.data, pts=(d.carto&&d.carto.pts)||[], st=geoStats(pts);
+  const projet=cfg.get('projet','');
+  let h=`<div style="display:flex;justify-content:space-between;gap:12px;border-bottom:2px solid #17694A;padding-bottom:6px;margin-bottom:8px"><div>${projet?`<div style="font-size:10pt;color:#17694A;font-weight:700">${esc(projet)}</div>`:''}<h1 style="margin:2px 0;font-size:17pt">${esc(F.titre)}</h1></div><div style="text-align:right;font-size:9pt">Fiche n° ${esc(r.id)}<br>${r.statut==='finalise'?'Finalisée':'Brouillon'}</div></div>`;
+  if(pts.length>2){
+    h+=`<table style="margin:6px 0 4px"><tr><td><b>Superficie réelle après le mapping</b></td><td class="n" style="font-size:15pt"><b>${fmt(st.area/10000,2)} ha</b></td><td><b>Périmètre</b></td><td class="n">${fmt(st.perim)} m</td></tr><tr><td><b>Centre de la parcelle</b></td><td>Lat. ${st.centre.lat.toFixed(6)}<br>Long. ${st.centre.lon.toFixed(6)}</td><td><b>Points relevés</b></td><td class="n">${pts.length} (± ${fmt(st.accM||0)} m)</td></tr></table>`;
+    h+=`<figure>${mapSVG(pts,{wp:d.gps&&d.gps.lat?d.gps:null, h:420})}</figure>`;
+  }
+  F.sections.forEach(S=>{
+    const rows=S.f.filter(f=>!['geoshape','photo','sign','note'].includes(f.t) && (!f.rel||f.rel(d)));
+    let body='';
+    rows.forEach(f=>{ if(f.t==='rep'){ const L=(d[f.k]||[]).filter(x=>x.n||x.q); body+=`<tr><td style="width:38%"><b>${esc(lbl(f))}</b></td><td>${L.length?`<table>${L.map(x=>`<tr><td>${esc(x.n||'')}</td><td class="n" style="width:80px">${fmt(numv(x.q))}</td>${f.rem?`<td>${esc(x.r||'')}</td>`:''}</tr>`).join('')}<tr><td><b>Total</b></td><td class="n"><b>${fmt(repTot(L))}</b></td>${f.rem?'<td></td>':''}</tr></table>`:'–'}</td></tr>`; }
+      else body+=`<tr><td style="width:38%">${esc(lbl(f))}${f.t==='dec'||f.t==='int'?'':''}</td><td>${valTxt(f,d)||'<span style="color:#999">–</span>'}</td></tr>`; });
+    if(body) h+=`<h3 style="background:#DCEDE3;padding:3px 6px">${esc(S.t)}</h3><table>${body}</table>`;
+  });
+  if(pts.length>2 && pts.length<=80) h+=`<h3>Coordonnées des points du contour</h3><table style="font-size:9pt"><tr><th>N°</th><th>Latitude</th><th>Longitude</th><th>Précision</th></tr>${pts.map((p,i)=>`<tr><td>${i+1}</td><td>${p.lat.toFixed(6)}</td><td>${p.lon.toFixed(6)}</td><td>${p.acc?'± '+Math.round(p.acc)+' m':'saisi'}</td></tr>`).join('')}</table>`;
+  const ph=d.photos||[]; if(ph.length) h+=`<h3>Photos</h3><div>${ph.map(p=>`<img src="${p}" style="width:48%;margin:0 1% 6px 0;border:1px solid #999">`).join('')}</div>`;
+  const sig=(k,t)=>`<td style="width:50%;vertical-align:top"><b>${t}</b><br>${d[k]?`<img src="${d[k]}" style="height:70px">`:'<div style="height:70px"></div>'}</td>`;
+  const hasSig = F.sections.some(S=>S.f.some(f=>f.t==='sign'));
+  if(hasSig) h+=`<h3>Signatures</h3><table><tr>${sig('sig_agent','Agent / enquêteur : '+esc(d.agent||''))}${sig('sig_prod','Producteur / représentant : '+esc(d.nom_rep||d.nom||''))}</tr></table>`;
+  h+=`<p style="font-size:8pt;color:#555;margin-top:10px">Superficie calculée à partir des points GPS relevés sur le terrain (marge d'erreur indicative ± ${fmt(st.incert/10000,2)} ha). Fiche établie avec AKA AgroDiag CI.</p>`;
+  const box=document.createElement('div'); box.innerHTML=h;
+  MOD.print(box, F.court+' '+(d.nom||''));
+}
+
+/* =====================================================================
+   EXPORTS
+   ===================================================================== */
+async function saveFile(name, blob){
+  const m=$('#exp-msg');
+  if(window.AgroDiagAndroid && window.AgroDiagAndroid.saveFile){
+    const b64=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(',')[1]||''); r.onerror=rej; r.readAsDataURL(blob); });
+    const st=await new Promise(res=>{ window.__agrodiagSaved=s=>{ window.__agrodiagSaved=null; res(s); }; window.AgroDiagAndroid.saveFile(name, blob.type||'application/octet-stream', b64); });
+    m.textContent = st==='ok' ? `Fichier enregistré : ${name}` : st==='declined' ? 'Enregistrement annulé.' : 'Le fichier n\'a pas pu être enregistré.'; m.style.color=st==='ok'?'var(--ok)':'var(--crit)'; return;
+  }
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },2000);
+  m.textContent=`Fichier préparé : ${name}`; m.style.color='var(--ok)';
+}
+const stamp=()=>new Date().toISOString().slice(0,10);
+function csvFor(type){
+  const F=FORMS[type], recs=ALL.filter(r=>r.type===type);
+  const cols=[]; F.sections.forEach(S=>S.f.forEach(f=>{ if(['note','photo','sign','calc'].includes(f.t)) return;
+    if(f.t==='geopoint'){ cols.push([f.k+'_lat',r=>r.data[f.k]?.lat?.toFixed(6)??''],[f.k+'_lon',r=>r.data[f.k]?.lon?.toFixed(6)??''],[f.k+'_precision_m',r=>r.data[f.k]?.acc?Math.round(r.data[f.k].acc):'']); return; }
+    if(f.t==='geoshape'){ cols.push(['superficie_reelle_ha',r=>{ const s=geoStats(r.data[f.k]?.pts||[]); return s.area>0?(s.area/10000).toFixed(4):''; }],['perimetre_m',r=>{ const s=geoStats(r.data[f.k]?.pts||[]); return s.perim?Math.round(s.perim):''; }],['centre_lat',r=>{ const s=geoStats(r.data[f.k]?.pts||[]); return s.area>0?s.centre.lat.toFixed(6):''; }],['centre_lon',r=>{ const s=geoStats(r.data[f.k]?.pts||[]); return s.area>0?s.centre.lon.toFixed(6):''; }],['nb_points',r=>(r.data[f.k]?.pts||[]).length||'']); return; }
+    if(f.t==='rep'){ cols.push([f.k,r=>(r.data[f.k]||[]).filter(x=>x.n||x.q).map(x=>`${x.n||'?'}: ${numv(x.q)}${x.r?' ('+x.r+')':''}`).join(' | ')],[f.k+'_total',r=>repTot(r.data[f.k])||'']); return; }
+    cols.push([f.k, r=>{ const v=r.data[f.k]; return Array.isArray(v)?v.join(' ; '):(v??''); }]);
+    if(f.autre) cols.push([f.k+'_autre',r=>r.data[f.k+'_autre']||'']);
+    if(f.prec) cols.push([f.k+'_precisions',r=>r.data[f.k+'_prec']||'']);
+  }));
+  cols.unshift(['fiche_id',r=>r.id],['statut',r=>r.statut==='finalise'?'finalisée':'brouillon'],['modifiee_le',r=>r.modifie]);
+  const q=v=>{ const s=String(v??''); return /[;"\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; };
+  const lines=[cols.map(c=>q(c[0])).join(';')].concat(recs.map(r=>cols.map(c=>q(c[1](r))).join(';')));
+  return {n:recs.length, blob:new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv'})};
+}
+function shapes(){ return ALL.filter(r=>r.data.carto&&r.data.carto.pts&&r.data.carto.pts.length>2); }
+function exp(kind){
+  const m=$('#exp-msg');
+  if(kind.startsWith('csv-')){ const t=kind.slice(4), c=csvFor(t); if(!c.n){ m.textContent='Aucune fiche de ce type.'; m.style.color='var(--warn)'; return; } return saveFile(`agroforesterie_${t}_${stamp()}.csv`, c.blob); }
+  if(kind==='json') return saveFile(`agroforesterie_sauvegarde_${stamp()}.json`, new Blob([JSON.stringify({app:'AKA AgroDiag CI',module:'agroforesterie',version:1,date:new Date().toISOString(),fiches:ALL})],{type:'application/json'}));
+  const S=shapes(); if(!S.length){ m.textContent='Aucune parcelle cartographiée pour l\'instant.'; m.style.color='var(--warn)'; return; }
+  if(kind==='geojson'){
+    const fc={type:'FeatureCollection',features:S.map(r=>{ const p=r.data.carto.pts, st=geoStats(p); const ring=p.map(x=>[x.lon,x.lat]); ring.push(ring[0]);
+      return {type:'Feature',properties:{fiche:r.id,type:FORMS[r.type].court,producteur:r.data.nom||'',village:r.data.village||'',date:r.data.date||'',superficie_ha:+(st.area/10000).toFixed(4),perimetre_m:Math.round(st.perim)},geometry:{type:'Polygon',coordinates:[ring]}}; })};
+    return saveFile(`parcelles_${stamp()}.geojson`, new Blob([JSON.stringify(fc)],{type:'application/geo+json'}));
+  }
+  if(kind==='kml'){
+    const x=s=>String(s??'').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+    const pm=S.map(r=>{ const p=r.data.carto.pts, st=geoStats(p), co=p.concat([p[0]]).map(q=>`${q.lon},${q.lat},0`).join(' ');
+      return `<Placemark><name>${x(r.data.nom||r.id)} – ${(st.area/10000).toFixed(2)} ha</name><description>${x(FORMS[r.type].court)} · ${x(r.data.village||'')} · ${x(r.data.date||'')} · ${(st.area/10000).toFixed(4)} ha · ${Math.round(st.perim)} m</description><styleUrl>#p</styleUrl><Polygon><outerBoundaryIs><LinearRing><coordinates>${co}</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>`; }).join('');
+    const kml=`<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>Parcelles ${stamp()}</name><Style id="p"><LineStyle><color>ff4a6a17</color><width>3</width></LineStyle><PolyStyle><color>5545b88c</color></PolyStyle></Style>${pm}</Document></kml>`;
+    return saveFile(`parcelles_${stamp()}.kml`, new Blob([kml],{type:'application/vnd.google-earth.kml+xml'}));
+  }
+}
+$$('[data-exp]').forEach(b=>b.onclick=()=>exp(b.dataset.exp));
+$('#imp').onchange=async e=>{ const f=e.target.files[0], m=$('#exp-msg'); if(!f) return;
+  try{ const j=JSON.parse(await f.text()); const L=Array.isArray(j.fiches)?j.fiches:[]; let n=0;
+    for(const r of L){ if(r && r.id && FORMS[r.type] && r.data){ const ex=ALL.find(x=>x.id===r.id); if(!ex || String(r.modifie)>String(ex.modifie)){ await DB.put(r); n++; } } }
+    m.textContent=`${n} fiche(s) importée(s).`; m.style.color='var(--ok)'; renderList();
+  }catch(err){ m.textContent='Ce fichier n\'est pas une sauvegarde valide.'; m.style.color='var(--crit)'; }
+  e.target.value=''; };
+
+/* =====================================================================
+   CALCUL DES PLANTS
+   ===================================================================== */
+const PT={ '20x20':[20,20,'carre'], '5x5':[5,5,'carre'], '3x3':[3,3,'carre'], '8x8':[8,8,'quinc'], '4x1':[4,1,'carre'] };
+function plants(){
+  const s=numv($('#p-s').value), x=numv($('#p-x').value), y=numv($('#p-y').value), quinc=$('#p-disp').value==='quinc', marge=numv($('#p-m').value)/100;
+  const per=numv($('#p-per').value), pe=numv($('#p-pe').value);
+  if(!(x>0&&y>0)) return;
+  const dens = 10000/(x*y)*(quinc?1.1547:1);
+  const n=dens*s, bord= per>0&&pe>0 ? Math.ceil(per/pe) : 0, tot=n+bord, cmd=Math.ceil(tot*(1+marge));
+  let h='<div class="panel" id="p-doc"><h3 style="margin-top:0">Besoin en plants</h3>';
+  h+=`<div class="kpis"><div class="kpi"><span>Densité</span><b>${fmt(dens)}/ha</b></div><div class="kpi"><span>Plants dans la parcelle</span><b>${fmt(n)}</b></div>${bord?`<div class="kpi"><span>Plants en bordure</span><b>${fmt(bord)}</b></div>`:''}<div class="kpi"><span>À commander (marge ${fmt(marge*100)} %)</span><b>${fmt(cmd)}</b></div></div>`;
+  h+=`<div class="tblw"><table><tbody><tr><td>Trous à creuser (40 × 40 × 40 cm)</td><td class="n">${fmt(tot)}</td></tr><tr><td>Compost ou fumier (5 kg par trou)</td><td class="n">${MOD.kg(tot*5)}</td></tr><tr><td>Tuteurs</td><td class="n">${fmt(tot)}</td></tr><tr><td>Plants de remplacement gardés en pépinière</td><td class="n">${fmt(cmd-tot)}</td></tr></tbody></table></div>`;
+  h+=`<figure class="ill">${planSchema(x,y,quinc)}</figure>`;
+  if($('#p-type').value==='20x20') h+='<div class="msg info">Dans un cacao planté à 3 × 3 m, un arbre d\'ombrage tous les 20 m prend la place d\'environ 1 cacaoyer sur 44. Choisissez des arbres à cime haute et légère (fraké, framiré, akpi, avocatier).</div>';
+  h+='<div class="btns"><button class="btn sec" type="button" onclick="MOD.print(document.getElementById(\'p-doc\'),\'Besoin en plants\')">Imprimer / PDF</button></div></div>';
+  $('#p-out').innerHTML=h;
+}
+function planSchema(x,y,quinc){
+  const W=640,H=300, s=Math.min(560/(x*4), 220/(y*3)); let c='';
+  for(let r=0;r<4;r++) for(let i=0;i<5;i++){ const off= quinc && r%2 ? x*s/2 : 0, cx=40+i*x*s+off, cy=40+r*y*s; if(cx>W-20) continue; c+=`<circle cx="${cx}" cy="${cy}" r="${Math.max(5,Math.min(16,x*s/4))}" fill="#3E8A5A"/>`; }
+  c+=`<line x1="40" y1="${40+3*y*s+26}" x2="${40+x*s}" y2="${40+3*y*s+26}" stroke="#B3261E" stroke-width="2"/><text x="${40+x*s/2}" y="${40+3*y*s+44}" font-size="13" text-anchor="middle" fill="#B3261E" font-family="Arial">${fmt(x,1)} m</text>`;
+  c+=`<line x1="22" y1="40" x2="22" y2="${40+y*s}" stroke="#B3261E" stroke-width="2"/><text x="16" y="${40+y*s/2}" font-size="13" text-anchor="end" fill="#B3261E" font-family="Arial">${fmt(y,1)} m</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><rect width="${W}" height="${H}" fill="#fff"/>${c}<text x="${W-16}" y="${H-12}" font-size="13" text-anchor="end" fill="#566259" font-family="Arial">Disposition ${quinc?'en quinconce':'en carré'}</text></svg><figcaption>Schéma de plantation (vu de dessus).</figcaption>`;
+}
+$('#p-type').onchange=()=>{ const v=PT[$('#p-type').value]; if(v){ $('#p-x').value=v[0]; $('#p-y').value=v[1]; $('#p-disp').value=v[2]; } plants(); };
+$$('#t-plants input,#t-plants select').forEach(e=>e.addEventListener('input',plants));
+
+/* =====================================================================
+   IMAGES DU GUIDE
+   ===================================================================== */
+const T=(x,y,s,o)=>{ o=o||{}; return `<text x="${x}" y="${y}" font-size="${o.fs||13}" fill="${o.c||'#17201A'}" text-anchor="${o.a||'middle'}" font-weight="${o.b?700:400}" font-family="Arial">${s}</text>`; };
+function tree(x,base,h,r,col,trunk){ return `<rect x="${x-r*0.08}" y="${base-h}" width="${r*0.16}" height="${h}" fill="${trunk||'#8D6E4A'}"/><ellipse cx="${x}" cy="${base-h}" rx="${r}" ry="${r*0.55}" fill="${col}"/>`; }
+function figStrates(){
+  let s=`<rect width="640" height="330" fill="#fff"/><rect x="0" y="280" width="640" height="50" fill="#C9A57A"/>`;
+  s+=tree(110,280,210,70,'#2E6B3A')+tree(470,280,220,80,'#2E6B3A');
+  s+=tree(300,280,120,45,'#5E9C3A')+tree(580,280,110,40,'#5E9C3A');
+  for(let i=0;i<9;i++) s+=tree(40+i*70,280,55,26,'#7CB342','#6B4B2E');
+  for(let i=0;i<14;i++) s+=`<path d="M${30+i*45} 280 q6 -18 12 0" fill="#A5D06A"/>`;
+  for(let i=0;i<10;i++) s+=`<path d="M${50+i*62} 290 q10 20 0 34" stroke="#6B4B2E" fill="none" stroke-width="2"/>`;
+  const lab=[[60,'Étage haut : arbres forestiers (fraké, framiré, akpi) · 25–40 m'],[150,'Étage moyen : fruitiers (avocatier, safoutier, agrumes) · 8–15 m'],[210,'Cacaoyers · 3–6 m, à mi-ombre'],[272,'Sol couvert : feuilles mortes, paillis, plantes de couverture'],[318,'Racines à des profondeurs différentes : peu de concurrence']];
+  lab.forEach(l=>{ s+=`<rect x="190" y="${l[0]-14}" width="${Math.min(440,l[1].length*6.4+14)}" height="20" rx="4" fill="#fff" opacity=".88"/>`+T(197,l[0],l[1],{a:'start',fs:12,b:1}); });
+  return `<svg viewBox="0 0 640 330" xmlns="http://www.w3.org/2000/svg">${s}</svg><figcaption>Chaque étage utilise la lumière, l'eau et le sol à son niveau.</figcaption>`;
+}
+function figCouloirs(){
+  let s=`<rect width="640" height="240" fill="#fff"/><rect x="0" y="40" width="640" height="190" fill="#E9DCC3"/>`;
+  for(let l=0;l<4;l++){ const y=60+l*55; for(let i=0;i<20;i++) s+=`<circle cx="${20+i*32}" cy="${y}" r="9" fill="#2E6B3A"/>`; if(l<3) for(let i=0;i<13;i++) s+=`<path d="M${30+i*48} ${y+30} v-12 m0 4 l-7 -6 m7 6 l7 -6" stroke="#D5A653" stroke-width="2.5" fill="none"/>`; }
+  s+=`<line x1="610" y1="60" x2="610" y2="115" stroke="#B3261E" stroke-width="2"/>`+T(600,92,'4–6 m',{a:'end',fs:12,c:'#B3261E',b:1});
+  s+=T(320,24,'Lignes de gliricidia ou d\'acacia (vert foncé) · cultures entre les lignes (maïs, igname, manioc)',{fs:12,b:1});
+  return `<svg viewBox="0 0 640 240" xmlns="http://www.w3.org/2000/svg">${s}</svg><figcaption>Les arbustes sont taillés à 50 cm – 1 m avant le semis ; les feuilles coupées sont laissées sur le sol comme engrais.</figcaption>`;
+}
+function figPlant(){
+  let s=`<rect width="640" height="300" fill="#fff"/>`;
+  // trou en coupe
+  s+=`<rect x="20" y="120" width="190" height="150" fill="#C9A57A"/><rect x="20" y="120" width="190" height="30" fill="#6B4B2E"/><rect x="75" y="120" width="80" height="80" fill="#fff"/><path d="M75 120 v80 h80 v-80" fill="none" stroke="#17201A" stroke-dasharray="4 3"/>`;
+  s+=`<path d="M25 118 q20 -30 45 0z" fill="#6B4B2E"/><path d="M160 118 q22 -30 45 0z" fill="#C9A57A" stroke="#999"/>`+T(48,100,'terre du dessus',{fs:10})+T(183,100,'terre du fond',{fs:10});
+  s+=T(115,165,'40 × 40 cm',{fs:12,b:1})+T(115,180,'40 cm de profondeur',{fs:11})+T(115,30,'1. Creuser',{b:1,fs:15});
+  // sachet
+  s+=`<rect x="262" y="140" width="46" height="60" rx="4" fill="#333"/><path d="M285 140 v-60" stroke="#3E8A5A" stroke-width="4"/><path d="M285 100 c-20 -4 -26 -18 -26 -28 14 0 26 10 26 28zM285 90 c20 -4 26 -18 26 -28 -14 0 -26 10 -26 28z" fill="#7CB342"/>`;
+  s+=`<path d="M318 150 l30 -10" stroke="#B3261E" stroke-width="2"/>`+T(330,30,'2. Enlever le sachet',{b:1,fs:15})+T(285,230,'Couper le sachet',{fs:12})+T(285,246,'sans casser la motte',{fs:12});
+  // planté
+  s+=`<rect x="420" y="180" width="200" height="90" fill="#C9A57A"/><path d="M450 180 q70 14 140 0" fill="#6B4B2E"/><path d="M445 178 q75 -14 150 0" fill="none" stroke="#8D6E4A" stroke-width="4"/>`;
+  s+=`<path d="M520 182 v-90" stroke="#3E8A5A" stroke-width="5"/><path d="M520 120 c-26 -4 -34 -22 -34 -34 18 0 34 12 34 34zM520 108 c26 -4 34 -22 34 -34 -18 0 -34 12 -34 34z" fill="#7CB342"/><path d="M545 182 v-110" stroke="#8D6E4A" stroke-width="3"/><path d="M520 135 h25" stroke="#B97A12" stroke-width="2"/>`;
+  s+=`<path d="M520 182 q-10 30 -30 50 M520 182 q8 34 30 46 M520 182 v52" stroke="#E6D2B0" stroke-width="3" fill="none"/>`;
+  for(let i=0;i<6;i++) s+=`<path d="M${452+i*10} 176 l8 -5" stroke="#D5A653" stroke-width="3"/><path d="M${548+i*10} 176 l8 -5" stroke="#D5A653" stroke-width="3"/>`;
+  s+=T(520,30,'3. Planter, tasser, pailler',{b:1,fs:15})+T(470,72,'tuteur',{fs:11,a:'start'})+T(600,160,'paillis',{fs:11})+T(430,165,'cuvette',{fs:11})+T(520,292,'Collet au niveau du sol',{fs:12,b:1});
+  return `<svg viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg">${s}</svg><figcaption>Planter un arbre : trou préparé à l'avance, compost au fond, sachet retiré, cuvette et paillis.</figcaption>`;
+}
+$('#fig-strates').innerHTML=figStrates(); $('#fig-couloirs').innerHTML=figCouloirs(); $('#fig-plant').innerHTML=figPlant();
+$('#g-print').onclick=()=>MOD.print($('#g-doc'),'Guide agroforesterie');
+
+/* =====================================================================
+   DÉMARRAGE
+   ===================================================================== */
+$$('[data-new]').forEach(b=>b.onclick=async()=>{ const r=newRec(b.dataset.new); await DB.put(r).catch(()=>{}); openForm(r,0); });
+$('#col-q').addEventListener('input', renderList);
+$('#cfg-projet').value=cfg.get('projet',''); $('#cfg-agent').value=cfg.get('agent','')||agentDefaut();
+$('#cfg-projet').oninput=e=>cfg.set('projet',e.target.value); $('#cfg-agent').oninput=e=>cfg.set('agent',e.target.value);
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible' && GPS.watch!=null) wake(true); });
+window.addEventListener('pagehide',()=>{ if(CUR){ CUR.modifie=new Date().toISOString(); DB.put(CUR); } });
+MOD.remember('agrodiag.agrof.ui');
+espUI(); plants(); MOD.tabs();
+DB.open().then(renderList);
+})();
+</script>
+</body>
+</html>
