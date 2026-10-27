@@ -89,6 +89,8 @@ public class MainActivity extends Activity {
                 if (HOST.equals(url.getHost())) return assetLoader.shouldInterceptRequest(url);
                 // Seule exception : le fichier de données publié par l'administrateur (mise à jour des données)
                 if (DATA_HOST.equals(url.getHost()) && url.getPath() != null && url.getPath().startsWith("/AgroDiagCI/data/")) return null;
+                // Avis de nouvelle version (assets/maj.js)
+                if (DATA_HOST.equals(url.getHost()) && "/AgroDiagCI/docs/version.json".equals(url.getPath())) return null;
                 // Inscription (avec accord de l'utilisateur) : seuls les points d'accès inscrits / rpc sont autorisés
                 if (INSCRIPTION_HOST.equals(url.getHost()) && url.getPath() != null
                         && (url.getPath().equals("/rest/v1/inscrits") || url.getPath().startsWith("/rest/v1/rpc/"))) return null;

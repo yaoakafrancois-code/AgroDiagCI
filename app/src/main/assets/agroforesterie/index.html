@@ -62,9 +62,12 @@
 
 <nav class="tabs" aria-label="Rubriques" id="mainnav"><div class="row" role="tablist">
   <button role="tab" data-tab="t-col">Collecte</button>
+  <button role="tab" data-tab="t-arb">Reconnaître les arbres</button>
+  <button role="tab" data-tab="t-sys">Systèmes agroforestiers</button>
+  <button role="tab" data-tab="t-rest">Restauration forestière</button>
+  <button role="tab" data-tab="t-mil">Agrosystème et milieux</button>
   <button role="tab" data-tab="t-plants">Calcul des plants</button>
-  <button role="tab" data-tab="t-guide">Guide technique</button>
-  <button role="tab" data-tab="t-esp">Essences</button>
+  <button role="tab" data-tab="t-guide">Planter un arbre</button>
 </div></nav>
 
 <!-- ============ COLLECTE (type Kobo) ============ -->
@@ -80,6 +83,7 @@
     <div id="col-sum" class="kpis"></div>
     <label class="f" style="max-width:420px">Rechercher (producteur, village)<input type="text" id="col-q" data-nomem placeholder="Tapez un nom"></label>
     <div id="col-list"></div>
+    <div class="panel" id="sync-box" style="margin:14px 0"></div>
     <h3>Exporter toutes les fiches</h3>
     <p class="note">Pour Excel, pour un ordinateur ou pour le superviseur. Les cartes s'ouvrent dans Google Earth (KML) ou dans QGIS (GeoJSON).</p>
     <div class="btns">
@@ -92,6 +96,18 @@
       <label class="btn sec" style="cursor:pointer">Importer une sauvegarde<input type="file" id="imp" accept=".json,application/json" hidden></label>
     </div>
     <p class="gpsmsg" id="exp-msg"></p>
+    <details class="acc" id="sup-acc"><summary>Espace superviseur (responsable du projet)</summary><div>
+      <p>Récupérez ici les fiches envoyées par tous les agents, pour les lire, les imprimer et les exporter vers Excel ou Google Earth.</p>
+      <label class="f">Clé du superviseur<input type="password" id="sup-cle" data-nomem autocomplete="off"></label>
+      <label style="display:flex;gap:8px;align-items:center;margin:-4px 0 10px"><input type="checkbox" id="sup-mem" data-nomem> Se souvenir de la clé sur ce téléphone</label>
+      <div class="btns"><button class="btn" type="button" id="sup-get">Récupérer les nouvelles fiches</button><button class="btn sec" type="button" id="sup-all">Tout recharger</button></div>
+      <p class="gpsmsg" id="sup-msg"></p>
+      <div id="sup-out"></div>
+      <details class="acc"><summary>Changer la clé</summary><div>
+        <div class="two"><label class="f">Ancienne clé<input type="password" id="sup-old" data-nomem></label><label class="f">Nouvelle clé (8 caractères ou plus)<input type="password" id="sup-new" data-nomem></label></div>
+        <button class="btn sec" type="button" id="sup-key">Changer la clé</button><p class="gpsmsg" id="sup-key-msg"></p>
+      </div></details>
+    </div></details>
     <details class="acc"><summary>Réglages des fiches</summary><div>
       <label class="f">Nom du projet ou de la structure (en haut des fiches imprimées)<input type="text" id="cfg-projet" data-nomem placeholder="ex. Projet de restauration – Région de l'Agnéby-Tiassa"></label>
       <label class="f">Nom de l'agent de terrain (rempli automatiquement)<input type="text" id="cfg-agent" data-nomem></label>
@@ -133,17 +149,7 @@
   <div class="btns noprint"><button class="btn sec" type="button" id="g-print">Imprimer / enregistrer en PDF</button></div>
   <h3>Un cacao agroforestier : les étages</h3>
   <figure class="ill" id="fig-strates"></figure>
-  <h3>Les principaux systèmes</h3>
-  <div class="cards">
-    <div class="card"><h3>Cacao ou café sous ombrage</h3><p>18 à 25 arbres d'ombrage par hectare, tous les 20 à 25 m, pour environ 30 à 40 % d'ombre. Mélanger arbres forestiers (fraké, framiré, akpi) et fruitiers (avocatier, safoutier, agrumes).</p></div>
-    <div class="card"><h3>Cultures en couloirs</h3><p>Lignes de gliricidia ou d'acacia tous les 4 à 6 m, cultures vivrières entre les lignes. On coupe les arbustes 2 à 3 fois par an et les feuilles servent d'engrais vert.</p></div>
-    <div class="card"><h3>Haies vives et brise-vent</h3><p>Arbres en limite de parcelle : ils marquent la propriété, arrêtent le vent et le feu, et donnent du bois ou du fourrage.</p></div>
-    <div class="card"><h3>Jachère améliorée</h3><p>Planter acacia, pois d'Angole ou mucuna sur une terre fatiguée : en 2 à 3 ans le sol redevient fertile, au lieu de 8 à 10 ans.</p></div>
-    <div class="card"><h3>Restauration forestière</h3><p>Reboiser une parcelle dégradée avec des essences locales (souvent 400 plants/ha, 5 × 5 m), avec des cultures vivrières les premières années (taungya).</p></div>
-    <div class="card"><h3>Parcs arborés (centre et nord)</h3><p>Garder et protéger les karités, nérés, rôniers et baobabs dans les champs : fruits, beurre, ombre pour les animaux.</p></div>
-  </div>
-  <h3>Cultures en couloirs</h3>
-  <figure class="ill" id="fig-couloirs"></figure>
+  <p class="note">Les différents systèmes sont expliqués dans les onglets « Systèmes agroforestiers » et « Restauration forestière ».</p>
   <h3>Bien planter un arbre</h3>
   <figure class="ill" id="fig-plant"></figure>
   <ol class="steps">
@@ -160,23 +166,223 @@
     <li>Planter en saison sèche ou à la fin des pluies.</li>
     <li>Laisser le sachet plastique, ou enterrer le collet trop profond.</li>
     <li>Brûler la parcelle pour la nettoyer : le feu tue les jeunes arbres.</li>
-    <li>Mettre dans le cacao des arbres hôtes du swollen shoot (fromager, colatier, poré-poré) ou très gourmands en eau (teck, eucalyptus).</li>
+    <li>Mettre dans le cacao des arbres réservoirs du swollen shoot (fromager, kapokier, colatiers, koto, poré-poré, prunier mombin) ou très gourmands en eau (teck, eucalyptus).</li>
     <li>Ne pas impliquer le propriétaire : sans accord écrit sur la propriété des arbres, ils sont souvent coupés.</li>
   </ul>
   </div>
 </section>
 
-<!-- ============ ESSENCES ============ -->
-<section class="tab" id="t-esp" hidden>
-  <h2>Les essences utiles</h2>
-  <p class="lead">Arbres courants en Côte d'Ivoire, classés comme dans les fiches de diagnostic. Touchez un filtre.</p>
-  <div class="opts" id="esp-f" style="margin-bottom:12px"></div>
-  <div class="tblw"><table id="esp-t"></table></div>
+<!-- ============ ARBRES ============ -->
+<section class="tab" id="t-arb" hidden>
+  <h2>Reconnaître les arbres</h2>
+  <p class="lead">Chaque fiche montre la feuille, la forme de l'arbre adulte à côté d'un homme (pour juger la taille), l'écorce, les signes pour le reconnaître et s'il va avec le cacao.</p>
+
+  <details class="acc" open><summary>Le bois très recherché et très cher</summary><div>
+    <p>L'arbre dont on dit qu'il « coûte extrêmement cher » est très probablement le <b>bois de vène</b>, aussi appelé <b>bois de rose</b> ou <b>kosso</b> (<i>Pterocarpus erinaceus</i>). Ce n'est pas un arbre de la forêt du sud : il pousse dans les savanes du nord. Ses troncs ont été coupés en masse pour être exportés vers l'Asie, où l'on fabrique des meubles de luxe en « bois de rose ».</p>
+    <div class="msg crit"><b>Interdit :</b> en Côte d'Ivoire, la coupe, la vente et l'exportation du bois de vène sont interdites depuis le décret n° 2013-508 du 25 juillet 2013. Depuis 2016, l'espèce est aussi inscrite à l'annexe II de la CITES (commerce international contrôlé). Si on vous propose d'en acheter ou d'en vendre, c'est illégal.</div>
+    <p><b>Comment le reconnaître :</b> feuille composée de 5 à 15 folioles alternes avec une foliole au bout ; quand on entaille l'écorce, une <b>sève rouge comme du sang</b> coule lentement ; fruits ronds et plats entourés d'une aile (4 à 7 cm) ; arbre de 15 à 25 m.</p>
+    <p><b>Les autres bois les plus précieux de Côte d'Ivoire</b> (souvent menacés, à protéger et à replanter) : assamela (afrormosia, CITES), makoré, sipo, aboudikro (sapelli), acajou, iroko, tiama, bété, niangon, lingué, ébène.</p>
+    <p class="note">Si on vous a parlé d'un autre arbre, donnez-moi son nom local : je compléterai.</p>
+    <div class="chips" id="arb-prec"></div>
+  </div></details>
+
+  <div class="panel" style="margin:12px 0">
+    <label class="f">Chercher un arbre<input type="text" id="arb-q" data-nomem placeholder="ex. fraké, samba, Terminalia…"></label>
+    <div class="three">
+      <label class="f">Catégorie<select id="arb-cat" data-nomem><option value="">Toutes</option><option value="o">Œuvre / forestiers</option><option value="f">Fertilitaires</option><option value="a">Alimentaires</option><option value="n">Nuisibles au cacao</option></select></label>
+      <label class="f">Zone<select id="arb-z" data-nomem><option value="">Toutes</option><option value="S">Sud forestier</option><option value="C">Centre</option><option value="N">Nord (savane)</option></select></label>
+      <label class="f">Avec le cacao<select id="arb-cac" data-nomem><option value="">Tous</option><option value="oui">Compatibles</option><option value="cond">Sous conditions</option><option value="non">À éviter</option></select></label>
+    </div>
+    <details class="acc"><summary>Clé d'identification : je ne connais pas l'arbre</summary><div>
+      <p class="note">Regardez une feuille entière (avec sa tige) et le tronc, puis choisissez ce que vous voyez.</p>
+      <div class="two">
+        <label class="f">La feuille<select id="k-f" data-nomem><option value="">Je ne sais pas</option><option value="s">Simple (une seule lame)</option><option value="l">Simple, découpée en main (lobes)</option><option value="i">Composée en plume, avec une foliole au bout</option><option value="p">Composée en plume, SANS foliole au bout</option><option value="b">Deux fois composée (très finement découpée)</option><option value="d">Composée en main (folioles en éventail)</option><option value="t">3 folioles</option><option value="ph">Fausses feuilles à nervures parallèles (acacias)</option><option value="pal">Palme</option></select></label>
+        <label class="f">Feuilles opposées (deux par deux) ?<select id="k-o" data-nomem><option value="">Je ne sais pas</option><option value="1">Oui</option><option value="0">Non, alternes</option></select></label>
+        <label class="f">Bord de la feuille<select id="k-bd" data-nomem><option value="">Je ne sais pas</option><option value="e">Lisse</option><option value="d">Denté (petites dents)</option></select></label>
+        <label class="f">Quand on entaille l'écorce<select id="k-sv" data-nomem><option value="">Je ne sais pas</option><option value="blanc">Latex blanc</option><option value="rouge">Sève rouge</option><option value="jaune">Latex jaune</option><option value="none">Rien de coloré</option></select></label>
+        <label class="f">Contreforts (ailes) au pied<select id="k-cf" data-nomem><option value="">Je ne sais pas</option><option value="1">Oui</option><option value="0">Non</option></select></label>
+        <label class="f">Taille de l'arbre adulte<select id="k-h" data-nomem><option value="">Je ne sais pas</option><option value="p">Petit (moins de 15 m)</option><option value="m">Moyen (15 à 30 m)</option><option value="g">Grand (plus de 30 m)</option></select></label>
+        <label class="f">Épines sur le tronc ou les branches<select id="k-ep" data-nomem><option value="">Je ne sais pas</option><option value="1">Oui</option><option value="0">Non</option></select></label>
+      </div>
+      <figure class="ill" id="fig-ftypes"></figure>
+    </div></details>
+  </div>
+
+  <div id="arb-fiche"></div>
+  <p class="note" id="arb-count"></p>
+  <div class="cards" id="arb-list"></div>
+
+  <h3>Comparer les tailles</h3>
+  <figure class="ill" id="fig-tailles"></figure>
+
+  <h3>Pourquoi certains arbres sont « nuisibles » au cacao</h3>
+  <div class="cards">
+    <div class="card"><h3>1. Réservoirs du swollen shoot</h3><p>Le virus du swollen shoot vit aussi dans certains arbres sauvages. De petites cochenilles farineuses (protégées par des fourmis) le transportent de ces arbres vers les cacaoyers. Une étude faite en Côte d'Ivoire (Marahoué, 2020) cite comme réservoirs : <b>fromager, kapokier rouge, colatier géant, koto, poré-poré, prunier mombin</b>. Dans une zone touchée, il faut les éloigner des cacaoyers.</p></div>
+    <div class="card"><h3>2. Hôtes des mirides (capsides)</h3><p>Les chercheurs déconseillent les <b>colatiers</b>, le <b>fromager</b> et le <b>samba</b> près du cacao, car ils hébergent des ravageurs du cacaoyer, notamment les mirides. Ces arbres ont pourtant de la valeur (noix de cola, bois) : les garder en bordure ou à l'écart.</p></div>
+    <div class="card"><h3>3. Concurrence trop forte</h3><p><b>Teck</b> (sol nu et durci sous ses grandes feuilles), <b>eucalyptus</b> (boit beaucoup d'eau, rien ne pousse dessous), <b>manguier</b> et <b>Samanea</b> (ombre trop dense), <b>palmier à huile</b> en grand nombre. Le problème vient du nombre et de l'emplacement : en limite ou en faible nombre, ils sont acceptables.</p></div>
+    <div class="card"><h3>4. Arbres qui envahissent</h3><p><b>Acacia mangium, Acacia auriculiformis, Leucaena</b> : très utiles (azote, bois de chauffe), mais leurs graines se répandent. Les tailler et ne pas les planter près des forêts naturelles.</p></div>
+  </div>
+  <div class="msg info"><b>Et l'hévéa ?</b> Vous avez raison : il n'est pas « nuisible ». Je l'ai corrigé en « possible sous conditions ». Des essais en Côte d'Ivoire ont été encourageants (pas de dégâts sur l'hévéa, cacaoyers qui fleurissent plus tôt). Une étude de 2026 à Soubré montre que des planteurs font cohabiter cacao et hévéa, ce que les structures de conseil ont longtemps jugé impossible. La limite : l'ombre de l'hévéa grandit avec l'âge et le rendement du cacao baisse peu à peu. Il faut donc des lignes d'hévéa bien espacées, éclaircir à temps, fertiliser et bien entretenir le cacao.</div>
 </section>
+
+<!-- ============ SYSTÈMES ============ -->
+<section class="tab" id="t-sys" hidden>
+  <div id="sys-doc">
+  <h2>Les systèmes agroforestiers</h2>
+  <p class="lead">L'agroforesterie, c'est associer volontairement des arbres avec des cultures et/ou des animaux sur la même terre, pour que chacun profite à l'autre. On classe les systèmes selon ce qu'on associe.</p>
+  <div class="btns noprint"><button class="btn sec" type="button" id="sys-print">Imprimer / enregistrer en PDF</button></div>
+  <figure class="ill" id="fig-familles"></figure>
+
+  <h3>Les systèmes dans le monde et en Côte d'Ivoire</h3>
+  <div class="tblw"><table>
+    <thead><tr><th>Système</th><th>Principe</th><th>Dans le monde</th><th>En Côte d'Ivoire</th></tr></thead>
+    <tbody>
+      <tr><td colspan="4" style="background:var(--sunk)"><b>Arbres + cultures (agrosylvicoles)</b></td></tr>
+      <tr><td><b>Cultures pérennes sous ombrage</b></td><td>Cacao, café ou thé sous des arbres d'ombrage.</td><td>Ghana, Cameroun, Amérique latine (cacao sous inga ou erythrina), Inde (café)</td><td>Cacao et café agroforestiers : le grand système du pays.</td></tr>
+      <tr><td><b>Agroforêt complexe</b></td><td>Plantation à plusieurs étages, plus de 15 grands arbres/ha, surtout locaux.</td><td>Indonésie (agroforêts à damar, « hévéa de jungle »), Cameroun</td><td>Vieilles cacaoyères du Centre-Ouest et de l'Est ; elles disparaissent vite.</td></tr>
+      <tr><td><b>Agroforêt simple</b></td><td>5 à 6 arbres émergents/ha, souvent légumineuses introduites.</td><td>Partout</td><td>Plantations nouvelles des programmes cacao.</td></tr>
+      <tr><td><b>Jardins de case</b></td><td>Autour de la maison : fruitiers, légumes, plantes médicinales, petits animaux.</td><td>Kerala (Inde), Java, Kilimandjaro</td><td>Cours de village : manguier, avocatier, agrumes, moringa, poules.</td></tr>
+      <tr><td><b>Cultures en couloirs</b></td><td>Lignes d'arbustes fixateurs d'azote tous les 4 à 6 m, cultures entre les lignes.</td><td>Nigeria, Philippines</td><td>Gliricidia, flemingia dans les projets.</td></tr>
+      <tr><td><b>Jachère améliorée</b></td><td>Planter des légumineuses pour régénérer le sol en 2 à 3 ans.</td><td>Zambie, Malawi (sesbania, tephrosia)</td><td>Acacia, pois d'Angole, mucuna ; jachère à « Sékou Touré » (Chromolaena).</td></tr>
+      <tr><td><b>Taungya</b></td><td>Planter des arbres forestiers et cultiver des vivriers entre eux les premières années.</td><td>Né en Birmanie au XIX<sup>e</sup> siècle ; « shamba » au Kenya</td><td>SODEFOR : contrats de cultures intercalaires aux reboisements.</td></tr>
+      <tr><td><b>Parcs arborés</b></td><td>Arbres utiles gardés et protégés dans les champs.</td><td>Sahel (kad, karité, néré, baobab)</td><td>Nord : parcs à karité et néré.</td></tr>
+      <tr><td><b>Haies vives, brise-vent, arbres en limite</b></td><td>Lignes d'arbres autour ou à travers les parcelles.</td><td>Bocage en France, Sahel</td><td>Haies de gliricidia ; dans le nord, haies vives et clôtures pour séparer champs et pâturages.</td></tr>
+      <tr><td><b>Régénération naturelle assistée (RNA)</b></td><td>Protéger et tailler les jeunes pousses et rejets d'arbres déjà présents.</td><td>Niger, Burkina Faso (des millions d'hectares)</td><td>Savanes du centre et du nord.</td></tr>
+      <tr><td><b>Cultures sous forêt</b></td><td>Produire sous un couvert forestier (épices, plantes médicinales, fruits sauvages).</td><td>Asie, Amérique du Nord</td><td>Cueillette d'akpi, de kplé, de rotin, de plantes médicinales.</td></tr>
+      <tr><td colspan="4" style="background:var(--sunk)"><b>Arbres + animaux (sylvopastoraux)</b></td></tr>
+      <tr><td><b>Pâturage sous les arbres</b></td><td>Les animaux broutent sous des plantations ou des arbres épars.</td><td>Espagne et Portugal (« dehesa » : chênes et porcs), Amérique latine</td><td>Bovins sous anacardiers (nord-est), sous cocotiers (littoral), sous palmiers.</td></tr>
+      <tr><td><b>Arbres et haies fourragers</b></td><td>Arbres dont on coupe les feuilles pour nourrir les animaux.</td><td>Afrique de l'Est, Amérique</td><td>Leucaena, gliricidia, Samanea, lingué.</td></tr>
+      <tr><td colspan="4" style="background:var(--sunk)"><b>Arbres + cultures + animaux (agrosylvopastoraux)</b></td></tr>
+      <tr><td><b>Systèmes mixtes</b></td><td>Les trois ensemble, avec le fumier qui nourrit le sol.</td><td>Sahel, hautes terres d'Afrique de l'Est</td><td>Anacarde + igname et manioc + bovins (nord-est, étude Nitidæ 2025).</td></tr>
+      <tr><td colspan="4" style="background:var(--sunk)"><b>Autres systèmes</b></td></tr>
+      <tr><td><b>Sylvo-aquaculture</b></td><td>Mangroves ou arbres associés à l'élevage de poissons ou de crevettes.</td><td>Vietnam, Indonésie</td><td>Lagunes Aby, Ébrié, Grand-Lahou, Fresco (voir l'onglet « Agrosystème et milieux »).</td></tr>
+      <tr><td><b>Apiforesterie</b></td><td>Ruches dans les arbres ou les vergers.</td><td>Partout</td><td>Miel d'anacarde, de forêt, de mangrove.</td></tr>
+      <tr><td><b>Bandes boisées le long de l'eau</b></td><td>Garder ou replanter des arbres sur les berges.</td><td>États-Unis, Europe (zones tampons)</td><td>Bande de 25 m de chaque côté des cours d'eau (Code forestier 2019, art. 99).</td></tr>
+      <tr><td><b>Agro-forêt (sens de la loi)</b></td><td>Espace du domaine privé de l'État où coexistent plantations agricoles et arbres forestiers.</td><td>–</td><td>Code forestier 2019 (art. 1) ; forêts classées dégradées reconverties.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Les cacaoyères en Côte d'Ivoire : 3 types</h3>
+  <figure class="ill" id="fig-cacao3"></figure>
+  <div class="msg info"><b>Agroforesterie de reforestation ou de déforestation ?</b> Planter des arbres dans un cacao déjà installé reconstitue le couvert forestier. Abattre une forêt pour y faire un « cacao agroforestier » la détruit. Seule la première est une vraie restauration.</div>
+
+  <h3>Cultures en couloirs</h3>
+  <figure class="ill" id="fig-couloirs"></figure>
+  </div>
+</section>
+
+<!-- ============ RESTAURATION ============ -->
+<section class="tab" id="t-rest" hidden>
+  <div id="rest-doc">
+  <h2>Les types de restauration forestière</h2>
+  <p class="lead">Restaurer, c'est faire revenir les arbres et les services de la forêt (eau, sol, bois, fruits, animaux) sur une terre dégradée. On choisit la méthode selon ce qui reste sur le terrain.</p>
+  <div class="btns noprint"><button class="btn sec" type="button" id="rest-print">Imprimer / enregistrer en PDF</button></div>
+  <figure class="ill" id="fig-echelle"></figure>
+  <div class="cards">
+    <div class="card"><h3>1. Mise en défens (régénération naturelle)</h3><p>On protège la parcelle (contre le feu, les animaux et la coupe) et la forêt revient seule à partir des graines et des souches.</p><p class="note">Quand : il reste des souches, des jeunes arbres et une forêt proche. Le moins cher ; le plus lent.</p></div>
+    <div class="card"><h3>2. Régénération naturelle assistée (RNA)</h3><p>On repère les jeunes arbres et rejets utiles, on les marque, on les dégage, on les taille (1 à 3 tiges gardées) et on les protège.</p><p class="note">Quand : beaucoup de rejets et de semis naturels. Peu coûteux.</p></div>
+    <div class="card"><h3>3. Enrichissement en layons ou en trouées</h3><p>Dans une forêt dégradée, on ouvre des lignes (layons de 2 à 3 m tous les 10 à 20 m) ou des petites trouées, et on y plante des essences de valeur qui supportent l'ombre (acajou, tiama, sipo, makoré, bossé).</p><p class="note">Quand : forêt appauvrie mais encore boisée.</p></div>
+    <div class="card"><h3>4. Système taungya</h3><p>On plante les arbres forestiers et, pendant 2 à 3 ans, le paysan cultive entre les lignes : <b>banane plantain</b>, maïs, igname, manioc, arachide, piment… Il récolte ses vivriers et, en désherbant ses cultures, il entretient les jeunes arbres. La banane fait de l'ombre aux jeunes plants. On peut aussi associer des arbres fruitiers. Quand les arbres se referment, les cultures s'arrêtent et la forêt reste.</p><p class="note">Quand : terre déboisée avec des paysans demandeurs de terre. Coûts d'entretien réduits.</p></div>
+    <div class="card"><h3>5. Reboisement en plein (plantation)</h3><p>Plantation régulière sur toute la parcelle, d'une seule espèce (teck, gmelina, fraké, framiré…) ou de plusieurs mélangées. Souvent 400 plants/ha (5 × 5 m) à 1 111 plants/ha (3 × 3 m).</p><p class="note">Quand : terre nue, objectif bois. Le mélange d'espèces locales résiste mieux aux maladies et ravageurs.</p></div>
+    <div class="card"><h3>6. Agroforêt de restauration</h3><p>Dans les forêts classées dégradées occupées par des cultures, on plante des arbres forestiers dans les plantations existantes (cacao, café) selon un plan avec la SODEFOR. La loi de 2019 a créé les « agro-forêts ».</p></div>
+    <div class="card"><h3>7. Nucléation (îlots d'arbres)</h3><p>Au lieu de planter partout, on plante des îlots de 10 à 30 arbres répartis sur la parcelle. Les oiseaux et les chauves-souris s'y posent et apportent des graines entre les îlots.</p><p class="note">Moins cher qu'une plantation en plein.</p></div>
+    <div class="card"><h3>8. Micro-forêt dense (méthode Miyawaki)</h3><p>Sur une petite surface (100 à 1 000 m²), on plante très serré (2 à 3 plants/m²) beaucoup d'espèces locales, sur un sol bien préparé avec du compost. La forêt se ferme très vite.</p><p class="note">Pour écoles, villages, sources, bords de route.</p></div>
+    <div class="card"><h3>9. Restauration des mangroves</h3><p>Rétablir la circulation de l'eau, puis replanter des propagules de palétuviers (voir l'onglet « Agrosystème et milieux »).</p></div>
+    <div class="card"><h3>10. Restauration des berges</h3><p>Replanter des arbres qui aiment l'eau sur 25 m de chaque côté des cours d'eau et autour des sources.</p></div>
+    <div class="card"><h3>11. Forêts sacrées et communautaires</h3><p>Protéger, agrandir et relier les forêts sacrées ; ce sont aussi des réserves de graines pour les pépinières.</p></div>
+    <div class="card"><h3>12. Restauration des sols (nord)</h3><p>Zaï, demi-lunes, cordons pierreux, puis arbres : on retient l'eau avant de planter.</p></div>
+  </div>
+
+  <h3>Le système taungya, année après année</h3>
+  <figure class="ill" id="fig-taungya"></figure>
+
+  <h3>Quelle méthode choisir ?</h3>
+  <div class="tblw"><table><thead><tr><th>Ce que je vois sur le terrain</th><th>Méthode conseillée</th></tr></thead><tbody>
+    <tr><td>Beaucoup de souches, de rejets et de jeunes arbres</td><td>Mise en défens + RNA</td></tr>
+    <tr><td>Forêt encore là, mais pauvre en arbres de valeur</td><td>Enrichissement en layons ou en trouées</td></tr>
+    <tr><td>Terre nue, des paysans veulent cultiver</td><td>Taungya</td></tr>
+    <tr><td>Terre nue, objectif bois</td><td>Reboisement en plein (mélange d'espèces)</td></tr>
+    <tr><td>Cacao ou café déjà installés</td><td>Agroforêt : planter des arbres dans la plantation</td></tr>
+    <tr><td>Grande surface, peu de moyens</td><td>Nucléation (îlots) + mise en défens</td></tr>
+    <tr><td>Petite surface près du village ou d'une source</td><td>Micro-forêt dense</td></tr>
+  </tbody></table></div>
+
+  <h3>Les étapes d'un projet de restauration</h3>
+  <ol class="steps">
+    <li><b>Diagnostic</b> de la parcelle et du producteur, avec la cartographie (onglet Collecte).</li>
+    <li><b>Accord écrit</b> avec le propriétaire de la terre sur la propriété des arbres plantés (Code forestier, art. 27).</li>
+    <li><b>Choix de la méthode et des espèces</b> : surtout des espèces locales, mélangées.</li>
+    <li><b>Pépinière</b> : graines des forêts sacrées et des arbres mères de la zone.</li>
+    <li><b>Plantation</b> au début des pluies (onglet « Planter un arbre »).</li>
+    <li><b>Entretien pendant 3 ans</b> : désherbage, pare-feu, protection contre les animaux.</li>
+    <li><b>Suivi</b> : compter les plants vivants, calculer le taux de survie, puis faire le <b>regarnissage</b> (fiche « Visite avant regarnissage »).</li>
+  </ol>
+  </div>
+</section>
+
+<!-- ============ AGROSYSTÈME ET MILIEUX ============ -->
+<section class="tab" id="t-mil" hidden>
+  <div id="mil-doc">
+  <h2>L'agrosystème</h2>
+  <p class="lead">Un agrosystème (ou agroécosystème), c'est un milieu naturel transformé par l'homme pour produire de la nourriture, du bois ou des revenus : un champ, une plantation, un pâturage, un bas-fond rizicole, un étang. Il garde des éléments naturels (sol, climat, insectes, microbes) mais l'homme décide de ce qui pousse et récolte une partie de la production.</p>
+  <div class="btns noprint"><button class="btn sec" type="button" id="mil-print">Imprimer / enregistrer en PDF</button></div>
+  <figure class="ill" id="fig-agrosys"></figure>
+  <div class="tblw"><table><thead><tr><th></th><th>Forêt naturelle (écosystème)</th><th>Agrosystème</th></tr></thead><tbody>
+    <tr><td>Nombre d'espèces</td><td>Très élevé</td><td>Faible (souvent une seule culture)</td></tr>
+    <tr><td>Matière organique</td><td>Tout retourne au sol</td><td>Une partie part avec la récolte : le sol s'appauvrit si on ne la remplace pas</td></tr>
+    <tr><td>Équilibre</td><td>Stable, les ravageurs ont des ennemis naturels</td><td>Fragile : ravageurs et maladies se multiplient</td></tr>
+    <tr><td>Énergie et intrants</td><td>Le soleil seulement</td><td>Soleil + travail + semences + engrais + traitements</td></tr>
+    <tr><td>Sol</td><td>Toujours couvert</td><td>Souvent nu : érosion</td></tr>
+  </tbody></table></div>
+  <h3>Rendre l'agrosystème plus durable</h3>
+  <ul class="clean">
+    <li><b>Diversifier</b> : plusieurs cultures, des arbres, des animaux.</li>
+    <li><b>Recycler</b> : résidus, fumier et compost retournent au sol.</li>
+    <li><b>Couvrir le sol</b> en permanence (paillis, plantes de couverture).</li>
+    <li><b>Mettre des arbres</b> : ils remontent les éléments nutritifs du fond du sol, abritent les auxiliaires et cassent le vent.</li>
+    <li><b>Réduire les produits chimiques</b> : biopesticides, lutte intégrée.</li>
+  </ul>
+  <p><b>Les grands agrosystèmes de Côte d'Ivoire :</b> plantations pérennes (cacao, café, hévéa, palmier, anacarde), vivriers sur brûlis avec jachère, bas-fonds rizicoles, maraîchage autour des villes, élevage extensif du nord, cacaoyères agroforestières.</p>
+
+  <h2 style="margin-top:28px">Les mangroves</h2>
+  <figure class="ill" id="fig-mangrove"></figure>
+  <p>Les mangroves sont des forêts qui poussent dans l'eau salée ou saumâtre, au bord des lagunes et des embouchures : Aby, Ébrié, Grand-Lahou, Fresco, Sassandra, San-Pédro.</p>
+  <div class="cards">
+    <div class="card"><h3>Les arbres</h3><ul class="clean"><li><b>Palétuvier rouge</b> (<i>Rhizophora racemosa</i>) : racines en échasses, graines qui germent sur l'arbre (propagules).</li><li><b>Palétuvier blanc</b> (<i>Avicennia germinans</i>) : petites racines qui sortent du sol pour respirer.</li><li><b>Laguncularia</b> et <b>Conocarpus</b> vers la terre ferme.</li></ul></div>
+    <div class="card"><h3>À quoi elles servent</h3><ul class="clean"><li>Nurserie des poissons, crevettes, crabes et huîtres : sans mangrove, moins de pêche.</li><li>Protègent la côte et les villages contre l'érosion et les vagues.</li><li>Filtrent l'eau.</li><li>Stockent beaucoup de carbone dans la vase.</li></ul></div>
+    <div class="card"><h3>Agroforesterie autour des mangroves</h3><ul class="clean"><li>Planter des bois de chauffe (acacias, cassia) sur la terre ferme pour les fumoirs à poisson, au lieu de couper les palétuviers.</li><li>Foyers et fumoirs améliorés (moins de bois).</li><li>Ruches (miel de mangrove), huîtres et crabes, pisciculture sans défricher.</li><li>Replanter les propagules de palétuvier rouge en saison favorable, là où l'eau circule bien.</li></ul></div>
+  </div>
+  <div class="msg warn"><b>La loi :</b> défricher dans les mangroves et les zones humides est une infraction (Code forestier 2019, art. 99).</div>
+
+  <h2 style="margin-top:28px">Les forêts sacrées</h2>
+  <p>La loi définit la forêt sacrée comme une forêt réservée à l'expression culturelle ou cultuelle. L'administration forestière doit la protéger en respectant les coutumes (art. 26). Y exploiter du bois est une infraction (art. 89).</p>
+  <ul class="clean">
+    <li>Ce sont souvent les derniers morceaux de vraie forêt : <b>réserves d'arbres rares</b> (iroko, makoré, acajou…), d'animaux et de plantes médicinales.</li>
+    <li>Ce sont des <b>réserves de graines</b> : avec l'accord des chefs coutumiers, on y récolte les graines pour les pépinières de restauration.</li>
+    <li><b>Agroforesterie autour</b> : une ceinture de cultures arborées (cacao agroforestier, fruitiers, haies) protège la forêt sacrée du feu et des défrichements.</li>
+    <li><b>Les relier</b> entre elles et aux berges par des bandes d'arbres (corridors) pour que les animaux et les graines circulent.</li>
+  </ul>
+
+  <h2 style="margin-top:28px">Protéger les eaux</h2>
+  <figure class="ill" id="fig-berges"></figure>
+  <ul class="clean">
+    <li><b>Bande de 25 m</b> de chaque côté des cours d'eau, à partir de la limite des plus hautes eaux : y déboiser est une infraction (Code forestier 2019, art. 99).</li>
+    <li>Arbres qui aiment les berges : bahia (<i>Mitragyna</i>), badi (<i>Nauclea</i>), palmier raphia, <i>Pterocarpus santalinoides</i>, <i>Alchornea cordifolia</i> (arbuste).</li>
+    <li>Autour des sources : pas de cultures, pas d'engrais ni de pesticides, pas de lavage de pulvérisateurs ; laisser ou replanter la forêt.</li>
+    <li>Sur les pentes : haies et bandes d'arbres en suivant les courbes de niveau, contre l'érosion.</li>
+    <li>Pas d'eucalyptus près des sources et des bas-fonds : il assèche le sol.</li>
+  </ul>
+
+  <h2 style="margin-top:28px">À qui appartiennent les arbres ?</h2>
+  <p>Selon le Code forestier de 2019 (art. 27), un arbre ou une forêt <b>naturelle</b> appartient au propriétaire de la terre. Un arbre <b>planté</b> appartient au propriétaire de la terre, ou à celui qui l'a planté s'il existe une <b>convention</b> avec le propriétaire. Conseil : avant de planter sur la terre d'un autre, faites un accord écrit et signé.</p>
+  </div>
+</section>
+
 
 <p class="foot">Les fiches sont enregistrées dans ce téléphone. Exportez-les régulièrement (sauvegarde ou Excel) pour ne rien perdre.</p>
 </div>
 
+<script src="../assets/arbres.js"></script>
 <script src="../assets/modules.js"></script>
 <script>
 (function(){
@@ -184,59 +390,267 @@
 const $=MOD.$, $$=MOD.$$, fmt=MOD.fmt, esc=MOD.esc;
 
 /* =====================================================================
-   ESSENCES
+   ARBRES : dessins (feuille, silhouette, écorce) et fiches
    ===================================================================== */
-// cat : o = œuvre / forestière, a = alimentaire, f = fertilitaire, n = nuisible au cacao
-const ESP = [
-  ['Fraké','Terminalia superba','o','Bois d\'œuvre, croissance rapide, bon ombrage du cacao','Sud, centre'],
-  ['Framiré','Terminalia ivorensis','o','Bois d\'œuvre de valeur, ombrage du cacao','Sud, centre'],
-  ['Akpi','Ricinodendron heudelotii','oa','Graines vendues (sauce), bois léger, ombrage du cacao','Sud, centre'],
-  ['Acajou','Khaya ivorensis / K. grandifoliola','o','Bois d\'œuvre de grande valeur','Sud, centre'],
-  ['Iroko','Milicia excelsa','o','Bois d\'œuvre de grande valeur, croissance lente','Sud, centre'],
-  ['Bété','Mansonia altissima','o','Bois d\'œuvre','Sud, centre'],
-  ['Samba (ayous)','Triplochiton scleroxylon','o','Bois d\'œuvre, croissance rapide (hôte possible du swollen shoot : à éloigner du cacao)','Sud, centre'],
-  ['Tiama','Entandrophragma angolense','o','Bois d\'œuvre','Sud'],
-  ['Kotibé','Nesogordonia papaverifera','o','Bois d\'œuvre','Sud, centre'],
-  ['Cedrela','Cedrela odorata','o','Bois d\'œuvre, croissance rapide','Sud, centre'],
-  ['Gmelina','Gmelina arborea','o','Bois de service, croissance très rapide (en bordure, pas dans le cacao)','Partout'],
-  ['Albizia','Albizia adianthifolia / A. zygia','of','Ombrage léger du cacao, fixe l\'azote','Sud, centre'],
-  ['Avocatier','Persea americana','a','Fruits, bon ombrage du cacao','Sud, centre'],
-  ['Safoutier','Dacryodes edulis','a','Fruits (safou), ombrage du cacao','Sud'],
-  ['Manguier','Mangifera indica','a','Fruits, ombre','Partout'],
-  ['Oranger, mandarinier, citronnier','Citrus spp.','a','Fruits, revenus réguliers','Sud, centre'],
-  ['Corossolier','Annona muricata','a','Fruits','Sud, centre'],
-  ['Cocotier','Cocos nucifera','a','Noix, bordure de parcelle','Littoral, sud'],
-  ['Bananier / plantain','Musa spp.','a','Ombrage temporaire des jeunes cacaoyers, nourriture','Sud, centre'],
-  ['Anacardier','Anacardium occidentale','a','Noix de cajou','Centre, nord'],
-  ['Karité','Vitellaria paradoxa','a','Amandes, beurre de karité (parcs arborés)','Nord'],
-  ['Néré','Parkia biglobosa','af','Soumbala, fixe l\'azote','Centre, nord'],
-  ['Moringa','Moringa oleifera','a','Feuilles très nutritives, haies','Partout'],
-  ['Gliricidia','Gliricidia sepium','f','Fixe l\'azote, haies, cultures en couloirs, tuteurs vivants','Partout'],
-  ['Acacia mangium','Acacia mangium','f','Fixe l\'azote, jachère améliorée, bois de chauffe (envahissant : ne pas planter près des forêts)','Sud, centre'],
-  ['Acacia auriculiformis','Acacia auriculiformis','f','Fixe l\'azote, jachère, bois de chauffe','Partout'],
-  ['Leucaena','Leucaena leucocephala','f','Fixe l\'azote, fourrage, couloirs (peut envahir : tailler)','Partout'],
-  ['Pois d\'Angole','Cajanus cajan','fa','Fixe l\'azote, graines comestibles, jachère courte','Partout'],
-  ['Erythrina','Erythrina spp.','f','Fixe l\'azote, tuteurs vivants, haies','Sud, centre'],
-  ['Fromager','Ceiba pentandra','n','Hôte du virus du swollen shoot du cacao : à éviter dans et autour des cacaoyères','Partout'],
-  ['Colatier','Cola nitida','na','Noix de cola, mais hôte du swollen shoot : à éviter dans les zones touchées','Sud, centre'],
-  ['Poré-poré','Sterculia tragacantha','n','Hôte du swollen shoot','Sud, centre'],
-  ['Teck','Tectona grandis','no','Bois d\'œuvre, mais concurrence forte (eau, ombre dense, sol nu) : pas dans le cacao','Centre, nord'],
-  ['Eucalyptus','Eucalyptus spp.','n','Consomme beaucoup d\'eau, rien ne pousse dessous : pas dans les cultures','Partout'],
-  ['Hévéa','Hevea brasiliensis','n','Concurrence le cacao (racines, ombre) : parcelles séparées','Sud']
-];
-const CATN={o:'Œuvre / forestière',a:'Alimentaire',f:'Fertilitaire',n:'Nuisible au cacao'};
-const CATC={o:'g',a:'o',f:'',n:'r'};
-function espUI(){
-  let sel='tout';
-  const f=$('#esp-f');
-  f.innerHTML=[['tout','Toutes']].concat(Object.entries(CATN)).map(([k,n])=>`<label><input type="radio" name="espf" value="${k}" ${k==='tout'?'checked':''}> ${n}</label>`).join('');
-  const draw=()=>{ $('#esp-t').innerHTML='<thead><tr><th>Nom</th><th>Catégorie</th><th>Usages et remarques</th><th>Zone</th></tr></thead><tbody>'+
-    ESP.filter(e=>sel==='tout'||e[2].includes(sel)).map(e=>`<tr><td><b>${esc(e[0])}</b><br><i class="note">${esc(e[1])}</i></td><td>${e[2].split('').map(c=>`<span class="chip ${CATC[c]}">${CATN[c]}</span>`).join(' ')}</td><td>${esc(e[3])}</td><td>${esc(e[4])}</td></tr>`).join('')+'</tbody>'; };
-  $$('input',f).forEach(i=>i.onchange=()=>{ sel=i.value; draw(); });
+const ARB = window.ARBRES || [];
+const SVGW = (w,h,b,lbl)=>`<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" font-family="Arial" role="img"${lbl?` aria-label="${esc(lbl)}"`:''}>${b}</svg>`;
+const TX=(x,y,s,o)=>{ o=o||{}; return `<text x="${x}" y="${y}" font-size="${o.fs||13}" fill="${o.c||'#17201A'}" text-anchor="${o.a||'middle'}" font-weight="${o.b?700:400}" font-family="Arial">${s}</text>`; };
+const LEAF='#4E9A3F', LEAFD='#2E6B3A', VEIN='#C8E6B0';
+// largeur relative de la lame selon la forme (t de 0 = base à 1 = pointe)
+function prof(sh,t){
+  const s=Math.sin(Math.PI*t);
+  switch(sh){ case 'obo': return Math.sin(Math.PI*Math.pow(t,1.6));
+    case 'ova': case 'cor': return Math.sin(Math.PI*Math.pow(t,0.6));
+    case 'lan': return Math.pow(s,1.2)*0.6;
+    case 'fal': return Math.pow(s,1.1)*0.45;
+    case 'obl': return Math.min(1,1.7*s)*0.75;
+    case 'ron': return Math.pow(s,0.6);
+    default: return s; }
+}
+// lame : base (x,y), longueur L, demi-largeur W, angle (degrés, 0 = vers le haut)
+function blade(x,y,L,W,ang,sh,bd,col,veins){
+  const a=ang*Math.PI/180, ux=Math.sin(a), uy=-Math.cos(a), vx=-uy, vy=ux, N=40;
+  const curve = sh==='fal' ? 0.18 : 0;
+  const R=[], Lf=[];
+  for(let i=0;i<=N;i++){ const t=i/N; let w=prof(sh,t)*W; if(bd==='d' && i>1 && i<N-1) w*= (i%2?1.09:0.93);
+    const off = curve*L*Math.sin(Math.PI*t);
+    const cx=x+ux*L*t+vx*off, cy=y+uy*L*t+vy*off;
+    R.push([cx+vx*w, cy+vy*w]); Lf.push([cx-vx*w, cy-vy*w]); }
+  let pts=R.concat(Lf.reverse());
+  if(sh==='cor'){ const bw=W*0.8; pts=[[x+vx*bw*0.2-ux*W*0.35, y+vy*bw*0.2-uy*W*0.35]].concat(R.slice(1), Lf.slice(0,-1), [[x-vx*bw*0.2-ux*W*0.35, y-vy*bw*0.2-uy*W*0.35],[x,y]]); }
+  let s=`<path d="M${pts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L')}Z" fill="${col||LEAF}" stroke="${LEAFD}" stroke-width="1.2" stroke-linejoin="round"/>`;
+  if(veins!==false){
+    const mid=[]; for(let i=0;i<=N;i+=4){ const t=i/N, off=curve*L*Math.sin(Math.PI*t); mid.push([x+ux*L*t+vx*off, y+uy*L*t+vy*off]); }
+    s+=`<polyline points="${mid.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')}" fill="none" stroke="${VEIN}" stroke-width="${Math.max(0.8,W/14)}"/>`;
+    if(W>9) for(let k=1;k<6;k++){ const t=k/6.5, w=prof(sh,t)*W*0.8, off=curve*L*Math.sin(Math.PI*t), cx=x+ux*L*t+vx*off, cy=y+uy*L*t+vy*off;
+      s+=`<path d="M${cx.toFixed(1)} ${cy.toFixed(1)} l${(vx*w+ux*w*0.5).toFixed(1)} ${(vy*w+uy*w*0.5).toFixed(1)} M${cx.toFixed(1)} ${cy.toFixed(1)} l${(-vx*w+ux*w*0.5).toFixed(1)} ${(-vy*w+uy*w*0.5).toFixed(1)}" stroke="${VEIN}" stroke-width="0.9"/>`; }
+  }
+  return s;
+}
+const stem=(x1,y1,x2,y2,w)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#7a5a3a" stroke-width="${w||3}" stroke-linecap="round"/>`;
+function leafSVG(a){
+  const f=a.f, W=320, H=280; let s=`<rect width="${W}" height="${H}" fill="#fff"/>`;
+  const sh=f.sh||'ell', bd=f.bd||'e';
+  switch(f.t){
+    case 's': {
+      if(f.g){ s+=stem(160,265,160,150,4); [-70,-35,0,35,70].forEach(g=>s+=blade(160,150,110,26,g,sh,bd)); break; }
+      if(f.o){ s+=stem(160,275,160,40,4); [[200,-55],[200,55],[110,-60],[110,60]].forEach(([y,g])=>s+=blade(160,y,95,26,g,sh,bd)); break; }
+      s+=stem(160,275,160,60,4); [[230,-50],[170,50],[110,-45]].forEach(([y,g])=>s+=blade(160,y,100,28,g,sh,bd)); s+=blade(160,62,95,26,0,sh,bd); break; }
+    case 'v': s+=stem(160,270,160,40,4); [-80,-40,0,40,80,180].forEach(g=>s+=blade(160,150,105,22,g,sh,bd)); break;
+    case 'l': { s+=stem(160,275,160,190,3); const n=f.n||5; for(let i=0;i<n;i++){ const g=-75+150*i/(n-1); s+=blade(160,190,i===(n-1)/2?150:120,30,g,'ell',bd,LEAF,false); } s+=`<circle cx="160" cy="190" r="30" fill="${LEAF}"/>`; for(let i=0;i<n;i++){ const g=(-75+150*i/(n-1))*Math.PI/180; s+=`<line x1="160" y1="190" x2="${(160+Math.sin(g)*125).toFixed(1)}" y2="${(190-Math.cos(g)*125).toFixed(1)}" stroke="${VEIN}" stroke-width="2"/>`; } break; }
+    case 'p': case 'i': {
+      const pairs = f.t==='i' ? Math.max(1,Math.round(((f.n||7)-1)/2)) : (f.n||5), np=Math.min(pairs,8), L=230, top=30, step=(L-30)/np;
+      s+=stem(160,275,160,f.t==='i'?top+40:top+10,3);
+      for(let k=0;k<np;k++){ const y=275-30-k*step, Lf=Math.max(34,70-k*2), Wf=Lf*0.32;
+        s+=blade(160,y,Lf,Wf,f.t==='i'&&k%2?-58:-62,sh,bd)+blade(160,y-(f.t==='i'?step/2:0),Lf,Wf,62,sh,bd); }
+      if(f.t==='i') s+=blade(160,top+40,62,20,0,sh,bd);
+      if(pairs>np) s+=TX(268,40,`${pairs} paires`,{fs:12,c:'#566259'});
+      break; }
+    case 'b': {
+      const np=Math.min(f.n||4,5); s+=stem(160,275,160,40,3);
+      for(let k=0;k<np;k++){ const y=250-k*(200/np);
+        [-1,1].forEach(sd=>{ const x2=160+sd*120, y2=y-50; s+=`<line x1="160" y1="${y}" x2="${x2}" y2="${y2}" stroke="#7a5a3a" stroke-width="1.5"/>`;
+          for(let j=1;j<=9;j++){ const t=j/10, cx=160+sd*120*t, cy=y-50*t; s+=`<ellipse cx="${cx.toFixed(1)}" cy="${(cy-7).toFixed(1)}" rx="3.2" ry="7" fill="${LEAF}" transform="rotate(${sd*-20} ${cx.toFixed(1)} ${(cy-7).toFixed(1)})"/><ellipse cx="${cx.toFixed(1)}" cy="${(cy+7).toFixed(1)}" rx="3.2" ry="7" fill="${LEAF}" transform="rotate(${sd*-20} ${cx.toFixed(1)} ${(cy+7).toFixed(1)})"/>`; } }); }
+      s+=TX(160,24,'Feuille 2 fois composée : chaque branche porte de petites folioles',{fs:11,c:'#566259'}); break; }
+    case 'd': { const n=f.n||5, full=n>9; s+=stem(160,275,160,150,3); for(let i=0;i<n;i++){ const g= full ? 360*i/n : -90+180*i/(n-1); s+=blade(160,150,full?105:120,full?14:22,g,sh,bd); } s+=`<circle cx="160" cy="150" r="5" fill="#7a5a3a"/>`; break; }
+    case 't': s+=stem(160,275,160,150,3)+blade(160,150,110,28,-55,sh,bd)+blade(160,150,110,28,55,sh,bd)+blade(160,150,125,32,0,sh,bd); break;
+    case 'ph': { s+=stem(160,275,160,40,3); [[240,-50],[190,50],[140,-48],[90,46]].forEach(([y,g])=>{ s+=blade(160,y,100,sh==='fal'?40:18,g,sh,bd,LEAF,false);
+        const a=g*Math.PI/180; for(let k=-1;k<=2;k++) s+=`<line x1="160" y1="${y}" x2="${(160+Math.sin(a)*96+Math.cos(a)*k*3).toFixed(1)}" y2="${(y-Math.cos(a)*96+Math.sin(a)*k*3).toFixed(1)}" stroke="${VEIN}" stroke-width="0.9"/>`; });
+      s+=TX(250,272,'4 nervures parallèles',{fs:11,c:'#566259'}); break; }
+    case 'pal': { s+=`<path d="M40 270 Q150 60 300 70" fill="none" stroke="#7a5a3a" stroke-width="4"/>`; for(let i=1;i<26;i++){ const t=i/26, x=(1-t)*(1-t)*40+2*(1-t)*t*150+t*t*300, y=(1-t)*(1-t)*270+2*(1-t)*t*60+t*t*70; s+=blade(x,y,60,5,-25,'lan','e',LEAF,false)+blade(x,y,55,5,95,'lan','e',LEAF,false); } s+=TX(160,272,'Palme de plusieurs mètres',{fs:11,c:'#566259'}); break; }
+    case 'ban': { s+=stem(160,278,160,250,8)+blade(160,250,230,70,0,'obl','e'); for(let k=1;k<12;k++){ const y=250-k*19; s+=`<path d="M160 ${y} l${-55} -10 M160 ${y} l55 -10" stroke="${VEIN}" stroke-width="1"/>`; } break; }
+  }
+  return SVGW(W,H,s,'Feuille de '+a.n);
+}
+function barkSVG(code){
+  let s='<rect width="140" height="90" rx="8" fill="#9C8468"/>';
+  if(code==='lis') s='<rect width="140" height="90" rx="8" fill="#A9A49A"/>'+[18,44,70].map(y=>`<path d="M10 ${y} q60 -6 120 2" stroke="#8f8a80" fill="none"/>`).join('');
+  if(code==='fis') for(let x=10;x<140;x+=16) s+=`<path d="M${x} 0 q-4 22 2 45 q4 22 -2 45" stroke="#4A3826" stroke-width="3" fill="none"/>`;
+  if(code==='pla'){ s='<rect width="140" height="90" rx="8" fill="#8C6A4C"/>'; [[25,22],[70,16],[110,30],[35,62],[85,58],[122,72]].forEach(([x,y])=>s+=`<ellipse cx="${x}" cy="${y}" rx="20" ry="13" fill="#B9926A" stroke="#5a4028"/>`); }
+  if(code==='rug') for(let i=0;i<40;i++) s+=`<circle cx="${(i*37)%140}" cy="${(i*23)%90}" r="${2+(i%3)}" fill="#6E5A44"/>`;
+  if(code==='epi'){ s='<rect width="140" height="90" rx="8" fill="#9EA28F"/>'; [[20,20],[60,30],[100,18],[35,62],[80,70],[120,55]].forEach(([x,y])=>s+=`<path d="M${x-7} ${y+6} L${x} ${y-10} L${x+7} ${y+6}z" fill="#6B5B45"/>`); }
+  return SVGW(140,90,s,'Écorce');
+}
+function crown(p,x,base,h,sc){
+  const H=h*sc, tr=Math.max(3,H*0.035); let s='';
+  const trunk=(top)=>`<rect x="${x-tr}" y="${base-top}" width="${tr*2}" height="${top}" fill="#7a5a3a"/>`;
+  switch(p){
+    case 'pag': { s+=trunk(H*0.95); for(let k=0;k<4;k++){ const y=base-H*(0.45+k*0.16), w=H*(0.42-k*0.07); s+=`<ellipse cx="${x}" cy="${y}" rx="${w}" ry="${H*0.05}" fill="#3E8A5A"/>`; } break; }
+    case 'par': s+=trunk(H*0.7)+`<ellipse cx="${x}" cy="${base-H*0.78}" rx="${H*0.75}" ry="${H*0.2}" fill="#3E8A5A"/>`; break;
+    case 'dom': s+=trunk(H*0.45)+`<ellipse cx="${x}" cy="${base-H*0.62}" rx="${H*0.42}" ry="${H*0.38}" fill="#3E8A5A"/>`; break;
+    case 'emg': s+=trunk(H*0.8)+[[-0.18,0.86,0.2],[0.16,0.88,0.2],[0,0.95,0.17]].map(([dx,dy,r])=>`<ellipse cx="${x+dx*H}" cy="${base-H*dy}" rx="${H*r}" ry="${H*0.1}" fill="#3E8A5A"/>`).join(''); break;
+    case 'eta': s+=trunk(H*0.4)+`<path d="M${x} ${base-H*0.4} l${-H*0.2} ${-H*0.25} M${x} ${base-H*0.4} l${H*0.22} ${-H*0.22}" stroke="#7a5a3a" stroke-width="${tr*1.4}"/>`+[[-0.25,0.7,0.24],[0.25,0.72,0.24],[0,0.85,0.22]].map(([dx,dy,r])=>`<ellipse cx="${x+dx*H}" cy="${base-H*dy}" rx="${H*r}" ry="${H*0.16}" fill="#3E8A5A"/>`).join(''); break;
+    case 'pal': s+=`<path d="M${x} ${base} q${H*0.06} ${-H*0.5} 0 ${-H*0.9}" stroke="#7a5a3a" stroke-width="${tr*1.6}" fill="none"/>`+[-70,-35,0,35,70,110,-110].map(g=>{ const a=g*Math.PI/180; return `<path d="M${x} ${base-H*0.9} q${Math.sin(a)*H*0.2} ${-Math.cos(a)*H*0.2-H*0.05} ${Math.sin(a)*H*0.35} ${-Math.cos(a)*H*0.25+H*0.12}" stroke="#3E8A5A" stroke-width="${Math.max(2,H*0.03)}" fill="none"/>`; }).join(''); break;
+    case 'arb': s+=[-0.15,0,0.15].map(d=>`<line x1="${x}" y1="${base}" x2="${x+d*H}" y2="${base-H*0.5}" stroke="#7a5a3a" stroke-width="${Math.max(1.5,tr*0.7)}"/>`).join('')+`<ellipse cx="${x}" cy="${base-H*0.62}" rx="${H*0.38}" ry="${H*0.32}" fill="#3E8A5A"/>`; break;
+    case 'ban': s+=`<rect x="${x-H*0.05}" y="${base-H*0.6}" width="${H*0.1}" height="${H*0.6}" fill="#8FB46A"/>`+[-50,-15,20,55].map(g=>`<ellipse cx="${x+Math.sin(g*Math.PI/180)*H*0.28}" cy="${base-H*0.62-Math.cos(g*Math.PI/180)*H*0.22}" rx="${H*0.08}" ry="${H*0.3}" fill="#6FA84A" transform="rotate(${g} ${x+Math.sin(g*Math.PI/180)*H*0.28} ${base-H*0.62-Math.cos(g*Math.PI/180)*H*0.22})"/>`).join(''); break;
+    case 'ech': s+=[-1,-0.5,0.5,1].map(d=>`<line x1="${x}" y1="${base-H*0.15}" x2="${x+d*H*0.12}" y2="${base}" stroke="#7a5a3a" stroke-width="${Math.max(1.5,tr*0.6)}"/>`).join('')+trunk(H*0.8)+`<ellipse cx="${x}" cy="${base-H*0.85}" rx="${H*0.4}" ry="${H*0.12}" fill="#3E8A5A"/>`; break;
+    default: s+=trunk(H*0.6)+`<ellipse cx="${x}" cy="${base-H*0.7}" rx="${H*0.3}" ry="${H*0.3}" fill="#3E8A5A"/>`;
+  }
+  return s;
+}
+function buttress(x,base,h,sc){ const H=h*sc, w=Math.max(6,H*0.09); return `<path d="M${x-w*1.6} ${base} Q${x-w*0.4} ${base-w*0.4} ${x-2} ${base-w*2.2} L${x+2} ${base-w*2.2} Q${x+w*0.4} ${base-w*0.4} ${x+w*1.6} ${base}z" fill="#7a5a3a"/>`; }
+function human(x,base,sc){ const h=1.7*sc; return `<g fill="#B3261E"><circle cx="${x}" cy="${base-h+h*0.1}" r="${Math.max(1.5,h*0.1)}"/><rect x="${x-h*0.08}" y="${base-h*0.8}" width="${h*0.16}" height="${h*0.8}"/></g>`; }
+function silhouetteSVG(a){
+  const W=320, H=280, base=250, sc=210/60;
+  let s=`<rect width="${W}" height="${H}" fill="#fff"/><rect x="0" y="${base}" width="${W}" height="${H-base}" fill="#E9DCC3"/>`;
+  for(let m=10;m<=60;m+=10){ const y=base-m*sc; s+=`<line x1="34" y1="${y}" x2="${W}" y2="${y}" stroke="#EEF0EB"/>`+TX(30,y+4,m+' m',{fs:10,a:'end',c:'#566259'}); }
+  s+=crown(a.p,180,base,a.H,sc); if(a.cf) s+=buttress(180,base,a.H,sc);
+  if(a.e==='epi') for(let k=1;k<5;k++){ const y=base-k*a.H*sc*0.1; s+=`<path d="M${180+3} ${y} l6 -3 l-6 -3z M${180-3} ${y-8} l-6 -3 l6 -3z" fill="#4a3826"/>`; }
+  s+=human(250,base,sc)+TX(250,base+16,'homme 1,70 m',{fs:10,c:'#B3261E'});
+  s+=`<line x1="${W-20}" y1="${base}" x2="${W-20}" y2="${base-a.H*sc}" stroke="#17201A" stroke-width="1.5"/><path d="M${W-25} ${base-a.H*sc} h10" stroke="#17201A"/>`+TX(W-26,base-a.H*sc-6,'≈ '+a.H+' m',{fs:12,a:'end',b:1});
+  return SVGW(W,H,s,'Silhouette de '+a.n);
+}
+const FTYPE={s:'Simple',l:'Simple découpée en main',i:'Composée avec foliole au bout',p:'Composée sans foliole au bout',b:'Deux fois composée',d:'Composée en main',t:'3 folioles',ph:'Fausses feuilles (phyllodes)',pal:'Palme',v:'Simples en rosettes (verticilles)',ban:'Immense feuille simple'};
+const PORT={pag:'branches en étages (pagode)',par:'cime en parasol',dom:'cime ronde',emg:'grand fût droit, cime haute (émergent)',eta:'cime étalée',pal:'palmier',arb:'arbuste',ban:'bananier',ech:'racines-échasses, cime en parasol'};
+const BARK={lis:'lisse',fis:'fissurée en long',pla:'s\'écaillant en plaques',rug:'rugueuse',epi:'avec épines'};
+const ZN={S:'sud forestier',C:'centre',N:'nord'};
+const catChips=a=>a.cat.split('').map(c=>`<span class="chip ${({o:'g',a:'o',f:'',n:'r',c:'o'})[c]}">${ARB_CAT[c]}</span>`).join(' ');
+function arbFiche(a){
+  const c=ARB_CAC[a.cac]||['',''];
+  return `<div class="panel" id="arb-doc" style="margin-bottom:14px">
+    <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><div><h2 style="margin:0">${esc(a.n)}</h2><p class="note" style="margin:2px 0"><i>${esc(a.sci)}</i> · ${esc(a.fam)}</p></div>
+    <div class="btns noprint" style="margin:0"><button class="btn sec" type="button" id="arb-pr">Imprimer / PDF</button><button class="btn sec" type="button" id="arb-x">Fermer</button></div></div>
+    <div class="chips">${catChips(a)} <span class="chip ${c[1]}">${c[0]}</span>${a.st?` <span class="chip r">${esc(a.st)}</span>`:''}</div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin-top:10px">
+      <figure class="ill" style="margin:0">${leafSVG(a).replace('<svg','<svg style="min-width:0"')}<figcaption><b>La feuille :</b> ${esc(FTYPE[a.f.t]||'')}${a.f.n&&['p','i','d','l','b'].includes(a.f.t)?` (${a.f.t==='p'?a.f.n+' paires environ':a.f.t==='b'?'':a.f.n+' environ'})`:''}${a.f.o?', opposées':''}${a.f.g?', en bouquets au bout des rameaux':''}, bord ${a.f.bd==='d'?'denté':'lisse'}, longueur ≈ ${a.f.L>=100?fmt(a.f.L/100,1)+' m':a.f.L+' cm'}.</figcaption></figure>
+      <figure class="ill" style="margin:0">${silhouetteSVG(a).replace('<svg','<svg style="min-width:0"')}<figcaption><b>L'arbre adulte :</b> ${esc(PORT[a.p]||'')}, jusqu'à environ ${a.H} m${a.cf?', avec contreforts':''}.</figcaption></figure>
+    </div>
+    <div style="display:flex;gap:12px;align-items:center;margin:10px 0">${barkSVG(a.e).replace('<svg','<svg style="width:120px;flex:none"')}<div><b>Écorce :</b> ${esc(BARK[a.e]||'')}${a.sv?`<br><b>Entaille :</b> ${a.sv==='blanc'?'latex blanc':a.sv==='rouge'?'sève rouge':'latex jaune'}`:''}<br><b>Zone :</b> ${a.z.split('').map(z=>ZN[z]).join(', ')}</div></div>
+    <h3>Comment le reconnaître</h3><ul class="clean">${a.reco.map(r=>`<li>${esc(r)}</li>`).join('')}</ul>
+    <h3>Usages</h3><p>${esc(a.us)}</p>
+    <div class="msg ${a.cac==='oui'?'ok':a.cac==='non'?'crit':'warn'}"><b>Avec le cacao : ${c[0].toLowerCase()}.</b> ${esc(a.why)}</div>
+    <p class="note">Dessins schématiques pour aider à reconnaître l'arbre ; vérifiez sur le terrain avec plusieurs signes (feuille, écorce, sève, fruit).</p>
+  </div>`;
+}
+function openArb(id){ const a=ARB.find(x=>x.id===id); if(!a) return; $('#arb-fiche').innerHTML=arbFiche(a); $('#arb-pr').onclick=()=>MOD.print($('#arb-doc'),'Arbre '+a.n); $('#arb-x').onclick=()=>{ $('#arb-fiche').innerHTML=''; }; $('#arb-fiche').scrollIntoView({behavior:'smooth',block:'start'}); }
+function arbUI(){
+  const draw=()=>{
+    const q=($('#arb-q').value||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''), cat=$('#arb-cat').value, z=$('#arb-z').value, cac=$('#arb-cac').value;
+    const k={f:$('#k-f').value,o:$('#k-o').value,bd:$('#k-bd').value,sv:$('#k-sv').value,cf:$('#k-cf').value,h:$('#k-h').value,ep:$('#k-ep').value};
+    const L=ARB.filter(a=>{
+      if(q && !(a.n+' '+a.sci+' '+a.fam).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').includes(q)) return false;
+      if(cat && !a.cat.includes(cat)) return false; if(z && !a.z.includes(z)) return false; if(cac && a.cac!==cac) return false;
+      if(k.f){ const t=a.f.t==='v'||a.f.t==='ban'?'s':a.f.t; if(t!==k.f) return false; }
+      if(k.o && String(a.f.o?1:0)!==k.o) return false;
+      if(k.bd && (a.f.bd||'e')!==k.bd) return false;
+      if(k.sv && (k.sv==='none' ? !!a.sv : a.sv!==k.sv)) return false;
+      if(k.cf && String(a.cf?1:0)!==k.cf) return false;
+      if(k.ep && String(a.e==='epi'?1:0)!==k.ep) return false;
+      if(k.h){ const c=a.H<15?'p':a.H<=30?'m':'g'; if(c!==k.h) return false; }
+      return true; });
+    $('#arb-count').textContent = `${L.length} arbre${L.length>1?'s':''} sur ${ARB.length}. Touchez un arbre pour voir sa fiche.`;
+    $('#arb-list').innerHTML = L.map(a=>`<button type="button" class="card" data-arb="${a.id}" style="text-align:left;font:inherit;color:inherit;cursor:pointer;display:flex;gap:10px;align-items:center">
+      <span style="flex:none;width:70px">${leafSVG(a).replace('<svg','<svg style="width:70px;height:auto;min-width:0"')}</span>
+      <span><b style="font:700 1.05rem var(--display)">${esc(a.n)}</b><br><i class="note">${esc(a.sci)}</i><br>${catChips(a)} <span class="chip ${ARB_CAC[a.cac][1]}">${a.cac==='oui'?'cacao ✓':a.cac==='non'?'cacao ✗':'cacao : conditions'}</span></span></button>`).join('');
+    $$('[data-arb]').forEach(b=>b.onclick=()=>openArb(b.dataset.arb));
+  };
+  $$('#t-arb input,#t-arb select').forEach(e=>e.addEventListener('input',draw));
+  $('#arb-prec').innerHTML=['vene','assamela','makore','sipo','aboudikro','acajou','iroko'].map(id=>{ const a=ARB.find(x=>x.id===id); return a?`<button type="button" class="chip r" data-prec="${id}" style="border:0;cursor:pointer">${esc(a.n.split(' (')[0])}</button>`:''; }).join(' ');
+  $$('[data-prec]').forEach(b=>b.onclick=()=>openArb(b.dataset.prec));
   draw();
 }
-const DL = '<datalist id="dl-esp">'+ESP.map(e=>`<option value="${esc(e[0])}">`).join('')+'</datalist>';
-document.body.insertAdjacentHTML('beforeend', DL+'<datalist id="dl-reg">'+['Agnéby-Tiassa','Bafing','Bagoué','Bélier','Béré','Bounkani','Cavally','District d\'Abidjan','District de Yamoussoukro','Folon','Gbêkê','Gbôklé','Gôh','Gontougo','Grands-Ponts','Guémon','Hambol','Haut-Sassandra','Iffou','Indénié-Djuablin','Kabadougou','La Mé','Lôh-Djiboua','Marahoué','Moronou','Nawa','N\'Zi','Poro','San-Pédro','Sud-Comoé','Tchologo','Tonkpi','Worodougou'].map(r=>`<option value="${esc(r)}">`).join('')+'</datalist>');
+function figTailles(){
+  const L=['fromager','makore','samba','iroko','frake','akpi','samanea','avocat','gliricidia','bananier'].map(id=>ARB.find(a=>a.id===id)).filter(Boolean);
+  const W=640, H=320, base=280, sc=240/60; let s=`<rect width="${W}" height="${H}" fill="#fff"/><rect x="0" y="${base}" width="${W}" height="40" fill="#E9DCC3"/>`;
+  for(let m=10;m<=60;m+=10){ const y=base-m*sc; s+=`<line x1="30" y1="${y}" x2="${W}" y2="${y}" stroke="#EEF0EB"/>`+TX(26,y+4,m+' m',{fs:10,a:'end',c:'#566259'}); }
+  L.forEach((a,i)=>{ const x=60+i*(W-80)/L.length+20; s+=crown(a.p,x,base,a.H,sc)+(a.cf?buttress(x,base,a.H,sc):'')+TX(x,base+16,esc(a.n.split(' (')[0]),{fs:10,b:1})+TX(x,base+30,a.H+' m',{fs:10,c:'#566259'}); });
+  s+=human(W-14,base,sc);
+  return SVGW(W,H,s)+'<figcaption>Hauteur adulte approximative, à la même échelle (petit trait rouge à droite : un homme de 1,70 m).</figcaption>';
+}
+function figFtypes(){
+  const T=[['s','Simple'],['l','Lobée en main'],['i','Composée, foliole au bout'],['p','Composée, sans foliole au bout'],['b','2 fois composée'],['d','En main'],['t','3 folioles'],['ph','Phyllodes']];
+  let s='<rect width="640" height="330" fill="#fff"/>';
+  T.forEach(([t,l],i)=>{ const col=i%4, row=Math.floor(i/4), x=col*160, y=row*165; const fake={n:'',f:{t,n:t==='d'?5:t==='l'?5:t==='b'?3:t==='i'?7:4,sh:t==='ph'?'ell':'ell',bd:'e',L:10}};
+    s+=`<g transform="translate(${x+15},${y+5}) scale(0.42)">${leafSVG(fake).replace(/^<svg[^>]*>|<\/svg>$/g,'')}</g>`+TX(x+80,y+140,l,{fs:12,b:1}); });
+  return SVGW(640,330,s)+'<figcaption>Les types de feuilles pour utiliser la clé.</figcaption>';
+}
+document.body.insertAdjacentHTML('beforeend','<datalist id="dl-esp">'+ARB.map(a=>`<option value="${esc(a.n.split(' (')[0])}">`).join('')+'</datalist>');
+document.body.insertAdjacentHTML('beforeend','<datalist id="dl-reg">'+['Agnéby-Tiassa','Bafing','Bagoué','Bélier','Béré','Bounkani','Cavally','District d\'Abidjan','District de Yamoussoukro','Folon','Gbêkê','Gbôklé','Gôh','Gontougo','Grands-Ponts','Guémon','Hambol','Haut-Sassandra','Iffou','Indénié-Djuablin','Kabadougou','La Mé','Lôh-Djiboua','Marahoué','Moronou','Nawa','N\'Zi','Poro','San-Pédro','Sud-Comoé','Tchologo','Tonkpi','Worodougou'].map(r=>`<option value="${esc(r)}">`).join('')+'</datalist>');
+
+/* ---------- figures des systèmes ---------- */
+function figFamilles(){
+  let s='<rect width="640" height="300" fill="#fff"/>';
+  s+=`<circle cx="250" cy="120" r="95" fill="#3E8A5A" opacity=".35"/><circle cx="390" cy="120" r="95" fill="#E2A846" opacity=".4"/><circle cx="320" cy="215" r="95" fill="#8D6E4A" opacity=".35"/>`;
+  s+=TX(215,80,'ARBRES',{b:1,fs:15})+TX(430,80,'CULTURES',{b:1,fs:15})+TX(320,285,'ANIMAUX',{b:1,fs:15});
+  s+=TX(320,100,'Agrosylvicole',{b:1,fs:12})+TX(320,115,'arbres + cultures',{fs:11});
+  s+=TX(235,200,'Sylvopastoral',{b:1,fs:12})+TX(235,215,'arbres + animaux',{fs:11});
+  s+=TX(410,200,'Agropastoral',{b:1,fs:12})+TX(410,215,'(pas d\'arbres)',{fs:11});
+  s+=TX(320,160,'Agrosylvo-',{b:1,fs:12})+TX(320,174,'pastoral',{b:1,fs:12});
+  s+=TX(560,150,'+ autres :',{b:1,fs:12,a:'start'})+TX(520,170,'apiforesterie',{fs:11,a:'start'})+TX(520,186,'sylvo-aquaculture',{fs:11,a:'start'})+TX(520,202,'bandes riveraines',{fs:11,a:'start'});
+  return SVGW(640,300,s)+'<figcaption>Les grandes familles de l\'agroforesterie selon ce qu\'on associe aux arbres.</figcaption>';
+}
+function miniTree(x,base,h,col){ return `<rect x="${x-2}" y="${base-h}" width="4" height="${h}" fill="#7a5a3a"/><ellipse cx="${x}" cy="${base-h}" rx="${h*0.38}" ry="${h*0.22}" fill="${col||'#2E6B3A'}"/>`; }
+function figCacao3(){
+  let s='<rect width="640" height="230" fill="#fff"/>';
+  [['Complexe','plus de 15 grands arbres/ha',[[40,150],[85,120],[130,160],[165,130]]],['Simple','5 à 6 arbres émergents/ha',[[260,110],[345,100]]],['Plein soleil','3 arbres/ha au plus',[[530,90]]]].forEach((b,i)=>{
+    const x0=i*213, base=190; s+=`<rect x="${x0+6}" y="${base}" width="200" height="12" fill="#C9A57A"/>`;
+    for(let k=0;k<8;k++) s+=miniTree(x0+20+k*24,base,26,'#7CB342');
+    b[2].forEach(([x,h])=>s+=miniTree(x+ (i===2?0:0),base,h,'#2E6B3A'));
+    s+=TX(x0+106,20,b[0],{b:1,fs:14})+TX(x0+106,37,b[1],{fs:11})+TX(x0+106,222,i===0?'beaucoup d\'espèces, 3 étages et plus':i===1?'souvent légumineuses introduites':'hybrides, engrais, peu d\'arbres',{fs:10,c:'#566259'}); });
+  return SVGW(640,230,s)+'<figcaption>Les 3 types de cacaoyères décrits par les chercheurs en Côte d\'Ivoire (petits arbres verts clairs : cacaoyers).</figcaption>';
+}
+function figCouloirs(){
+  let s=`<rect width="640" height="240" fill="#fff"/><rect x="0" y="40" width="640" height="190" fill="#E9DCC3"/>`;
+  for(let l=0;l<4;l++){ const y=60+l*55; for(let i=0;i<20;i++) s+=`<circle cx="${20+i*32}" cy="${y}" r="9" fill="#2E6B3A"/>`; if(l<3) for(let i=0;i<13;i++) s+=`<path d="M${30+i*48} ${y+30} v-12 m0 4 l-7 -6 m7 6 l7 -6" stroke="#D5A653" stroke-width="2.5" fill="none"/>`; }
+  s+=`<line x1="610" y1="60" x2="610" y2="115" stroke="#B3261E" stroke-width="2"/>`+TX(600,92,'4–6 m',{a:'end',fs:12,c:'#B3261E',b:1});
+  s+=TX(320,24,'Lignes de gliricidia ou d\'acacia (vert foncé) · cultures entre les lignes (maïs, igname, manioc)',{fs:12,b:1});
+  return SVGW(640,240,s)+'<figcaption>Les arbustes sont taillés à 50 cm – 1 m avant le semis ; les feuilles coupées restent sur le sol comme engrais.</figcaption>';
+}
+function figEchelle(){
+  const E=[['Mise en défens','protéger'],['RNA','aider les rejets'],['Enrichissement','planter en layons'],['Taungya','arbres + vivriers'],['Agroforêt','arbres dans les cultures'],['Reboisement','plantation en plein']];
+  let s='<rect width="640" height="200" fill="#fff"/><defs><linearGradient id="gE"><stop offset="0" stop-color="#DCEDE3"/><stop offset="1" stop-color="#3E8A5A"/></linearGradient></defs><rect x="20" y="40" width="600" height="18" rx="9" fill="url(#gE)"/>';
+  s+=TX(20,28,'moins cher, plus lent',{a:'start',fs:12})+TX(620,28,'plus cher, plus rapide',{a:'end',fs:12});
+  E.forEach((e,i)=>{ const x=70+i*100; s+=`<circle cx="${x}" cy="49" r="7" fill="#fff" stroke="#17201A" stroke-width="2"/>`+TX(x,90,e[0],{b:1,fs:12})+TX(x,106,e[1],{fs:11,c:'#566259'});
+    const n=1+i; for(let k=0;k<n;k++) s+=miniTree(x-20+ (k%3)*20, 175-Math.floor(k/3)*0, 18+((k*7)%10),'#2E6B3A'); });
+  return SVGW(640,200,s)+'<figcaption>Des méthodes les plus légères aux plus intensives.</figcaption>';
+}
+function figTaungya(){
+  let s='<rect width="640" height="230" fill="#fff"/>';
+  ['Année 1','Année 3','Année 10'].forEach((t,i)=>{ const x0=i*213, base=190; s+=`<rect x="${x0+6}" y="${base}" width="200" height="12" fill="#C9A57A"/>`+TX(x0+106,22,t,{b:1,fs:14});
+    const th=[22,60,130][i];
+    for(let k=0;k<3;k++) s+=miniTree(x0+40+k*65,base,th,'#2E6B3A');
+    if(i<2){ for(let k=0;k<6;k++) s+=`<path d="M${x0+20+k*32} ${base} v-${i?16:22} m0 6 l-7 -6 m7 6 l7 -6" stroke="#D5A653" stroke-width="2.5" fill="none"/>`;
+      for(let k=0;k<2;k++){ const bx=x0+72+k*65; s+=`<rect x="${bx-3}" y="${base-34}" width="6" height="34" fill="#8FB46A"/><ellipse cx="${bx-10}" cy="${base-40}" rx="5" ry="16" fill="#6FA84A" transform="rotate(-35 ${bx-10} ${base-40})"/><ellipse cx="${bx+10}" cy="${base-40}" rx="5" ry="16" fill="#6FA84A" transform="rotate(35 ${bx+10} ${base-40})"/>`; } }
+    s+=TX(x0+106,222,['Arbres plantés + maïs, banane, igname','Arbres plus hauts, derniers vivriers','La forêt est refermée'][i],{fs:11}); });
+  return SVGW(640,230,s)+'<figcaption>Taungya : le paysan cultive ses vivriers entre les jeunes arbres et les entretient en même temps.</figcaption>';
+}
+function figAgrosys(){
+  let s='<rect width="640" height="260" fill="#fff"/><rect x="190" y="70" width="260" height="150" rx="14" fill="#DCEDE3" stroke="#17694A" stroke-width="2"/>';
+  s+=TX(320,95,'AGROSYSTÈME',{b:1,fs:15,c:'#17694A'})+TX(320,118,'sol · cultures · arbres · animaux',{fs:12})+TX(320,136,'insectes · microbes · eau',{fs:12});
+  s+=`<circle cx="70" cy="50" r="22" fill="#F2C14E"/>`+TX(70,92,'Soleil, pluie',{fs:12});
+  s+=`<path d="M100 60 L185 95" stroke="#17201A" stroke-width="2" marker-end="url(#ag)"/>`;
+  s+=TX(90,170,'Travail, semences,',{fs:12})+TX(90,186,'engrais, traitements',{fs:12})+`<path d="M150 178 L185 168" stroke="#17201A" stroke-width="2" marker-end="url(#ag)"/>`;
+  s+=`<path d="M455 120 L540 120" stroke="#17201A" stroke-width="2" marker-end="url(#ag)"/>`+TX(575,112,'Récoltes',{b:1,fs:13})+TX(575,128,'(sortent du champ)',{fs:11});
+  s+=`<path d="M380 222 q-60 40 -120 0" stroke="#3E8A5A" stroke-width="2.5" fill="none" marker-end="url(#ag2)"/>`+TX(320,254,'Recyclage : résidus, fumier, compost, feuilles des arbres',{fs:12,c:'#2E6B3A',b:1});
+  s='<defs><marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#17201A"/></marker><marker id="ag2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3E8A5A"/></marker></defs>'+s;
+  return SVGW(640,260,s)+'<figcaption>Ce qui entre dans l\'agrosystème, ce qui en sort, et ce qu\'il faut recycler pour garder le sol fertile.</figcaption>';
+}
+function figMangrove(){
+  let s='<rect width="640" height="260" fill="#fff"/><rect x="0" y="150" width="640" height="110" fill="#9CC3D9"/><path d="M0 230 Q320 200 640 225 V260 H0z" fill="#6B5A44"/>';
+  s+=TX(150,25,'Palétuvier rouge (Rhizophora)',{b:1,fs:13})+TX(470,25,'Palétuvier blanc (Avicennia)',{b:1,fs:13});
+  // Rhizophora
+  s+=`<rect x="146" y="70" width="8" height="90" fill="#6B4B2E"/><ellipse cx="150" cy="70" rx="70" ry="35" fill="#2E6B3A"/>`;
+  for(let k=-3;k<=3;k++) if(k) s+=`<path d="M150 ${130+Math.abs(k)*4} Q${150+k*18} ${150} ${150+k*28} 232" stroke="#6B4B2E" stroke-width="3" fill="none"/>`;
+  s+=`<path d="M190 90 v30" stroke="#5E8C3A" stroke-width="3"/>`+TX(225,118,'propagule',{fs:11,a:'start'});
+  // Avicennia
+  s+=`<rect x="466" y="80" width="9" height="140" fill="#7a6a5a"/><ellipse cx="470" cy="80" rx="80" ry="38" fill="#4E7F3A"/>`;
+  for(let k=0;k<14;k++) s+=`<line x1="${400+k*11}" y1="230" x2="${400+k*11}" y2="${212-(k%3)*4}" stroke="#7a6a5a" stroke-width="2.5"/>`;
+  s+=TX(470,250,'racines qui sortent pour respirer',{fs:11,c:'#fff'})+TX(150,250,'racines en échasses',{fs:11,c:'#fff'});
+  // poissons
+  [[300,190],[340,175],[290,212]].forEach(([x,y])=>s+=`<path d="M${x} ${y} q12 -8 24 0 q-12 8 -24 0z M${x+24} ${y} l8 -6 v12z" fill="#E2A846"/>`);
+  s+=TX(320,165,'poissons, crevettes, huîtres',{fs:12,c:'#17201A'});
+  return SVGW(640,260,s)+'<figcaption>Les deux grands palétuviers des lagunes ivoiriennes et la vie qu\'ils abritent.</figcaption>';
+}
+function figBerges(){
+  let s='<rect width="640" height="230" fill="#fff"/><rect x="0" y="40" width="640" height="170" fill="#E9DCC3"/><path d="M270 40 Q320 120 300 210 L360 210 Q380 120 340 40z" fill="#9CC3D9"/>';
+  s+=`<rect x="160" y="40" width="110" height="170" fill="#3E8A5A" opacity=".35"/><rect x="350" y="40" width="110" height="170" fill="#3E8A5A" opacity=".35"/>`;
+  for(let k=0;k<4;k++){ s+=miniTree(190+(k%2)*40,80+k*38,30,'#2E6B3A')+miniTree(380+(k%2)*45,85+k*38,30,'#2E6B3A'); }
+  for(let k=0;k<6;k++) s+=`<path d="M${30+k*20} 190 v-14 m0 5 l-6 -5 m6 5 l6 -5" stroke="#D5A653" stroke-width="2.5" fill="none"/><path d="M${490+k*22} 190 v-14 m0 5 l-6 -5 m6 5 l6 -5" stroke="#D5A653" stroke-width="2.5" fill="none"/>`;
+  s+=`<path d="M160 30 h110 M350 30 h110" stroke="#B3261E" stroke-width="2"/>`+TX(215,24,'25 m',{fs:12,c:'#B3261E',b:1})+TX(405,24,'25 m',{fs:12,c:'#B3261E',b:1});
+  s+=TX(320,226,'Cours d\'eau',{fs:12,b:1})+TX(70,226,'Cultures',{fs:12})+TX(560,226,'Cultures',{fs:12});
+  return SVGW(640,230,s)+'<figcaption>Garder ou replanter une bande d\'arbres de 25 m de chaque côté du cours d\'eau.</figcaption>';
+}
+
 
 /* =====================================================================
    GÉOMÉTRIE
@@ -307,16 +721,19 @@ function mapSVG(pts, opt){
 /* =====================================================================
    STOCKAGE (IndexedDB, repli localStorage)
    ===================================================================== */
-const DB={ db:null, mem:null,
-  open(){ return new Promise(res=>{ try{ const r=indexedDB.open('agrodiag-agroforesterie',1); r.onupgradeneeded=()=>r.result.createObjectStore('fiches',{keyPath:'id'}); r.onsuccess=()=>{ DB.db=r.result; res(); }; r.onerror=()=>res(); }catch(e){ res(); } }); },
-  tx(mode){ return DB.db.transaction('fiches',mode).objectStore('fiches'); },
-  lsAll(){ try{ return JSON.parse(localStorage.getItem('agrodiag.agrof.fiches')||'[]'); }catch(e){ return []; } },
-  all(){ if(!DB.db) return Promise.resolve(DB.lsAll()); return new Promise((res,rej)=>{ const r=DB.tx('readonly').getAll(); r.onsuccess=()=>res(r.result||[]); r.onerror=()=>rej(r.error); }); },
-  put(rec){ if(!DB.db){ const a=DB.lsAll().filter(x=>x.id!==rec.id); a.push(rec); localStorage.setItem('agrodiag.agrof.fiches', JSON.stringify(a)); return Promise.resolve(); }
-    return new Promise((res,rej)=>{ const r=DB.tx('readwrite').put(rec); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); }); },
-  del(id){ if(!DB.db){ localStorage.setItem('agrodiag.agrof.fiches', JSON.stringify(DB.lsAll().filter(x=>x.id!==id))); return Promise.resolve(); }
-    return new Promise((res,rej)=>{ const r=DB.tx('readwrite').delete(id); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); }); }
-};
+function makeDB(name, lsk){
+  const D={ db:null,
+    open(){ return new Promise(res=>{ try{ const r=indexedDB.open(name,1); r.onupgradeneeded=()=>r.result.createObjectStore('fiches',{keyPath:'id'}); r.onsuccess=()=>{ D.db=r.result; res(); }; r.onerror=()=>res(); }catch(e){ res(); } }); },
+    tx(mode){ return D.db.transaction('fiches',mode).objectStore('fiches'); },
+    lsAll(){ try{ return JSON.parse(localStorage.getItem(lsk)||'[]'); }catch(e){ return []; } },
+    all(){ if(!D.db) return Promise.resolve(D.lsAll()); return new Promise((res,rej)=>{ const r=D.tx('readonly').getAll(); r.onsuccess=()=>res(r.result||[]); r.onerror=()=>rej(r.error); }); },
+    put(rec){ if(!D.db){ const a=D.lsAll().filter(x=>x.id!==rec.id); a.push(rec); localStorage.setItem(lsk, JSON.stringify(a)); return Promise.resolve(); }
+      return new Promise((res,rej)=>{ const r=D.tx('readwrite').put(rec); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); }); },
+    del(id){ if(!D.db){ localStorage.setItem(lsk, JSON.stringify(D.lsAll().filter(x=>x.id!==id))); return Promise.resolve(); }
+      return new Promise((res,rej)=>{ const r=D.tx('readwrite').delete(id); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); }); } };
+  return D;
+}
+const DB=makeDB('agrodiag-agroforesterie','agrodiag.agrof.fiches');
 const cfg = { get(k,d){ try{ return localStorage.getItem('agrodiag.agrof.'+k) ?? d; }catch(e){ return d; } }, set(k,v){ try{ localStorage.setItem('agrodiag.agrof.'+k,v); }catch(e){} } };
 function agentDefaut(){ const a=cfg.get('agent',''); if(a) return a; try{ const p=JSON.parse(localStorage.getItem('agrodiag.profil')||'null'); if(p) return [p.nom,p.prenoms].filter(Boolean).join(' '); }catch(e){} return ''; }
 
@@ -346,7 +763,8 @@ const FORMS = {
     {k:'naiss', t:'date', l:'Date de naissance'},
     {k:'piece', t:'text', l:'Numéro de la pièce d\'identité'},
     {k:'etude', t:'one', l:'Niveau d\'étude', o:['Non scolarisé','Primaire','Secondaire','Supérieur']},
-    {k:'tel', t:'tel', l:'Téléphone du producteur'}]},
+    {k:'tel', t:'tel', l:'Téléphone du producteur'},
+    {k:'consent', t:'one', l:'Le producteur accepte que ces informations soient transmises au responsable du projet', o:ON, req:1, hint:'Expliquez-lui à quoi servent ces données. S\'il refuse, la fiche reste seulement dans ce téléphone.'}]},
   {t:'III. Le verger – statistiques globales', f:[
     {k:'nb_plant', t:'int', l:'Combien de plantations disposez-vous ?'},
     {k:'sup_valeur', t:'dec', l:'Superficie totale mise en valeur', u:'ha'},
@@ -388,7 +806,7 @@ const FORMS = {
   {t:'IV. Essences présentes dans la parcelle', f:[
     {k:'e_princ', t:'rep', l:'Essences principales (arbres forestiers)', list:'dl-esp'},
     {k:'e_alim', t:'rep', l:'Essences alimentaires', list:'dl-esp'},
-    {k:'e_nuis', t:'rep', l:'Essences nuisibles', list:'dl-esp', hint:'Fromager, colatier, poré-poré (swollen shoot), teck, eucalyptus…'},
+    {k:'e_nuis', t:'rep', l:'Essences nuisibles', list:'dl-esp', hint:'Fromager, kapokier, colatiers, koto, poré-poré, prunier mombin (swollen shoot), teck, eucalyptus…'},
     {k:'e_fert', t:'rep', l:'Essences fertilitaires', list:'dl-esp'},
     {k:'e_tot', t:'calc', l:'Arbres associés', v:d=>{ const n=repTot(d.e_princ)+repTot(d.e_alim)+repTot(d.e_fert), s=supHa(d); return `<b>${fmt(n)}</b> arbres utiles` + (s>0 ? ` · <b>${fmt(n/s,1)} arbres/ha</b>` + (n/s<18 ? ' · en dessous du repère de 18 à 25 arbres/ha : à enrichir' : '') : '') + (repTot(d.e_nuis)?` · ${fmt(repTot(d.e_nuis))} arbres nuisibles`:''); }},
     {k:'obs', t:'textarea', l:'Observation générale et conclusion'}]},
@@ -417,7 +835,8 @@ const FORMS = {
     {k:'date_plant', t:'date', l:'Date de plantation initiale'},
     {k:'agents', t:'text', l:'Agents présents', def:agentDefaut},
     {k:'present', t:'one', l:'Le producteur est-il présent ?', o:ON},
-    {k:'rencontre', t:'text', l:'Si non, personne rencontrée', rel:d=>d.present==='Non'}]},
+    {k:'rencontre', t:'text', l:'Si non, personne rencontrée', rel:d=>d.present==='Non'},
+    {k:'consent', t:'one', l:'Le producteur accepte que ces informations soient transmises au responsable du projet', o:ON, req:1, hint:'Expliquez-lui à quoi servent ces données. S\'il refuse, la fiche reste seulement dans ce téléphone.'}]},
   {t:'Cartographie (facultatif)', f:[
     {k:'carto', t:'geoshape', l:'Contour de la parcelle restaurée', hint:'Utile pour vérifier la superficie réelle et la densité de plants.'},
     {k:'sup_cmp', t:'calc', l:'Superficie réelle', v:d=>{ const st=geoStats((d.carto&&d.carto.pts)||[]); if(!(st.area>0)) return 'Pas encore de mapping.'; const r=st.area/10000, dcl=numv(d.sup_rest); return `<b>${fmt(r,2)} ha</b>` + (dcl>0?` · déclarée ${fmt(dcl,2)} ha (écart ${fmt((r-dcl)/dcl*100,0)} %)`:''); }}]},
@@ -479,7 +898,8 @@ const FORMS = {
     {k:'village', t:'text', l:'Village / campement', req:1},
     {k:'region', t:'text', l:'Région', list:'dl-reg'},
     {k:'culture', t:'text', l:'Culture ou usage de la parcelle', list:'dl-cult'},
-    {k:'sup_dec', t:'dec', l:'Superficie déclarée par le producteur', u:'ha'}]},
+    {k:'sup_dec', t:'dec', l:'Superficie déclarée par le producteur', u:'ha'},
+    {k:'consent', t:'one', l:'Le producteur accepte que ces informations soient transmises au responsable du projet', o:ON, req:1, hint:'Expliquez-lui à quoi servent ces données. S\'il refuse, la fiche reste seulement dans ce téléphone.'}]},
   {t:'Cartographie', f:[
     {k:'carto', t:'geoshape', l:'Contour du champ', req:1},
     {k:'cmp', t:'calc', l:'Superficie réelle', v:d=>{ const st=geoStats((d.carto&&d.carto.pts)||[]); if(!(st.area>0)) return 'Faites le tour du champ.'; const r=st.area/10000, dcl=numv(d.sup_dec); return `<b>${fmt(r,2)} ha</b> · périmètre ${fmt(st.perim)} m` + (dcl>0?` · déclarée ${fmt(dcl,2)} ha (écart ${fmt((r-dcl)/dcl*100,0)} %)`:''); }},
@@ -642,7 +1062,7 @@ function finalize(){
     if(miss.length){ SEC=i; renderSection(); checkReq(i); return; }
   }
   CUR.statut='finalise'; CUR.modifie=new Date().toISOString();
-  DB.put(CUR).then(()=>{ const r=CUR; closeForm(); renderList(); printOffer(r); });
+  DB.put(CUR).then(()=>{ const r=CUR; closeForm(); renderList(); printOffer(r); syncNow(); });
 }
 function printOffer(r){ const m=$('#exp-msg'); m.innerHTML=`Fiche de <b>${esc(r.data.nom||'')}</b> finalisée. <a href="#" id="po">Imprimer / PDF</a>`; m.style.color='var(--ok)'; $('#po').onclick=e=>{ e.preventDefault(); printRec(r); }; }
 
@@ -762,11 +1182,12 @@ async function renderList(){
   try{ ALL=(await DB.all()).sort((a,b)=>String(b.modifie).localeCompare(String(a.modifie))); }catch(e){ ALL=[]; }
   const q=($('#col-q').value||'').toLowerCase();
   const L=ALL.filter(r=>!q || [r.data.nom,r.data.village,r.data.campement].join(' ').toLowerCase().includes(q));
+  renderSync();
   const ha=ALL.reduce((s,r)=>s+supHa(r.data),0);
   $('#col-sum').innerHTML=`<div class="kpi"><span>Fiches</span><b>${ALL.length}</b></div><div class="kpi"><span>Brouillons</span><b>${ALL.filter(r=>r.statut!=='finalise').length}</b></div><div class="kpi"><span>Finalisées</span><b>${ALL.filter(r=>r.statut==='finalise').length}</b></div><div class="kpi"><span>Superficie totale</span><b>${fmt(ha,2)} ha</b></div>`;
   if(!L.length){ $('#col-list').innerHTML='<p class="note">'+(ALL.length?'Aucune fiche ne correspond.':'Aucune fiche pour l\'instant. Touchez un des boutons ci-dessus pour commencer.')+'</p>'; return; }
   $('#col-list').innerHTML=L.map(r=>{ const s=supHa(r.data), st=geoStats((r.data.carto&&r.data.carto.pts)||[]);
-    return `<div class="rec"><div><b>${esc(r.data.nom||'(sans nom)')}</b> <span class="chip ${r.statut==='finalise'?'g':'o'}">${r.statut==='finalise'?'Finalisée':'Brouillon'}</span>
+    return `<div class="rec"><div><b>${esc(r.data.nom||'(sans nom)')}</b> <span class="chip ${r.statut==='finalise'?'g':'o'}">${r.statut==='finalise'?'Finalisée':'Brouillon'}</span>${r.statut==='finalise'&&SYNC.on()?(refus(r)?' <span class="chip">non envoyée (refus)</span>':r.envoye===r.modifie?' <span class="chip g">envoyée ✓</span>':' <span class="chip o">en attente d\'envoi</span>'):''}
       <div class="meta">${esc(FORMS[r.type].court)} · ${esc(r.data.village||'')}${r.data.date?' · '+new Date(r.data.date).toLocaleDateString('fr-FR'):''}</div>
       <div class="meta">${st.area>0?`Superficie réelle <b>${fmt(st.area/10000,2)} ha</b> (${st.n} points)`:(s>0?`Superficie ${fmt(s,2)} ha (déclarée)`:'Pas de cartographie')}</div></div>
       <div class="acts"><button class="btn" type="button" data-ed="${r.id}">${r.statut==='finalise'?'Modifier':'Continuer'}</button><button class="btn sec" type="button" data-pr="${r.id}">Fiche / PDF</button><button class="btn danger" type="button" data-dl="${r.id}">Supprimer</button></div></div>`; }).join('');
@@ -790,8 +1211,8 @@ function valTxt(f,d){
     default: return esc(v||'').replace(/\n/g,'<br>');
   }
 }
-function printRec(r){
-  if(!r) return;
+function printRec(r, onlyHtml){
+  if(!r) return '';
   const F=FORMS[r.type], d=r.data, pts=(d.carto&&d.carto.pts)||[], st=geoStats(pts);
   const projet=cfg.get('projet','');
   let h=`<div style="display:flex;justify-content:space-between;gap:12px;border-bottom:2px solid #17694A;padding-bottom:6px;margin-bottom:8px"><div>${projet?`<div style="font-size:10pt;color:#17694A;font-weight:700">${esc(projet)}</div>`:''}<h1 style="margin:2px 0;font-size:17pt">${esc(F.titre)}</h1></div><div style="text-align:right;font-size:9pt">Fiche n° ${esc(r.id)}<br>${r.statut==='finalise'?'Finalisée':'Brouillon'}</div></div>`;
@@ -812,6 +1233,7 @@ function printRec(r){
   const hasSig = F.sections.some(S=>S.f.some(f=>f.t==='sign'));
   if(hasSig) h+=`<h3>Signatures</h3><table><tr>${sig('sig_agent','Agent / enquêteur : '+esc(d.agent||''))}${sig('sig_prod','Producteur / représentant : '+esc(d.nom_rep||d.nom||''))}</tr></table>`;
   h+=`<p style="font-size:8pt;color:#555;margin-top:10px">Superficie calculée à partir des points GPS relevés sur le terrain (marge d'erreur indicative ± ${fmt(st.incert/10000,2)} ha). Fiche établie avec AKA AgroDiag CI.</p>`;
+  if(onlyHtml) return h;
   const box=document.createElement('div'); box.innerHTML=h;
   MOD.print(box, F.court+' '+(d.nom||''));
 }
@@ -819,8 +1241,8 @@ function printRec(r){
 /* =====================================================================
    EXPORTS
    ===================================================================== */
-async function saveFile(name, blob){
-  const m=$('#exp-msg');
+async function saveFile(name, blob, m){
+  m=m||$('#exp-msg');
   if(window.AgroDiagAndroid && window.AgroDiagAndroid.saveFile){
     const b64=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(',')[1]||''); r.onerror=rej; r.readAsDataURL(blob); });
     const st=await new Promise(res=>{ window.__agrodiagSaved=s=>{ window.__agrodiagSaved=null; res(s); }; window.AgroDiagAndroid.saveFile(name, blob.type||'application/octet-stream', b64); });
@@ -830,8 +1252,8 @@ async function saveFile(name, blob){
   m.textContent=`Fichier préparé : ${name}`; m.style.color='var(--ok)';
 }
 const stamp=()=>new Date().toISOString().slice(0,10);
-function csvFor(type){
-  const F=FORMS[type], recs=ALL.filter(r=>r.type===type);
+function csvFor(type, list){
+  const F=FORMS[type], recs=(list||ALL).filter(r=>r.type===type);
   const cols=[]; F.sections.forEach(S=>S.f.forEach(f=>{ if(['note','photo','sign','calc'].includes(f.t)) return;
     if(f.t==='geopoint'){ cols.push([f.k+'_lat',r=>r.data[f.k]?.lat?.toFixed(6)??''],[f.k+'_lon',r=>r.data[f.k]?.lon?.toFixed(6)??''],[f.k+'_precision_m',r=>r.data[f.k]?.acc?Math.round(r.data[f.k].acc):'']); return; }
     if(f.t==='geoshape'){ cols.push(['superficie_reelle_ha',r=>{ const s=geoStats(r.data[f.k]?.pts||[]); return s.area>0?(s.area/10000).toFixed(4):''; }],['perimetre_m',r=>{ const s=geoStats(r.data[f.k]?.pts||[]); return s.perim?Math.round(s.perim):''; }],['centre_lat',r=>{ const s=geoStats(r.data[f.k]?.pts||[]); return s.area>0?s.centre.lat.toFixed(6):''; }],['centre_lon',r=>{ const s=geoStats(r.data[f.k]?.pts||[]); return s.area>0?s.centre.lon.toFixed(6):''; }],['nb_points',r=>(r.data[f.k]?.pts||[]).length||'']); return; }
@@ -840,28 +1262,28 @@ function csvFor(type){
     if(f.autre) cols.push([f.k+'_autre',r=>r.data[f.k+'_autre']||'']);
     if(f.prec) cols.push([f.k+'_precisions',r=>r.data[f.k+'_prec']||'']);
   }));
-  cols.unshift(['fiche_id',r=>r.id],['statut',r=>r.statut==='finalise'?'finalisée':'brouillon'],['modifiee_le',r=>r.modifie]);
+  cols.unshift(['fiche_id',r=>r.id],['recue_le',r=>r.recu||''],['statut',r=>r.statut==='finalise'?'finalisée':'brouillon'],['modifiee_le',r=>r.modifie]);
   const q=v=>{ const s=String(v??''); return /[;"\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; };
   const lines=[cols.map(c=>q(c[0])).join(';')].concat(recs.map(r=>cols.map(c=>q(c[1](r))).join(';')));
   return {n:recs.length, blob:new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv'})};
 }
-function shapes(){ return ALL.filter(r=>r.data.carto&&r.data.carto.pts&&r.data.carto.pts.length>2); }
-function exp(kind){
-  const m=$('#exp-msg');
-  if(kind.startsWith('csv-')){ const t=kind.slice(4), c=csvFor(t); if(!c.n){ m.textContent='Aucune fiche de ce type.'; m.style.color='var(--warn)'; return; } return saveFile(`agroforesterie_${t}_${stamp()}.csv`, c.blob); }
-  if(kind==='json') return saveFile(`agroforesterie_sauvegarde_${stamp()}.json`, new Blob([JSON.stringify({app:'AKA AgroDiag CI',module:'agroforesterie',version:1,date:new Date().toISOString(),fiches:ALL})],{type:'application/json'}));
-  const S=shapes(); if(!S.length){ m.textContent='Aucune parcelle cartographiée pour l\'instant.'; m.style.color='var(--warn)'; return; }
+function shapes(list){ return (list||ALL).filter(r=>r.data.carto&&r.data.carto.pts&&r.data.carto.pts.length>2); }
+function exp(kind, list, m){
+  list=list||ALL; m=m||$('#exp-msg');
+  if(kind.startsWith('csv-')){ const t=kind.slice(4), c=csvFor(t,list); if(!c.n){ m.textContent='Aucune fiche de ce type.'; m.style.color='var(--warn)'; return; } return saveFile(`agroforesterie_${t}_${stamp()}.csv`, c.blob, m); }
+  if(kind==='json') return saveFile(`agroforesterie_sauvegarde_${stamp()}.json`, new Blob([JSON.stringify({app:'AKA AgroDiag CI',module:'agroforesterie',version:1,date:new Date().toISOString(),fiches:list})],{type:'application/json'}), m);
+  const S=shapes(list); if(!S.length){ m.textContent='Aucune parcelle cartographiée pour l\'instant.'; m.style.color='var(--warn)'; return; }
   if(kind==='geojson'){
     const fc={type:'FeatureCollection',features:S.map(r=>{ const p=r.data.carto.pts, st=geoStats(p); const ring=p.map(x=>[x.lon,x.lat]); ring.push(ring[0]);
-      return {type:'Feature',properties:{fiche:r.id,type:FORMS[r.type].court,producteur:r.data.nom||'',village:r.data.village||'',date:r.data.date||'',superficie_ha:+(st.area/10000).toFixed(4),perimetre_m:Math.round(st.perim)},geometry:{type:'Polygon',coordinates:[ring]}}; })};
-    return saveFile(`parcelles_${stamp()}.geojson`, new Blob([JSON.stringify(fc)],{type:'application/geo+json'}));
+      return {type:'Feature',properties:{fiche:r.id,type:FORMS[r.type].court,agent:r.data.agent||'',producteur:r.data.nom||'',village:r.data.village||'',date:r.data.date||'',superficie_ha:+(st.area/10000).toFixed(4),perimetre_m:Math.round(st.perim)},geometry:{type:'Polygon',coordinates:[ring]}}; })};
+    return saveFile(`parcelles_${stamp()}.geojson`, new Blob([JSON.stringify(fc)],{type:'application/geo+json'}), m);
   }
   if(kind==='kml'){
     const x=s=>String(s??'').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
     const pm=S.map(r=>{ const p=r.data.carto.pts, st=geoStats(p), co=p.concat([p[0]]).map(q=>`${q.lon},${q.lat},0`).join(' ');
       return `<Placemark><name>${x(r.data.nom||r.id)} – ${(st.area/10000).toFixed(2)} ha</name><description>${x(FORMS[r.type].court)} · ${x(r.data.village||'')} · ${x(r.data.date||'')} · ${(st.area/10000).toFixed(4)} ha · ${Math.round(st.perim)} m</description><styleUrl>#p</styleUrl><Polygon><outerBoundaryIs><LinearRing><coordinates>${co}</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>`; }).join('');
     const kml=`<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>Parcelles ${stamp()}</name><Style id="p"><LineStyle><color>ff4a6a17</color><width>3</width></LineStyle><PolyStyle><color>5545b88c</color></PolyStyle></Style>${pm}</Document></kml>`;
-    return saveFile(`parcelles_${stamp()}.kml`, new Blob([kml],{type:'application/vnd.google-earth.kml+xml'}));
+    return saveFile(`parcelles_${stamp()}.kml`, new Blob([kml],{type:'application/vnd.google-earth.kml+xml'}), m);
   }
 }
 $$('[data-exp]').forEach(b=>b.onclick=()=>exp(b.dataset.exp));
@@ -871,6 +1293,132 @@ $('#imp').onchange=async e=>{ const f=e.target.files[0], m=$('#exp-msg'); if(!f)
     m.textContent=`${n} fiche(s) importée(s).`; m.style.color='var(--ok)'; renderList();
   }catch(err){ m.textContent='Ce fichier n\'est pas une sauvegarde valide.'; m.style.color='var(--crit)'; }
   e.target.value=''; };
+
+/* =====================================================================
+   ENVOI AU SUPERVISEUR ET ESPACE SUPERVISEUR
+   ===================================================================== */
+const SB_URL='https://uxgwwwdtvrocuqnxuzzn.supabase.co', SB_KEY='sb_publishable_J47WwSHCMHxPtIzne5ShhA_HApNZf2t';
+async function rpc(fn, body){
+  let r; try{ r=await fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)}); }
+  catch(e){ const x=new Error('reseau'); x.reseau=1; throw x; }
+  const t=await r.text(); let j=null; try{ j=JSON.parse(t); }catch(e){}
+  if(!r.ok){ const x=new Error((j&&(j.message||j.hint))||('HTTP '+r.status)); x.status=r.status; throw x; }
+  return j;
+}
+const SYNC={ busy:false, msg:'', on:()=>cfg.get('envoi','0')==='1' };
+function jeton(){ let j=cfg.get('jeton',''); if(!j){ const a=new Uint8Array(24); crypto.getRandomValues(a); j=Array.from(a,b=>b.toString(16).padStart(2,'0')).join(''); cfg.set('jeton',j); } return j; }
+function shrinkURL(u,M,q){ return new Promise(res=>{ const im=new Image(); im.onload=()=>{ const s=Math.min(1,M/Math.max(im.width,im.height)); const c=document.createElement('canvas'); c.width=Math.round(im.width*s); c.height=Math.round(im.height*s); c.getContext('2d').drawImage(im,0,0,c.width,c.height); res(c.toDataURL('image/jpeg',q)); }; im.onerror=()=>res(null); im.src=u; }); }
+async function payload(r){
+  const d=JSON.parse(JSON.stringify(r.data||{}));
+  if(Array.isArray(d.photos)){ const L=[]; for(const p of d.photos){ const s=await shrinkURL(p,640,0.6); if(s) L.push(s); } d.photos=L; }
+  const ha=supHa(r.data||{});
+  return {type:r.type, statut:r.statut, cree:r.cree, modifie:r.modifie, superficie_ha: ha>0 ? +ha.toFixed(4) : null, data:d};
+}
+const refus = r=>r.data && r.data.consent==='Non';
+const aEnvoyer = r=>r.statut==='finalise' && !refus(r) && r.envoye!==r.modifie;
+async function syncNow(manuel){
+  if(!SYNC.on() || SYNC.busy) return;
+  if(!manuel && navigator.onLine===false){ renderSync(); return; }
+  SYNC.busy=true; SYNC.msg='Envoi en cours…'; renderSync();
+  let ok=0, err=null;
+  try{
+    const L=(await DB.all()).filter(aEnvoyer);
+    for(const r of L){
+      try{ await rpc('agrof_envoyer',{p_id:r.id, p_jeton:jeton(), p_fiche:await payload(r)});
+        const cur=(await DB.all()).find(x=>x.id===r.id);
+        if(cur && cur.modifie===r.modifie){ cur.envoye=r.modifie; cur.envoyeLe=new Date().toISOString(); await DB.put(cur); if(CUR&&CUR.id===cur.id){ CUR.envoye=cur.envoye; CUR.envoyeLe=cur.envoyeLe; } }
+        ok++;
+      }catch(e){ err=e; if(e.reseau) break; }
+    }
+  }catch(e){ err=e; }
+  SYNC.busy=false;
+  SYNC.msg = err ? (err.reseau ? 'Pas d\'Internet pour l\'instant : les fiches partiront automatiquement dès que le téléphone sera connecté.' : 'Envoi refusé par le serveur ('+err.message+').') + (ok?` ${ok} fiche(s) envoyée(s) quand même.`:'')
+                 : ok ? `${ok} fiche(s) envoyée(s) au superviseur.` : '';
+  if(!CUR) renderList(); else renderSync();
+}
+function renderSync(){
+  const box=$('#sync-box'); if(!box) return;
+  if(!SYNC.on()){
+    box.innerHTML=`<h3 style="margin-top:0">Agents de terrain : envoi automatique au superviseur</h3>
+      <p>Une fois activé, chaque fiche <b>finalisée</b> est envoyée toute seule au responsable du projet dès que le téléphone a Internet. Les brouillons restent dans le téléphone.</p>
+      <div class="btns"><button class="btn" type="button" id="sync-on">Activer l'envoi automatique</button></div>`;
+    $('#sync-on').onclick=()=>{ cfg.set('envoi','1'); jeton(); renderList(); syncNow(true); };
+    return;
+  }
+  const fin=ALL.filter(r=>r.statut==='finalise'), att=fin.filter(aEnvoyer).length, env=fin.filter(r=>!refus(r)&&r.envoye===r.modifie).length, ref=fin.filter(refus).length;
+  box.innerHTML=`<h3 style="margin-top:0">Envoi automatique au superviseur : activé</h3>
+    <div class="kpis"><div class="kpi"><span>Envoyées</span><b>${env}</b></div><div class="kpi"><span>En attente</span><b>${att}</b></div>${ref?`<div class="kpi"><span>Non envoyées (refus du producteur)</span><b>${ref}</b></div>`:''}</div>
+    <p class="gpsmsg" style="color:${/refus|impossible/i.test(SYNC.msg)?'var(--crit)':'var(--muted)'}">${esc(SYNC.msg||(att?'Les fiches en attente partiront dès qu\'il y aura Internet.':'Tout est envoyé.'))}</p>
+    <div class="btns"><button class="btn" type="button" id="sync-go" ${SYNC.busy?'disabled':''}>Envoyer maintenant</button><button class="btn sec" type="button" id="sync-off">Désactiver</button></div>`;
+  $('#sync-go').onclick=()=>syncNow(true);
+  $('#sync-off').onclick=()=>{ cfg.set('envoi','0'); renderSync(); };
+}
+window.addEventListener('online',()=>syncNow());
+setInterval(()=>syncNow(), 5*60*1000);
+
+/* ---------- espace superviseur ---------- */
+const SUP=makeDB('agrodiag-agrof-superviseur','agrodiag.agrof.sup');
+let SUPALL=[];
+function supMsg(m,cls){ const el=$('#sup-msg'); el.innerHTML=m; el.style.color= cls==='crit'?'var(--crit)':cls==='ok'?'var(--ok)':'var(--muted)'; }
+async function supFetch(tout){
+  const cle=$('#sup-cle').value.trim();
+  if(!cle) return supMsg('Entrez la clé du superviseur.','crit');
+  cfg.set('supcle', $('#sup-mem').checked ? cle : '');
+  if(tout) cfg.set('supdepuis','');
+  let depuis=cfg.get('supdepuis','')||null, n=0, total=0;
+  supMsg('Récupération des fiches…');
+  try{
+    for(let tour=0; tour<200; tour++){
+      const j=await rpc('agrof_lire',{p_cle:cle, p_depuis:depuis, p_limite:50, p_decalage:0});
+      const L=(j&&j.fiches)||[]; total=j&&j.total||0;
+      for(const f of L){ const x=f.fiche||{}; await SUP.put({id:f.id, recu:f.recu, type:FORMS[x.type]?x.type:'carto', statut:x.statut||'finalise', cree:x.cree, modifie:x.modifie, data:x.data||{}}); depuis=f.recu; n++; }
+      supMsg(`Récupération… ${n} fiche(s)`);
+      if(L.length<50) break;
+    }
+    if(depuis) cfg.set('supdepuis',depuis);
+    supMsg(`${n} fiche(s) nouvelle(s) ou mise(s) à jour. ${total} fiche(s) au total sur le serveur.`,'ok');
+  }catch(e){
+    supMsg(e.reseau ? 'Pas d\'Internet : réessayez quand le téléphone est connecté. Les fiches déjà récupérées restent visibles.' : /cle invalide/.test(e.message) ? 'Clé incorrecte.' : 'Erreur : '+esc(e.message),'crit');
+  }
+  supRender();
+}
+async function supRender(){
+  try{ SUPALL=(await SUP.all()).sort((a,b)=>String(b.recu).localeCompare(String(a.recu))); }catch(e){ SUPALL=[]; }
+  const out=$('#sup-out'); if(!SUPALL.length){ out.innerHTML='<p class="note">Aucune fiche récupérée sur ce téléphone pour l\'instant.</p>'; return; }
+  const ag=$('#sup-ag')?.value||'', ty=$('#sup-ty')?.value||'', q=($('#sup-q')?.value||'').toLowerCase();
+  const agents=[...new Set(SUPALL.map(r=>r.data.agent||'(sans nom)'))].sort();
+  const L=SUPALL.filter(r=>(!ag||(r.data.agent||'(sans nom)')===ag)&&(!ty||r.type===ty)&&(!q||[r.data.nom,r.data.village,r.data.campement].join(' ').toLowerCase().includes(q)));
+  const ha=L.reduce((s,r)=>s+supHa(r.data),0);
+  const parAg=agents.map(a=>{ const R=SUPALL.filter(r=>(r.data.agent||'(sans nom)')===a); return [a,R.length,R.reduce((s,r)=>s+supHa(r.data),0),R.map(r=>r.recu).sort().pop()]; });
+  let h=`<div class="kpis"><div class="kpi"><span>Fiches affichées</span><b>${L.length}</b></div><div class="kpi"><span>Agents</span><b>${agents.length}</b></div><div class="kpi"><span>Superficie totale</span><b>${fmt(ha,2)} ha</b></div><div class="kpi"><span>Dernière réception</span><b style="font-size:1rem">${SUPALL[0].recu?new Date(SUPALL[0].recu).toLocaleString('fr-FR'):'–'}</b></div></div>`;
+  h+=`<div class="three"><label class="f">Agent<select id="sup-ag" data-nomem><option value="">Tous</option>${agents.map(a=>`<option ${a===ag?'selected':''}>${esc(a)}</option>`).join('')}</select></label>
+      <label class="f">Type<select id="sup-ty" data-nomem><option value="">Tous</option>${Object.entries(FORMS).map(([k,f])=>`<option value="${k}" ${k===ty?'selected':''}>${esc(f.court)}</option>`).join('')}</select></label>
+      <label class="f">Producteur, village<input type="text" id="sup-q" data-nomem value="${esc(q)}"></label></div>`;
+  h+=`<h3>Par agent</h3><div class="tblw"><table><thead><tr><th>Agent</th><th class="n">Fiches</th><th class="n">Superficie</th><th>Dernier envoi</th></tr></thead><tbody>${parAg.map(a=>`<tr><td>${esc(a[0])}</td><td class="n">${a[1]}</td><td class="n">${fmt(a[2],2)} ha</td><td>${a[3]?new Date(a[3]).toLocaleDateString('fr-FR'):''}</td></tr>`).join('')}</tbody></table></div>`;
+  h+=`<h3>Fiches</h3><div class="tblw"><table><thead><tr><th>Producteur</th><th>Type</th><th>Village</th><th>Agent</th><th class="n">Superficie</th><th>Reçue le</th><th></th></tr></thead><tbody>${L.map(r=>`<tr><td><b>${esc(r.data.nom||'')}</b></td><td>${esc(FORMS[r.type].court)}</td><td>${esc(r.data.village||'')}</td><td>${esc(r.data.agent||'')}</td><td class="n">${supHa(r.data)>0?fmt(supHa(r.data),2)+' ha':'–'}</td><td>${r.recu?new Date(r.recu).toLocaleDateString('fr-FR'):''}</td><td><button class="btn sec" type="button" data-supr="${esc(r.id)}" style="min-height:34px;padding:4px 10px">Fiche / PDF</button></td></tr>`).join('')}</tbody></table></div>`;
+  h+=`<h3>Exporter les fiches affichées</h3><div class="btns">
+      <button class="btn sec" type="button" data-sexp="csv-diag">Excel : diagnostics</button><button class="btn sec" type="button" data-sexp="csv-regarn">Excel : regarnissage</button><button class="btn sec" type="button" data-sexp="csv-carto">Excel : cartographies</button>
+      <button class="btn sec" type="button" data-sexp="kml">Google Earth (.kml)</button><button class="btn sec" type="button" data-sexp="geojson">SIG (.geojson)</button><button class="btn sec" type="button" data-sexp="json">Sauvegarde (.json)</button>
+      <button class="btn sec" type="button" id="sup-printall">Imprimer toutes les fiches affichées</button></div><p class="gpsmsg" id="sup-exp-msg"></p>`;
+  out.innerHTML=h;
+  ['#sup-ag','#sup-ty'].forEach(s=>$(s).onchange=supRender);
+  $('#sup-q').onchange=supRender;
+  $$('[data-supr]').forEach(b=>b.onclick=()=>printRec(SUPALL.find(x=>x.id===b.dataset.supr)));
+  $$('[data-sexp]').forEach(b=>b.onclick=()=>exp(b.dataset.sexp, L, $('#sup-exp-msg')));
+  $('#sup-printall').onclick=()=>printMany(L);
+}
+function printMany(L){
+  if(!L.length) return;
+  const parts=L.map(r=>printRec(r,true));
+  const box=document.createElement('div'); box.innerHTML=parts.join('<div style="page-break-after:always"></div>');
+  MOD.print(box, 'Fiches agroforesterie ('+L.length+')');
+}
+async function supKey(){
+  const a=$('#sup-old').value.trim(), b=$('#sup-new').value.trim(), m=$('#sup-key-msg');
+  if(b.length<8){ m.textContent='La nouvelle clé doit avoir au moins 8 caractères.'; m.style.color='var(--crit)'; return; }
+  try{ await rpc('agrof_changer_cle',{p_ancienne:a,p_nouvelle:b}); m.textContent='Clé changée. Notez-la bien.'; m.style.color='var(--ok)'; if(cfg.get('supcle','')) cfg.set('supcle',b); $('#sup-cle').value=b; }
+  catch(e){ m.textContent= e.reseau?'Pas d\'Internet.':/cle invalide/.test(e.message)?'Ancienne clé incorrecte.':'Erreur : '+e.message; m.style.color='var(--crit)'; }
+}
 
 /* =====================================================================
    CALCUL DES PLANTS
@@ -916,13 +1464,6 @@ function figStrates(){
   lab.forEach(l=>{ s+=`<rect x="190" y="${l[0]-14}" width="${Math.min(440,l[1].length*6.4+14)}" height="20" rx="4" fill="#fff" opacity=".88"/>`+T(197,l[0],l[1],{a:'start',fs:12,b:1}); });
   return `<svg viewBox="0 0 640 330" xmlns="http://www.w3.org/2000/svg">${s}</svg><figcaption>Chaque étage utilise la lumière, l'eau et le sol à son niveau.</figcaption>`;
 }
-function figCouloirs(){
-  let s=`<rect width="640" height="240" fill="#fff"/><rect x="0" y="40" width="640" height="190" fill="#E9DCC3"/>`;
-  for(let l=0;l<4;l++){ const y=60+l*55; for(let i=0;i<20;i++) s+=`<circle cx="${20+i*32}" cy="${y}" r="9" fill="#2E6B3A"/>`; if(l<3) for(let i=0;i<13;i++) s+=`<path d="M${30+i*48} ${y+30} v-12 m0 4 l-7 -6 m7 6 l7 -6" stroke="#D5A653" stroke-width="2.5" fill="none"/>`; }
-  s+=`<line x1="610" y1="60" x2="610" y2="115" stroke="#B3261E" stroke-width="2"/>`+T(600,92,'4–6 m',{a:'end',fs:12,c:'#B3261E',b:1});
-  s+=T(320,24,'Lignes de gliricidia ou d\'acacia (vert foncé) · cultures entre les lignes (maïs, igname, manioc)',{fs:12,b:1});
-  return `<svg viewBox="0 0 640 240" xmlns="http://www.w3.org/2000/svg">${s}</svg><figcaption>Les arbustes sont taillés à 50 cm – 1 m avant le semis ; les feuilles coupées sont laissées sur le sol comme engrais.</figcaption>`;
-}
 function figPlant(){
   let s=`<rect width="640" height="300" fill="#fff"/>`;
   // trou en coupe
@@ -941,6 +1482,9 @@ function figPlant(){
   return `<svg viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg">${s}</svg><figcaption>Planter un arbre : trou préparé à l'avance, compost au fond, sachet retiré, cuvette et paillis.</figcaption>`;
 }
 $('#fig-strates').innerHTML=figStrates(); $('#fig-couloirs').innerHTML=figCouloirs(); $('#fig-plant').innerHTML=figPlant();
+$('#fig-familles').innerHTML=figFamilles(); $('#fig-cacao3').innerHTML=figCacao3(); $('#fig-echelle').innerHTML=figEchelle(); $('#fig-taungya').innerHTML=figTaungya();
+$('#fig-agrosys').innerHTML=figAgrosys(); $('#fig-mangrove').innerHTML=figMangrove(); $('#fig-berges').innerHTML=figBerges(); $('#fig-tailles').innerHTML=figTailles(); $('#fig-ftypes').innerHTML=figFtypes();
+$('#sys-print').onclick=()=>MOD.print($('#sys-doc'),'Systèmes agroforestiers'); $('#rest-print').onclick=()=>MOD.print($('#rest-doc'),'Restauration forestière'); $('#mil-print').onclick=()=>MOD.print($('#mil-doc'),'Agrosystème et milieux');
 $('#g-print').onclick=()=>MOD.print($('#g-doc'),'Guide agroforesterie');
 
 /* =====================================================================
@@ -953,8 +1497,11 @@ $('#cfg-projet').oninput=e=>cfg.set('projet',e.target.value); $('#cfg-agent').on
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible' && GPS.watch!=null) wake(true); });
 window.addEventListener('pagehide',()=>{ if(CUR){ CUR.modifie=new Date().toISOString(); DB.put(CUR); } });
 MOD.remember('agrodiag.agrof.ui');
-espUI(); plants(); MOD.tabs();
-DB.open().then(renderList);
+arbUI(); plants(); MOD.tabs();
+DB.open().then(renderList).then(()=>syncNow());
+SUP.open().then(supRender);
+$('#sup-cle').value=cfg.get('supcle',''); $('#sup-mem').checked=!!cfg.get('supcle','');
+$('#sup-get').onclick=()=>supFetch(false); $('#sup-all').onclick=()=>supFetch(true); $('#sup-key').onclick=supKey;
 })();
 </script>
 </body>
