@@ -1,10 +1,10 @@
 {
-  "versionCode": 17,
-  "version": "1.11.0",
+  "versionCode": 18,
+  "version": "1.11.1",
   "apk": "https://github.com/yaoakafrancois-code/AgroDiagCI/releases/download/test/AgroDiag-CI-test.apk",
   "nouveautes": [
+    "Ajout du Lebek (Albizia lebbeck) dans les arbres fertilitaires",
     "Reconnaître les arbres : 72 fiches avec feuille, taille et écorce",
-    "Systèmes agroforestiers, restauration forestière (taungya…), mangroves, forêts sacrées",
-    "Agroforesterie : envoi automatique des fiches au superviseur"
+    "Systèmes agroforestiers, restauration forestière (taungya…), mangroves, forêts sacrées"
   ]
 }
