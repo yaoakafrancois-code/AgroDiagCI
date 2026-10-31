@@ -1,10 +1,10 @@
 {
-  "versionCode": 18,
-  "version": "1.11.1",
+  "versionCode": 19,
+  "version": "1.12.0",
   "apk": "https://github.com/yaoakafrancois-code/AgroDiagCI/releases/download/test/AgroDiag-CI-test.apk",
   "nouveautes": [
-    "Ajout du Lebek (Albizia lebbeck) dans les arbres fertilitaires",
-    "Reconnaître les arbres : 72 fiches avec feuille, taille et écorce",
-    "Systèmes agroforestiers, restauration forestière (taungya…), mangroves, forêts sacrées"
+    "Nouveau module « Gestion de coopérative » : registre des membres avec codes",
+    "Collecte : pesées, montant calculé et reçu à imprimer pour le producteur",
+    "Intrants à crédit déduits automatiquement, bilan net à payer et exports Excel"
   ]
 }

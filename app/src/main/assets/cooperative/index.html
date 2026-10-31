@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Gestion de coopérative · AKA AgroDiag CI</title>
+<link rel="stylesheet" href="../assets/fonts.css">
+<link rel="stylesheet" href="../assets/modules.css">
+<style id="shell-back">
+.shell-bar{position:relative;z-index:1000;background:#17694A;padding:6px 12px}
+.shell-back{display:inline-flex;align-items:center;gap:6px;min-height:36px;font:600 15px system-ui,sans-serif;text-decoration:none;color:#fff}
+@media print{.shell-bar{display:none}}
+</style>
+<style>
+input[type=date],input[type=tel]{display:block;width:100%;margin-top:4px;font:inherit;font-size:1rem;padding:10px 11px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.rowact{display:flex;gap:4px;justify-content:flex-end}
+.mini{min-height:32px;padding:4px 10px;font-size:.88rem}
+.danger{border-color:var(--crit);color:var(--crit);background:transparent}
+.neg{color:var(--crit);font-weight:700}
+.search{margin-bottom:10px}
+.recu{border:1px dashed var(--line);border-radius:9px;padding:12px;margin-top:10px}
+.empty{color:var(--muted);font-style:italic;padding:10px 0}
+</style>
+</head>
+<body><div class="shell-bar"><a class="shell-back" href="../index.html" aria-label="Retour à l'accueil">&#8592; Accueil · AKA AgroDiag CI</a></div>
+<div class="wrap">
+<header class="app">
+  <svg width="44" height="44" viewBox="0 0 36 36" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="none" stroke="#17694A" stroke-width="2.4"/><circle cx="24" cy="12" r="4.5" fill="none" stroke="#17694A" stroke-width="2.4"/><path d="M4 30c0-6 4-10 8-10s8 4 8 10M16 30c0-6 4-10 8-10s8 4 8 10" fill="none" stroke="#17694A" stroke-width="2.4" stroke-linecap="round"/></svg>
+  <div><h1>Gestion de coopérative</h1><p id="hd-sub">Membres, collecte, intrants à crédit, paiement des producteurs</p></div>
+</header>
+
+<nav class="tabs" aria-label="Rubriques"><div class="row" role="tablist">
+  <button role="tab" data-tab="t-mem">Membres</button>
+  <button role="tab" data-tab="t-liv">Collecte</button>
+  <button role="tab" data-tab="t-int">Intrants à crédit</button>
+  <button role="tab" data-tab="t-bil">Bilan et paiements</button>
+  <button role="tab" data-tab="t-sav">Réglages et sauvegarde</button>
+</div></nav>
+
+<!-- ============ MEMBRES ============ -->
+<section class="tab" id="t-mem">
+  <h2>Registre des membres</h2>
+  <p class="lead">Chaque producteur reçoit un code. Ce code sert ensuite pour la collecte, les intrants et le paiement.</p>
+  <div class="grid">
+    <form class="panel" id="f-mem" autocomplete="off">
+      <h3 style="margin-top:0" id="f-mem-t">Nouveau membre</h3>
+      <input type="hidden" id="m-id" data-nomem>
+      <div class="two">
+        <label class="f">Nom<input type="text" id="m-nom" required data-nomem></label>
+        <label class="f">Prénoms<input type="text" id="m-pre" data-nomem></label>
+      </div>
+      <div class="two">
+        <label class="f">Sexe<select id="m-sexe" data-nomem><option value="">–</option><option>Homme</option><option>Femme</option></select></label>
+        <label class="f">Téléphone<input type="tel" id="m-tel" inputmode="tel" data-nomem></label>
+      </div>
+      <label class="f">Village / section<input type="text" id="m-vil" data-nomem></label>
+      <div class="two">
+        <label class="f">Culture principale<input type="text" id="m-cul" list="l-prod" data-nomem></label>
+        <label class="f">Superficie (ha)<input type="number" id="m-sup" min="0" step="0.01" inputmode="decimal" data-nomem></label>
+      </div>
+      <div class="two">
+        <label class="f">Date d'adhésion<input type="date" id="m-adh" data-nomem></label>
+        <label class="f">Part sociale payée (FCFA)<input type="number" id="m-part" min="0" step="500" inputmode="decimal" data-nomem></label>
+      </div>
+      <div class="btns"><button class="btn" type="submit">Enregistrer</button><button class="btn sec" type="button" id="m-annul">Vider</button></div>
+      <p id="m-msg" class="small" role="status"></p>
+    </form>
+    <div>
+      <div class="kpis" id="mem-kpi"></div>
+      <input type="text" class="search" id="m-cherche" placeholder="Chercher un nom, un code, un village…" data-nomem>
+      <div class="tblw" id="mem-liste"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COLLECTE ============ -->
+<section class="tab" id="t-liv" hidden>
+  <h2>Collecte : livraisons des producteurs</h2>
+  <p class="lead">Notez chaque pesée. L'application calcule le montant et prépare un reçu à imprimer ou à montrer au producteur.</p>
+  <div class="grid">
+    <form class="panel" id="f-liv" autocomplete="off">
+      <label class="f">Date<input type="date" id="l-date" required data-nomem></label>
+      <label class="f">Producteur<select id="l-mem" required data-nomem></select></label>
+      <div class="two">
+        <label class="f">Produit<input type="text" id="l-prod" list="l-prod" required data-nomem></label>
+        <label class="f">Qualité<select id="l-grade" data-nomem><option>Bonne</option><option>Moyenne</option><option>Refusée</option></select></label>
+      </div>
+      <div class="two">
+        <label class="f">Poids net (kg)<input type="number" id="l-kg" min="0" step="0.1" required inputmode="decimal" data-nomem></label>
+        <label class="f">Prix payé (FCFA/kg)<input type="number" id="l-prix" min="0" step="5" required inputmode="decimal" data-nomem></label>
+      </div>
+      <div class="msg info" id="l-calc">Montant : –</div>
+      <div class="btns"><button class="btn" type="submit">Enregistrer la livraison</button></div>
+      <p id="l-msg" role="status"></p>
+      <div id="l-recu"></div>
+    </form>
+    <div>
+      <div class="kpis" id="liv-kpi"></div>
+      <div class="tblw" id="liv-liste"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ INTRANTS ============ -->
+<section class="tab" id="t-int" hidden>
+  <h2>Intrants remis à crédit</h2>
+  <p class="lead">Engrais, produits, plants ou outils avancés aux membres. Ce qui n'est pas encore remboursé est retenu automatiquement au moment du paiement.</p>
+  <div class="grid">
+    <form class="panel" id="f-int" autocomplete="off">
+      <label class="f">Date<input type="date" id="i-date" required data-nomem></label>
+      <label class="f">Producteur<select id="i-mem" required data-nomem></select></label>
+      <label class="f">Intrant<input type="text" id="i-nom" list="l-intr" required data-nomem></label>
+      <div class="two">
+        <label class="f">Quantité<input type="number" id="i-qte" min="0" step="0.5" inputmode="decimal" data-nomem></label>
+        <label class="f">Unité<input type="text" id="i-unite" value="sac" data-nomem></label>
+      </div>
+      <label class="f">Valeur à rembourser (FCFA)<input type="number" id="i-val" min="0" step="500" required inputmode="decimal" data-nomem></label>
+      <div class="btns"><button class="btn" type="submit">Enregistrer</button></div>
+      <p id="i-msg" role="status"></p>
+    </form>
+    <div>
+      <div class="kpis" id="int-kpi"></div>
+      <div class="tblw" id="int-liste"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BILAN ============ -->
+<section class="tab" id="t-bil" hidden>
+  <h2>Bilan et paiement des producteurs</h2>
+  <p class="lead">Pour chaque membre : ce qu'il a livré, la retenue de la coopérative, le crédit intrants à déduire et le net à payer.</p>
+  <div class="panel" style="margin-bottom:14px">
+    <div class="two">
+      <label class="f">Du<input type="date" id="b-du" data-nomem></label>
+      <label class="f">Au<input type="date" id="b-au" data-nomem></label>
+    </div>
+    <div class="btns">
+      <button class="btn sec" type="button" id="b-print">Imprimer / PDF</button>
+      <button class="btn sec" type="button" id="b-csv">Excel (.csv)</button>
+      <button class="btn sec" type="button" id="b-solder">Marquer les crédits comme remboursés</button>
+    </div>
+    <p id="b-msg" role="status"></p>
+  </div>
+  <div id="b-doc"></div>
+</section>
+
+<!-- ============ RÉGLAGES ============ -->
+<section class="tab" id="t-sav" hidden>
+  <h2>Réglages et sauvegarde</h2>
+  <div class="grid">
+    <div class="panel">
+      <h3 style="margin-top:0">La coopérative</h3>
+      <label class="f">Nom de la coopérative ou du groupement<input type="text" id="p-nom" data-nomem></label>
+      <label class="f">Campagne<small>Ex. : 2026-2027</small><input type="text" id="p-camp" data-nomem></label>
+      <label class="f">Retenue de la coopérative (% du montant livré)<small>Frais de fonctionnement, ristourne, épargne… Mettez 0 si aucune.</small>
+        <input type="number" id="p-ret" min="0" max="50" step="0.5" inputmode="decimal" data-nomem></label>
+      <div class="btns"><button class="btn" type="button" id="p-save">Enregistrer</button></div>
+      <p id="p-msg" role="status"></p>
+    </div>
+    <div class="panel">
+      <h3 style="margin-top:0">Exports et sauvegarde</h3>
+      <p>Les données restent dans ce téléphone. Faites une sauvegarde chaque semaine et gardez-la sur WhatsApp ou par e-mail.</p>
+      <div class="btns">
+        <button class="btn sec" type="button" data-exp="membres">Excel : membres</button>
+        <button class="btn sec" type="button" data-exp="livraisons">Excel : livraisons</button>
+        <button class="btn sec" type="button" data-exp="intrants">Excel : intrants</button>
+      </div>
+      <div class="btns" style="margin-top:12px">
+        <button class="btn" type="button" id="s-back">Sauvegarder tout (fichier)</button>
+        <label class="btn sec" style="cursor:pointer">Restaurer une sauvegarde<input type="file" id="s-rest" accept=".json,application/json" hidden></label>
+      </div>
+      <p id="s-msg" role="status"></p>
+    </div>
+  </div>
+</section>
+
+<datalist id="l-prod"><option>Cacao</option><option>Café</option><option>Anacarde</option><option>Hévéa</option><option>Palmier à huile</option><option>Riz paddy</option><option>Maïs</option><option>Manioc</option><option>Igname</option><option>Banane plantain</option><option>Tomate</option><option>Piment</option><option>Gombo</option><option>Aubergine</option></datalist>
+<datalist id="l-intr"><option>NPK 15-15-15</option><option>Urée 46 %</option><option>Engrais cacao 0-23-19</option><option>Herbicide</option><option>Insecticide</option><option>Fongicide</option><option>Semences de riz</option><option>Plants d'arbres</option><option>Sacs de jute</option><option>Machette</option><option>Pulvérisateur</option></datalist>
+</div>
+
+<script src="../assets/modules.js"></script>
+<script>
+(function(){
+'use strict';
+const $=MOD.$, esc=MOD.esc, fmt=MOD.fmt;
+const KEY='agrodiag.coop';
+const VIDE=()=>({membres:[],livraisons:[],intrants:[],param:{nom:'',camp:'',ret:0}});
+let D=charger();
+
+function charger(){
+  try{ const d=JSON.parse(localStorage.getItem(KEY)||'null'); if(d&&d.membres) { const v=VIDE(); return {...v,...d,param:{...v.param,...(d.param||{})}}; } }catch(e){}
+  return VIDE();
+}
+function sauver(){ try{ localStorage.setItem(KEY, JSON.stringify(D)); return true; }catch(e){ alert("Mémoire du téléphone pleine : faites une sauvegarde puis libérez de la place."); return false; } }
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const today=()=>new Date().toISOString().slice(0,10);
+const n=v=>{ const x=parseFloat(String(v==null?'':v).replace(',','.')); return isFinite(x)?x:0; };
+const F=v=>fmt(v,0)+' F';
+const dfr=s=>s?s.split('-').reverse().join('/'):'';
+const mem=id=>D.membres.find(m=>m.id===id);
+const nomM=m=>m?(m.code+' · '+m.nom+' '+(m.prenoms||'')).trim():'(membre supprimé)';
+function say(id,txt,ok){ const e=$('#'+id); e.textContent=txt; e.style.color=ok===false?'var(--crit)':'var(--ok)'; }
+
+function prochainCode(){
+  let max=0; D.membres.forEach(m=>{ const k=parseInt(String(m.code).replace(/\D/g,''),10); if(k>max) max=k; });
+  return 'M'+String(max+1).padStart(4,'0');
+}
+
+/* ---------- Membres ---------- */
+function videMembre(){ ['m-id','m-nom','m-pre','m-tel','m-vil','m-cul','m-sup','m-part'].forEach(i=>$('#'+i).value=''); $('#m-sexe').value=''; $('#m-adh').value=today(); $('#f-mem-t').textContent='Nouveau membre ('+prochainCode()+')'; }
+$('#f-mem').addEventListener('submit',e=>{
+  e.preventDefault();
+  const id=$('#m-id').value, nom=$('#m-nom').value.trim();
+  if(!nom){ say('m-msg','Le nom est obligatoire.',false); return; }
+  const champs={nom:nom.toUpperCase(),prenoms:$('#m-pre').value.trim(),sexe:$('#m-sexe').value,tel:$('#m-tel').value.trim(),village:$('#m-vil').value.trim(),
+    culture:$('#m-cul').value.trim(),sup:n($('#m-sup').value),adhesion:$('#m-adh').value,part:n($('#m-part').value)};
+  let m;
+  if(id){ m=mem(id); Object.assign(m,champs); }
+  else { m={id:uid(),code:prochainCode(),...champs}; D.membres.push(m); }
+  if(sauver()){ say('m-msg','Enregistré : '+nomM(m)); videMembre(); toutAfficher(); }
+});
+$('#m-annul').addEventListener('click',()=>{ videMembre(); $('#m-msg').textContent=''; });
+$('#m-cherche').addEventListener('input',afficherMembres);
+
+function afficherMembres(){
+  const q=$('#m-cherche').value.trim().toLowerCase();
+  const L=D.membres.filter(m=>!q||[m.code,m.nom,m.prenoms,m.village,m.tel,m.culture].join(' ').toLowerCase().includes(q));
+  const femmes=D.membres.filter(m=>m.sexe==='Femme').length, sup=D.membres.reduce((s,m)=>s+n(m.sup),0);
+  $('#mem-kpi').innerHTML=`<div class="kpi"><span>Membres</span><b>${D.membres.length}</b></div><div class="kpi"><span>Femmes</span><b>${femmes}</b></div><div class="kpi"><span>Superficie totale</span><b>${fmt(sup,2)} ha</b></div>`;
+  if(!L.length){ $('#mem-liste').innerHTML='<p class="empty">'+(D.membres.length?'Aucun membre ne correspond.':'Aucun membre pour l\'instant. Ajoutez le premier avec le formulaire.')+'</p>'; return; }
+  $('#mem-liste').innerHTML='<table><thead><tr><th>Code</th><th>Nom et prénoms</th><th>Village</th><th class="n">ha</th><th></th></tr></thead><tbody>'+
+    L.map(m=>`<tr><td>${esc(m.code)}</td><td>${esc(m.nom+' '+(m.prenoms||''))}<br><small>${esc(m.tel||'')} ${esc(m.culture||'')}</small></td><td>${esc(m.village||'')}</td><td class="n">${m.sup?fmt(m.sup,2):''}</td>
+    <td><div class="rowact"><button class="btn sec mini" data-edit="${m.id}">Modifier</button><button class="btn mini danger" data-del="${m.id}" aria-label="Supprimer">✕</button></div></td></tr>`).join('')+'</tbody></table>';
+}
+$('#mem-liste').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  if(b.dataset.edit){ const m=mem(b.dataset.edit);
+    $('#m-id').value=m.id; $('#m-nom').value=m.nom; $('#m-pre').value=m.prenoms||''; $('#m-sexe').value=m.sexe||''; $('#m-tel').value=m.tel||'';
+    $('#m-vil').value=m.village||''; $('#m-cul').value=m.culture||''; $('#m-sup').value=m.sup||''; $('#m-adh').value=m.adhesion||''; $('#m-part').value=m.part||'';
+    $('#f-mem-t').textContent='Modifier '+m.code; window.scrollTo(0,0); }
+  if(b.dataset.del){ const m=mem(b.dataset.del);
+    const nb=D.livraisons.filter(l=>l.mid===m.id).length+D.intrants.filter(i=>i.mid===m.id).length;
+    if(!confirm('Supprimer '+nomM(m)+' ?'+(nb?'\n'+nb+' livraison(s) ou intrant(s) seront aussi supprimés.':''))) return;
+    D.membres=D.membres.filter(x=>x.id!==m.id); D.livraisons=D.livraisons.filter(l=>l.mid!==m.id); D.intrants=D.intrants.filter(i=>i.mid!==m.id);
+    sauver(); toutAfficher(); }
+});
+
+function remplirSelects(){
+  const opts='<option value="">– Choisir –</option>'+D.membres.slice().sort((a,b)=>a.nom.localeCompare(b.nom)).map(m=>`<option value="${m.id}">${esc(nomM(m))}</option>`).join('');
+  ['l-mem','i-mem'].forEach(id=>{ const s=$('#'+id), v=s.value; s.innerHTML=opts; s.value=v; });
+}
+
+/* ---------- Collecte ---------- */
+function calcLiv(){ const kg=n($('#l-kg').value), p=n($('#l-prix').value), ref=$('#l-grade').value==='Refusée';
+  $('#l-calc').innerHTML= ref?'<b>Lot refusé :</b> aucun montant.':'Montant : <b>'+F(kg*p)+'</b>'+(kg?' ('+fmt(kg,1)+' kg × '+fmt(p,0)+' F)':''); }
+['l-kg','l-prix','l-grade'].forEach(i=>$('#'+i).addEventListener('input',calcLiv));
+$('#l-mem').addEventListener('change',()=>{ const m=mem($('#l-mem').value); if(m&&m.culture&&!$('#l-prod').value) $('#l-prod').value=m.culture; });
+$('#f-liv').addEventListener('submit',e=>{
+  e.preventDefault();
+  if(!$('#l-mem').value){ say('l-msg','Choisissez le producteur.',false); return; }
+  const l={id:uid(),date:$('#l-date').value||today(),mid:$('#l-mem').value,produit:$('#l-prod').value.trim(),grade:$('#l-grade').value,kg:n($('#l-kg').value),prix:n($('#l-prix').value)};
+  if(!l.kg){ say('l-msg','Indiquez le poids.',false); return; }
+  D.livraisons.push(l);
+  try{ localStorage.setItem('agrodiag.coop.dernierPrix.'+l.produit, l.prix); }catch(e){}
+  if(sauver()){ say('l-msg','Livraison enregistrée.'); recu(l); $('#l-kg').value=''; calcLiv(); toutAfficher(); }
+});
+$('#l-prod').addEventListener('change',()=>{ let p=null; try{ p=localStorage.getItem('agrodiag.coop.dernierPrix.'+$('#l-prod').value.trim()); }catch(e){} if(p&&!$('#l-prix').value){ $('#l-prix').value=p; calcLiv(); } });
+const montant=l=>l.grade==='Refusée'?0:l.kg*l.prix;
+
+function recu(l){
+  const m=mem(l.mid), P=D.param;
+  const box=document.createElement('div'); box.className='recu';
+  box.innerHTML=`<h3 style="margin-top:0">Reçu de livraison</h3><p><b>${esc(P.nom||'Coopérative')}</b>${P.camp?' · Campagne '+esc(P.camp):''}</p>
+   <table><tr><td>Date</td><td>${dfr(l.date)}</td></tr><tr><td>Producteur</td><td>${esc(nomM(m))}</td></tr><tr><td>Produit</td><td>${esc(l.produit)} (${esc(l.grade)})</td></tr>
+   <tr><td>Poids net</td><td class="n">${fmt(l.kg,1)} kg</td></tr><tr><td>Prix</td><td class="n">${fmt(l.prix,0)} F/kg</td></tr><tr class="tot"><td>Montant</td><td class="n">${F(montant(l))}</td></tr></table>
+   <p style="margin-top:18px">Signature producteur : ____________ &nbsp; Signature peseur : ____________</p>`;
+  const w=$('#l-recu'); w.innerHTML=''; w.appendChild(box);
+  const b=document.createElement('div'); b.className='btns'; b.innerHTML='<button class="btn sec" type="button">Imprimer le reçu</button>';
+  b.querySelector('button').onclick=()=>MOD.print(box,'Reçu '+(m?m.code:'')+' '+l.date); w.appendChild(b);
+}
+function afficherLivraisons(){
+  const L=D.livraisons.slice().sort((a,b)=>b.date.localeCompare(a.date));
+  const kg=L.filter(l=>l.grade!=='Refusée').reduce((s,l)=>s+l.kg,0), mt=L.reduce((s,l)=>s+montant(l),0);
+  const jour=L.filter(l=>l.date===today()).reduce((s,l)=>s+(l.grade==='Refusée'?0:l.kg),0);
+  $('#liv-kpi').innerHTML=`<div class="kpi"><span>Livraisons</span><b>${L.length}</b></div><div class="kpi"><span>Tonnage accepté</span><b>${MOD.kg(kg)}</b></div><div class="kpi"><span>Aujourd'hui</span><b>${MOD.kg(jour)}</b></div><div class="kpi"><span>Valeur totale</span><b>${F(mt)}</b></div>`;
+  if(!L.length){ $('#liv-liste').innerHTML='<p class="empty">Aucune livraison enregistrée.</p>'; return; }
+  $('#liv-liste').innerHTML='<table><thead><tr><th>Date</th><th>Producteur</th><th>Produit</th><th class="n">kg</th><th class="n">Montant</th><th></th></tr></thead><tbody>'+
+    L.slice(0,200).map(l=>`<tr><td>${dfr(l.date)}</td><td>${esc(nomM(mem(l.mid)))}</td><td>${esc(l.produit)}${l.grade!=='Bonne'?' <span class="chip '+(l.grade==='Refusée'?'r':'o')+'">'+esc(l.grade)+'</span>':''}</td><td class="n">${fmt(l.kg,1)}</td><td class="n">${fmt(montant(l),0)}</td>
+    <td><div class="rowact"><button class="btn sec mini" data-recu="${l.id}">Reçu</button><button class="btn mini danger" data-del="${l.id}" aria-label="Supprimer">✕</button></div></td></tr>`).join('')+'</tbody></table>'+(L.length>200?'<p class="empty">Les 200 dernières livraisons sont affichées. Toutes sont dans l\'export Excel.</p>':'');
+}
+$('#liv-liste').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return;
+  if(b.dataset.recu){ recu(D.livraisons.find(l=>l.id===b.dataset.recu)); $('#l-recu').scrollIntoView({behavior:'smooth'}); }
+  if(b.dataset.del&&confirm('Supprimer cette livraison ?')){ D.livraisons=D.livraisons.filter(l=>l.id!==b.dataset.del); sauver(); toutAfficher(); } });
+
+/* ---------- Intrants ---------- */
+$('#f-int').addEventListener('submit',e=>{
+  e.preventDefault();
+  if(!$('#i-mem').value){ say('i-msg','Choisissez le producteur.',false); return; }
+  const i={id:uid(),date:$('#i-date').value||today(),mid:$('#i-mem').value,intrant:$('#i-nom').value.trim(),qte:n($('#i-qte').value),unite:$('#i-unite').value.trim(),valeur:n($('#i-val').value),rembourse:false};
+  if(!i.valeur){ say('i-msg','Indiquez la valeur à rembourser.',false); return; }
+  D.intrants.push(i);
+  if(sauver()){ say('i-msg','Intrant enregistré pour '+nomM(mem(i.mid))+'.'); ['i-nom','i-qte','i-val'].forEach(x=>$('#'+x).value=''); toutAfficher(); }
+});
+function afficherIntrants(){
+  const L=D.intrants.slice().sort((a,b)=>b.date.localeCompare(a.date));
+  const tot=L.reduce((s,i)=>s+i.valeur,0), du=L.filter(i=>!i.rembourse).reduce((s,i)=>s+i.valeur,0);
+  $('#int-kpi').innerHTML=`<div class="kpi"><span>Total avancé</span><b>${F(tot)}</b></div><div class="kpi"><span>Reste à rembourser</span><b>${F(du)}</b></div>`;
+  if(!L.length){ $('#int-liste').innerHTML='<p class="empty">Aucun intrant remis à crédit.</p>'; return; }
+  $('#int-liste').innerHTML='<table><thead><tr><th>Date</th><th>Producteur</th><th>Intrant</th><th class="n">Valeur</th><th>État</th><th></th></tr></thead><tbody>'+
+    L.map(i=>`<tr><td>${dfr(i.date)}</td><td>${esc(nomM(mem(i.mid)))}</td><td>${esc(i.intrant)}${i.qte?' · '+fmt(i.qte,1)+' '+esc(i.unite):''}</td><td class="n">${fmt(i.valeur,0)}</td>
+    <td><button class="btn mini ${i.rembourse?'':'sec'}" data-tog="${i.id}">${i.rembourse?'Remboursé':'À rembourser'}</button></td><td><button class="btn mini danger" data-del="${i.id}" aria-label="Supprimer">✕</button></td></tr>`).join('')+'</tbody></table>';
+}
+$('#int-liste').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return;
+  if(b.dataset.tog){ const i=D.intrants.find(x=>x.id===b.dataset.tog); i.rembourse=!i.rembourse; sauver(); toutAfficher(); }
+  if(b.dataset.del&&confirm('Supprimer cet intrant ?')){ D.intrants=D.intrants.filter(i=>i.id!==b.dataset.del); sauver(); toutAfficher(); } });
+
+/* ---------- Bilan ---------- */
+function dansPeriode(d){ const du=$('#b-du').value, au=$('#b-au').value; return (!du||d>=du)&&(!au||d<=au); }
+function bilan(){
+  const ret=n(D.param.ret)/100;
+  return D.membres.map(m=>{
+    const L=D.livraisons.filter(l=>l.mid===m.id&&dansPeriode(l.date));
+    const kg=L.filter(l=>l.grade!=='Refusée').reduce((s,l)=>s+l.kg,0), brut=L.reduce((s,l)=>s+montant(l),0);
+    const credit=D.intrants.filter(i=>i.mid===m.id&&!i.rembourse).reduce((s,i)=>s+i.valeur,0);
+    const retenue=Math.round(brut*ret), net=brut-retenue-credit;
+    return {m,kg,brut,retenue,credit,net};
+  }).filter(r=>r.kg||r.brut||r.credit).sort((a,b)=>a.m.nom.localeCompare(b.m.nom));
+}
+function afficherBilan(){
+  const B=bilan(), P=D.param, T=B.reduce((t,r)=>{ ['kg','brut','retenue','credit'].forEach(k=>t[k]+=r[k]); t.net+=Math.max(r.net,0); t.reste+=Math.max(-r.net,0); return t; },{kg:0,brut:0,retenue:0,credit:0,net:0,reste:0});
+  const per=($('#b-du').value||$('#b-au').value)?' · du '+(dfr($('#b-du').value)||'début')+' au '+(dfr($('#b-au').value)||'ce jour'):'';
+  let h=`<h3 style="margin-top:0">${esc(P.nom||'Coopérative')}${P.camp?' · Campagne '+esc(P.camp):''}${per}</h3>
+  <div class="kpis"><div class="kpi"><span>Tonnage payé</span><b>${MOD.kg(T.kg)}</b></div><div class="kpi"><span>Montant brut</span><b>${F(T.brut)}</b></div>
+  <div class="kpi"><span>Retenue coop (${fmt(n(P.ret),1)} %)</span><b>${F(T.retenue)}</b></div><div class="kpi"><span>Crédit déduit</span><b>${F(T.credit)}</b></div>
+  <div class="kpi"><span>Net à payer</span><b>${F(T.net)}</b></div></div>`;
+  if(T.reste) h+=`<div class="msg warn"><b>${F(T.reste)}</b> de crédit intrants ne sont pas couverts par les livraisons : ces membres restent débiteurs.</div>`;
+  if(!B.length){ $('#b-doc').innerHTML=h+'<p class="empty">Rien à payer sur cette période.</p>'; return; }
+  h+='<div class="tblw"><table><thead><tr><th>Producteur</th><th class="n">kg</th><th class="n">Brut</th><th class="n">Retenue</th><th class="n">Crédit</th><th class="n">Net à payer</th><th>Signature</th></tr></thead><tbody>'+
+   B.map(r=>`<tr><td>${esc(nomM(r.m))}</td><td class="n">${fmt(r.kg,1)}</td><td class="n">${fmt(r.brut,0)}</td><td class="n">${fmt(r.retenue,0)}</td><td class="n">${fmt(r.credit,0)}</td><td class="n${r.net<0?' neg':''}">${r.net<0?'doit '+fmt(-r.net,0):fmt(r.net,0)}</td><td></td></tr>`).join('')+
+   `<tr class="tot"><td>Total</td><td class="n">${fmt(T.kg,1)}</td><td class="n">${fmt(T.brut,0)}</td><td class="n">${fmt(T.retenue,0)}</td><td class="n">${fmt(T.credit,0)}</td><td class="n">${fmt(T.net,0)}</td><td></td></tr></tbody></table></div>`;
+  $('#b-doc').innerHTML=h;
+}
+['b-du','b-au'].forEach(i=>$('#'+i).addEventListener('change',afficherBilan));
+$('#b-print').addEventListener('click',()=>MOD.print($('#b-doc'),'Bilan paiement '+(D.param.nom||'cooperative')));
+$('#b-csv').addEventListener('click',()=>{ const B=bilan();
+  exporter('bilan_paiement',[['Code','Nom','Prénoms','Village','kg payés','Montant brut','Retenue','Crédit intrants','Net à payer']].concat(B.map(r=>[r.m.code,r.m.nom,r.m.prenoms,r.m.village,r.kg,r.brut,r.retenue,r.credit,r.net])),'b-msg'); });
+$('#b-solder').addEventListener('click',()=>{
+  const ids=new Set(bilan().filter(r=>r.credit&&r.net>=0).map(r=>r.m.id));
+  if(!ids.size){ say('b-msg','Aucun crédit entièrement couvert à solder.',false); return; }
+  if(!confirm('Après avoir payé les producteurs, marquer comme remboursés les crédits de '+ids.size+' membre(s) dont les livraisons couvrent la dette ?')) return;
+  D.intrants.forEach(i=>{ if(ids.has(i.mid)) i.rembourse=true; }); sauver(); toutAfficher(); say('b-msg','Crédits soldés pour '+ids.size+' membre(s).');
+});
+
+/* ---------- Exports et sauvegarde ---------- */
+async function saveFile(name, blob, msgId){
+  if(window.AgroDiagAndroid && window.AgroDiagAndroid.saveFile){
+    const b64=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(',')[1]||''); r.onerror=rej; r.readAsDataURL(blob); });
+    const st=await new Promise(res=>{ window.__agrodiagSaved=s=>{ window.__agrodiagSaved=null; res(s); }; window.AgroDiagAndroid.saveFile(name, blob.type||'application/octet-stream', b64); });
+    say(msgId, st==='ok'?'Fichier enregistré : '+name:st==='declined'?'Enregistrement annulé.':'Le fichier n\'a pas pu être enregistré.', st==='ok'); return;
+  }
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },2000);
+  say(msgId,'Fichier préparé : '+name);
+}
+function exporter(nom, rows, msgId){
+  if(rows.length<2){ say(msgId,'Rien à exporter.',false); return; }
+  const cell=v=>{ if(typeof v==='number') return String(v).replace('.',','); const s=String(v==null?'':v); return /[;"\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; };
+  const csv='﻿'+rows.map(r=>r.map(cell).join(';')).join('\r\n');
+  saveFile(nom+'_'+today()+'.csv', new Blob([csv],{type:'text/csv'}), msgId);
+}
+document.querySelectorAll('[data-exp]').forEach(b=>b.addEventListener('click',()=>{
+  const t=b.dataset.exp;
+  if(t==='membres') exporter('membres',[['Code','Nom','Prénoms','Sexe','Téléphone','Village','Culture','Superficie ha','Adhésion','Part sociale']].concat(D.membres.map(m=>[m.code,m.nom,m.prenoms,m.sexe,m.tel,m.village,m.culture,m.sup,dfr(m.adhesion),m.part])),'s-msg');
+  if(t==='livraisons') exporter('livraisons',[['Date','Code','Producteur','Produit','Qualité','kg','Prix F/kg','Montant']].concat(D.livraisons.map(l=>{ const m=mem(l.mid)||{}; return [dfr(l.date),m.code,(m.nom||'')+' '+(m.prenoms||''),l.produit,l.grade,l.kg,l.prix,montant(l)]; })),'s-msg');
+  if(t==='intrants') exporter('intrants',[['Date','Code','Producteur','Intrant','Quantité','Unité','Valeur','Remboursé']].concat(D.intrants.map(i=>{ const m=mem(i.mid)||{}; return [dfr(i.date),m.code,(m.nom||'')+' '+(m.prenoms||''),i.intrant,i.qte,i.unite,i.valeur,i.rembourse?'oui':'non']; })),'s-msg');
+}));
+$('#s-back').addEventListener('click',()=>saveFile('sauvegarde_cooperative_'+today()+'.json', new Blob([JSON.stringify({app:'AKA AgroDiag CI',module:'cooperative',date:today(),data:D})],{type:'application/json'}),'s-msg'));
+$('#s-rest').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader(); r.onload=()=>{ try{
+    const j=JSON.parse(r.result), d=j.data||j;
+    if(!d.membres||!d.livraisons) throw new Error('format');
+    if(!confirm('Remplacer les données actuelles ('+D.membres.length+' membres) par la sauvegarde ('+d.membres.length+' membres) ?')) return;
+    D={...VIDE(),...d,param:{...VIDE().param,...(d.param||{})}}; sauver(); remplirParam(); toutAfficher(); say('s-msg','Sauvegarde restaurée.');
+  }catch(err){ say('s-msg','Ce fichier n\'est pas une sauvegarde de coopérative.',false); } e.target.value=''; };
+  r.readAsText(f);
+});
+function remplirParam(){ $('#p-nom').value=D.param.nom||''; $('#p-camp').value=D.param.camp||''; $('#p-ret').value=D.param.ret||0; }
+$('#p-save').addEventListener('click',()=>{ D.param={nom:$('#p-nom').value.trim(),camp:$('#p-camp').value.trim(),ret:Math.min(50,Math.max(0,n($('#p-ret').value)))}; if(sauver()){ say('p-msg','Réglages enregistrés.'); toutAfficher(); } });
+
+function toutAfficher(){
+  $('#hd-sub').textContent=D.param.nom?D.param.nom+(D.param.camp?' · Campagne '+D.param.camp:''):'Membres, collecte, intrants à crédit, paiement des producteurs';
+  remplirSelects(); afficherMembres(); afficherLivraisons(); afficherIntrants(); afficherBilan();
+}
+
+/* ---------- Démarrage ---------- */
+$('#l-date').value=today(); $('#i-date').value=today();
+videMembre(); remplirParam(); toutAfficher(); calcLiv(); MOD.tabs();
+})();
+</script>
+</body>
+</html>
