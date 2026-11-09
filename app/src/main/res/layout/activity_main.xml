@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Lecture de la puce de la CNI"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#E87722" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Version de test. Les données restent sur ce téléphone : l'application n'a pas accès à Internet."
+            android:textSize="13sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Méthode 1 : code CAN (6 chiffres imprimés sur la carte, s'il existe)"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/editCan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Code CAN (6 chiffres)"
+            android:inputType="number"
+            android:maxLength="6" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Méthode 2 : informations du dos de la carte"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Numéro : dans la 1re ligne du bas au dos, les 9 caractères qui suivent « IDCIV »."
+            android:textSize="13sp" />
+
+        <EditText
+            android:id="@+id/editDocNum"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Numéro du document (9 caractères)"
+            android:inputType="textCapCharacters|textNoSuggestions"
+            android:maxLength="12" />
+
+        <EditText
+            android:id="@+id/editBirth"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Date de naissance (JJMMAAAA, ex : 15121991)"
+            android:inputType="number"
+            android:maxLength="8" />
+
+        <EditText
+            android:id="@+id/editExpiry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Date d'expiration (JJMMAAAA)"
+            android:inputType="number"
+            android:maxLength="8" />
+
+        <Button
+            android:id="@+id/btnReady"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Valider, puis poser la carte" />
+
+        <TextView
+            android:id="@+id/txtStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:padding="10dp"
+            android:background="#FFF3E0"
+            android:text="Remplissez une des deux méthodes, puis appuyez sur Valider."
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtParents"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:padding="10dp"
+            android:background="#E8F5E9"
+            android:textSize="17sp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/txtResult"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:fontFamily="monospace"
+            android:textIsSelectable="true"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/btnShare"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Partager le résultat"
+            android:visibility="gone" />
+    </LinearLayout>
+</ScrollView>
