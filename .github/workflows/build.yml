@@ -27,7 +27,19 @@ jobs:
           gradle-version: '8.7'
 
       - name: Compiler l'APK de test
-        run: gradle --no-daemon assembleDebug --stacktrace
+        run: |
+          set -o pipefail
+          gradle --no-daemon assembleDebug 2>&1 | tee build.log
+
+      - name: Publier le journal d'erreur
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          grep -nE "^e: |error:|FAILURE|What went wrong|Could not|Duplicate|> " build.log | head -150 > erreurs.txt || true
+          tail -80 build.log >> erreurs.txt
+          gh release delete lecture-cni-log -y --cleanup-tag || true
+          gh release create lecture-cni-log erreurs.txt --target lecture-cni --prerelease --title "Journal Lecture CNI" --notes "journal"
 
       - name: Publier l'APK (lien de téléchargement fixe)
         env:
