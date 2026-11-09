@@ -178,7 +178,7 @@ class MainActivity : Activity(), NfcAdapter.ReaderCallback {
         var paceOk = false
         try {
             val cardAccess = CardAccessFile(
-                service.getInputStream(PassportService.EF_CARD_ACCESS, PassportService.DEFAULT_MAX_BLOCKSIZE)
+                service.getInputStream(PassportService.EF_CARD_ACCESS)
             )
             for (info in cardAccess.securityInfos) {
                 if (paceOk) break
@@ -206,7 +206,7 @@ class MainActivity : Activity(), NfcAdapter.ReaderCallback {
             if (bacKey == null) {
                 throw Exception("Le code CAN n'a pas fonctionné. Essayez la méthode 2 (informations du dos de la carte).")
             }
-            service.getInputStream(PassportService.EF_COM, PassportService.DEFAULT_MAX_BLOCKSIZE).read()
+            service.getInputStream(PassportService.EF_COM).read()
             service.doBAC(bacKey)
             sb.append("Connexion sécurisée (BAC) : OK\n")
         }
@@ -220,7 +220,7 @@ class MainActivity : Activity(), NfcAdapter.ReaderCallback {
             val fid = (0x0100 + n).toShort()
             val bytes: ByteArray
             try {
-                bytes = service.getInputStream(fid, PassportService.DEFAULT_MAX_BLOCKSIZE).readBytes()
+                bytes = service.getInputStream(fid).readBytes()
             } catch (e: Exception) {
                 continue // groupe absent ou protégé
             }
