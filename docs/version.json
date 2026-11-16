@@ -1,10 +1,10 @@
 {
-  "versionCode": 18,
-  "version": "1.11.1",
+  "versionCode": 19,
+  "version": "1.12.0",
   "apk": "https://github.com/yaoakafrancois-code/AgroDiagCI/releases/download/test/AgroDiag-CI-test.apk",
   "nouveautes": [
-    "Ajout du Lebek (Albizia lebbeck) dans les arbres fertilitaires",
-    "Reconnaître les arbres : 72 fiches avec feuille, taille et écorce",
-    "Systèmes agroforestiers, restauration forestière (taungya…), mangroves, forêts sacrées"
+    "Nouvelle rubrique « Soigner avec les plantes » : vers, coccidiose, diarrhée, plaies, tiques, ballonnement",
+    "Maladies des cultures : oïdium, mildiou, rouille, fonte des semis, nématodes",
+    "14 plantes médicinales illustrées, calcul des quantités pour votre lot"
   ]
 }

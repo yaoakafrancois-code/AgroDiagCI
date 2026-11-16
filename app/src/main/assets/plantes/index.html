@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Soigner avec les plantes · AKA AgroDiag CI</title>
+<link rel="stylesheet" href="../assets/fonts.css">
+<link rel="stylesheet" href="../assets/modules.css">
+<style>
+.pl-ill{width:88px;height:88px;flex:none;border-radius:10px;background:var(--accent-soft);display:grid;place-items:center}
+.pl-head{display:flex;gap:12px;align-items:flex-start}
+.pl-head h3{margin:2px 0 0}
+.pl-head .sci{font-style:italic;color:var(--muted);font-size:.9rem;margin:0}
+.rem h3{margin-top:0}
+.rem .lbl{font-weight:700;font-size:.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin:10px 0 2px}
+.rem p{margin:2px 0}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+.filters button{font:600 .9rem var(--body);padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.filters button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.calc{background:var(--sunk);border-radius:9px;padding:10px 12px;margin-top:10px}
+.calc .two{margin-top:6px}
+.calc output{display:block;font-weight:700;margin-top:6px}
+</style>
+<style id="shell-back">
+.shell-bar{position:relative;z-index:1000;background:#17694A;padding:6px 12px}
+.shell-back{display:inline-flex;align-items:center;gap:6px;min-height:36px;font:600 15px system-ui,sans-serif;text-decoration:none;color:#fff}
+@media print{.shell-bar{display:none}}
+</style></head>
+<body><div class="shell-bar"><a class="shell-back" href="../index.html" aria-label="Retour à l'accueil">&#8592; Accueil · AKA AgroDiag CI</a></div>
+<div class="wrap">
+<header class="app">
+  <svg width="44" height="44" viewBox="0 0 36 36" aria-hidden="true"><path d="M18 32V14" stroke="#17694A" stroke-width="2.4" stroke-linecap="round"/><path d="M18 20c-7 0-11-4-11-12 8 0 11 5 11 12zm0-3c0-6 4-11 11-11 0 7-4 11-11 11z" fill="#DCEDE3" stroke="#17694A" stroke-width="2.2" stroke-linejoin="round"/><path d="M24 24h8M28 20v8" stroke="#B3261E" stroke-width="2.6" stroke-linecap="round"/></svg>
+  <div><h1>Soigner avec les plantes</h1><p>Remèdes à base de plantes pour les animaux et les cultures, avec les quantités et les limites</p></div>
+</header>
+
+<nav class="tabs" aria-label="Rubriques"><div class="row" role="tablist">
+  <button role="tab" data-tab="t-ani">Animaux</button>
+  <button role="tab" data-tab="t-cul">Cultures</button>
+  <button role="tab" data-tab="t-pl">Les plantes</button>
+  <button role="tab" data-tab="t-prep">Préparer</button>
+  <button role="tab" data-tab="t-lim">Limites &amp; précautions</button>
+</div></nav>
+
+<!-- ============ ANIMAUX ============ -->
+<section class="tab" id="t-ani">
+  <h2>Soigner les animaux avec les plantes</h2>
+  <p class="lead">Ces remèdes traditionnels aident contre les vers, la diarrhée, les plaies, les parasites de la peau et certains petits troubles. Ils <b>ne remplacent pas les vaccins</b> et ne guérissent pas les maladies graves (Newcastle, peste porcine, PPR…).</p>
+  <div class="msg crit"><b>Appelez le vétérinaire</b> si plusieurs animaux meurent, si l'animal ne mange plus depuis 2 jours, a une forte fièvre, du sang dans les selles en grande quantité, ou si rien ne s'améliore après 3 jours de remède.</div>
+  <label class="f">Cherchez un signe ou une maladie<input type="text" id="a-q" placeholder="ex. diarrhée, vers, tiques, toux, plaie" data-nomem></label>
+  <div class="filters" id="a-esp" role="group" aria-label="Espèce"></div>
+  <div id="a-list" class="cards"></div>
+</section>
+
+<!-- ============ CULTURES ============ -->
+<section class="tab" id="t-cul" hidden>
+  <h2>Soigner les cultures avec les plantes</h2>
+  <p class="lead">Contre les maladies des plantes (champignons surtout), les extraits végétaux agissent <b>en prévention</b> : traitez dès les premières taches et recommencez chaque semaine. Pour les insectes (chenilles, pucerons, aleurodes), voyez aussi la rubrique <a href="../biointrants/index.html">Biopesticides et compost</a>.</p>
+  <label class="f">Cherchez une maladie ou une culture<input type="text" id="c-q" placeholder="ex. oïdium, tomate, cacao, nématodes" data-nomem></label>
+  <div id="c-list" class="cards"></div>
+</section>
+
+<!-- ============ PLANTES ============ -->
+<section class="tab" id="t-pl" hidden>
+  <h2>Les plantes qui soignent</h2>
+  <p class="lead">Avant de préparer un remède, soyez sûr de reconnaître la plante. Une erreur de plante peut empoisonner l'animal.</p>
+  <div id="p-list" class="cards"></div>
+</section>
+
+<!-- ============ PREPARER ============ -->
+<section class="tab" id="t-prep" hidden>
+  <h2>Les façons de préparer</h2>
+  <p class="lead">Utilisez des récipients propres, de l'eau propre, et préparez le remède le jour même : un extrait de plante se gâte en 1 à 2 jours.</p>
+  <div class="cards" id="prep-list"></div>
+  <h3>Calculer l'eau de boisson</h3>
+  <div class="panel">
+    <p class="note" style="margin-top:0">Beaucoup de remèdes se donnent dans l'eau de boisson. Ce calcul vous dit combien d'eau vos animaux boivent par jour, donc combien de remède préparer.</p>
+    <div class="two">
+      <label class="f">Animaux<select id="w-esp"></select></label>
+      <label class="f">Nombre<input type="number" id="w-n" value="100" min="1" step="1" inputmode="decimal"></label>
+    </div>
+    <div id="w-out"></div>
+  </div>
+  <h3>Mesures de cuisine</h3>
+  <div class="tblw"><table>
+    <tr><th>Mesure</th><th class="n">Feuilles fraîches</th><th class="n">Poudre sèche</th><th class="n">Liquide</th></tr>
+    <tr><td>1 cuillère à café rase</td><td class="n">–</td><td class="n">≈ 3 g</td><td class="n">5 ml</td></tr>
+    <tr><td>1 cuillère à soupe rase</td><td class="n">–</td><td class="n">≈ 8 g</td><td class="n">15 ml</td></tr>
+    <tr><td>1 poignée (main d'adulte)</td><td class="n">≈ 50 g</td><td class="n">–</td><td class="n">–</td></tr>
+    <tr><td>1 verre ordinaire</td><td class="n">–</td><td class="n">–</td><td class="n">≈ 200 ml</td></tr>
+    <tr><td>1 gousse d'ail moyenne</td><td class="n" colspan="3">≈ 3 g</td></tr>
+  </table></div>
+</section>
+
+<!-- ============ LIMITES ============ -->
+<section class="tab" id="t-lim" hidden>
+  <h2>Limites et précautions</h2>
+  <div class="msg crit"><b>Aucune plante ne guérit ces maladies.</b> Seuls la vaccination, l'isolement et le vétérinaire protègent l'élevage.</div>
+  <div class="cards">
+    <div class="card"><h3>Volailles</h3><ul class="clean"><li>Maladie de Newcastle</li><li>Maladie de Gumboro</li><li>Variole aviaire</li><li>Grippe aviaire (déclaration obligatoire)</li><li>Maladie de Marek</li></ul><p class="note">Faites vacciner selon le calendrier de la rubrique Élevage.</p></div>
+    <div class="card"><h3>Porcs, ruminants, lapins</h3><ul class="clean"><li>Peste porcine africaine (déclaration obligatoire)</li><li>Peste des petits ruminants (PPR)</li><li>Fièvre aphteuse, charbon</li><li>Rage</li><li>Myxomatose et VHD du lapin</li></ul></div>
+    <div class="card"><h3>Cultures</h3><ul class="clean"><li>Viroses : mosaïques, enroulement, swollen shoot du cacao</li><li>Flétrissement bactérien (tomate, aubergine, piment)</li><li>Fortes attaques de pourriture brune du cacao</li></ul><p class="note">Arrachez les plants malades, faites la rotation, luttez contre les insectes qui transmettent les virus.</p></div>
+  </div>
+  <h3>Les règles de sécurité</h3>
+  <ol class="steps">
+    <li><b>Reconnaître la plante à coup sûr.</b> En cas de doute, demandez à un ancien ou à un agent d'agriculture.</li>
+    <li><b>Respecter les quantités.</b> « Plus » n'est pas « mieux » : le neem, les graines de papaye ou le tabac deviennent toxiques à forte dose.</li>
+    <li><b>Essayer d'abord sur 2 ou 3 animaux</b> (ou quelques plants) et observer 24 heures avant de traiter tout le lot.</li>
+    <li><b>Prudence avec les femelles pleines et les très jeunes animaux</b> : pas de neem ni de graines de papaye par la bouche aux femelles gestantes.</li>
+    <li><b>Isoler les malades</b>, nettoyer et désinfecter le local, changer la litière.</li>
+    <li><b>Noter</b> la date, le remède, les animaux traités et le résultat. Si rien ne change après 3 jours, passez au vétérinaire.</li>
+    <li><b>Ne jamais mettre de tabac</b> dans l'eau ou l'aliment des animaux, ni sur une plaie : la nicotine est un poison.</li>
+    <li><b>Sur les cultures</b>, pulvérisez tôt le matin ou en fin d'après-midi, portez des gants, et lavez les légumes avant de les manger.</li>
+  </ol>
+  <p class="foot">Ces informations viennent des savoirs paysans et vétérinaires traditionnels d'Afrique de l'Ouest et de travaux de recherche. Leur efficacité varie selon la plante, la saison et la préparation : elles complètent, sans le remplacer, l'avis d'un vétérinaire ou d'un agent agricole.</p>
+</section>
+
+<p class="foot">AKA AgroDiag CI · Soigner avec les plantes</p>
+</div>
+
+<script src="../assets/modules.js"></script>
+<script>
+(function(){
+var M=window.MOD, $=M.$, esc=M.esc;
+
+/* ---------- Plantes ---------- */
+var PL={
+ neem:{n:'Neem',sci:'Azadirachta indica',f:'pinn',o:'Feuilles, graines, huile, tourteau',u:['Vers intestinaux, plaies, parasites de la peau (tiques, poux, gale)','Cultures : insectes, champignons, nématodes (tourteau)'],a:'Toxique à forte dose par la bouche. Pas aux femelles pleines.'},
+ papaye:{n:'Papayer',sci:'Carica papaya',f:'palm',o:'Graines séchées, feuilles',u:['Graines : vers intestinaux des volailles, porcs, lapins, chèvres','Feuilles : coccidiose, rouille des cultures'],a:'Graines : pas aux femelles pleines. Le lait (latex) du fruit vert irrite la peau.'},
+ aloes:{n:'Aloès',sci:'Aloe vera',f:'aloe',o:'Gel transparent de la feuille',u:['Plaies, brûlures, pis enflammé','Coccidiose des volailles (en complément)'],a:'Retirer le jus jaune sous la peau de la feuille : il donne la diarrhée.'},
+ ail:{n:'Ail',sci:'Allium sativum',f:'bulb',o:'Gousses',u:['Toux et rhumes des volailles, vers','Cultures : mildiou, taches des feuilles, rouille'],a:'Sans danger aux doses indiquées.'},
+ gingembre:{n:'Gingembre',sci:'Zingiber officinale',f:'rhiz',o:'Racine (rhizome) fraîche',u:['Toux, rhume, appétit des volailles'],a:'Sans danger aux doses indiquées.'},
+ moringa:{n:'Moringa',sci:'Moringa oleifera',f:'pinn2',o:'Feuilles séchées à l\'ombre',u:['Vitamines, protéines, croissance, ponte'],a:'Ne pas dépasser 5 % de la ration.'},
+ amere:{n:'Feuille amère (vernonia)',sci:'Vernonia amygdalina',f:'oval',o:'Feuilles fraîches',u:['Coccidiose des volailles et des lapins','Vers, appétit'],a:'Très amer : les animaux boivent moins les premiers jours.'},
+ goyave:{n:'Goyavier',sci:'Psidium guajava',f:'oval2',o:'Jeunes feuilles',u:['Diarrhée des jeunes animaux'],a:'Sans danger aux doses indiquées.'},
+ basilic:{n:'Basilic africain',sci:'Ocimum gratissimum',f:'basil',o:'Feuilles',u:['Diarrhée, plaies (antiseptique)','Cultures : champignons (en essai)'],a:'Sans danger aux doses indiquées.'},
+ citronnelle:{n:'Citronnelle',sci:'Cymbopogon citratus',f:'grass',o:'Feuilles',u:['Chasse les mouches et les moustiques du local'],a:'Sans danger.'},
+ curcuma:{n:'Curcuma',sci:'Curcuma longa',f:'rhiz2',o:'Racine en poudre',u:['Plaies (poudre sur la plaie propre)'],a:'Sans danger.'},
+ tagete:{n:'Tagète (œillet d\'Inde)',sci:'Tagetes spp.',f:'flower',o:'Plante entière, en bordure',u:['Cultures : réduit les nématodes du sol'],a:'Sans danger.'},
+ crotalaire:{n:'Crotalaire',sci:'Crotalaria spp.',f:'trif',o:'Plante en jachère ou en rotation',u:['Cultures : réduit les nématodes, enrichit le sol en azote'],a:'Toxique pour les animaux : ne pas la donner à manger.'},
+ huile:{n:'Huile végétale',sci:'arachide, soja, coton',f:'drop',o:'Huile de cuisine',u:['Ballonnement (météorisation) des ruminants'],a:'Donner lentement, tête à peine relevée, pour ne pas étouffer l\'animal.'}
+};
+
+/* ---------- Remèdes animaux ---------- */
+var ESP={volailles:'Volailles',porcs:'Porcs',ruminants:'Chèvres, moutons, bœufs',lapins:'Lapins'};
+var EAU={poussin:{n:'Poussins (0–4 sem.)',l:0.05},poulet:{n:'Poulets, pondeuses',l:0.25},pintade:{n:'Pintades, canards',l:0.3},lapin:{n:'Lapins adultes',l:0.3},porcelet:{n:'Porcelets',l:2},porc:{n:'Porcs adultes',l:8},chevre:{n:'Chèvres, moutons',l:4},bovin:{n:'Bœufs, vaches',l:40}};
+var REM=[
+ {id:'vers',t:'Vers intestinaux',esp:['volailles','porcs','lapins'],pl:['papaye','neem'],
+  s:'Amaigrissement malgré l\'appétit, plumes ou poils ternes, diarrhée, vers dans les fientes, retard de croissance.',
+  p:'Sécher les graines de papaye mûre au soleil 3 à 5 jours, les moudre en poudre fine et mélanger à l\'aliment.',
+  d:'10 g de poudre de graines par kg d\'aliment, pendant 5 jours. Recommencer chaque mois.',calc:{k:'alim',q:10,u:'g de poudre de graines de papaye'},
+  v:'Si les animaux sont très maigres ou pâles, donnez un déparasitant vétérinaire.'},
+ {id:'versr',t:'Vers des chèvres et moutons',esp:['ruminants'],pl:['papaye','neem'],
+  s:'Animal maigre, poil terne, diarrhée, intérieur des paupières pâle (blanc au lieu de rose), gorge gonflée.',
+  p:'Poudre de graines de papaye séchées, mélangée à un peu de son mouillé ou de sel, ou délayée dans de l\'eau.',
+  d:'Adulte : 1 cuillère à soupe (≈ 8 g) par jour, 3 jours de suite. Jeune : la moitié. Recommencer après 3 semaines.',
+  v:'Paupières blanches ou gorge gonflée = forte anémie : déparasitant vétérinaire tout de suite. Changez souvent de pâturage.'},
+ {id:'cocci',t:'Coccidiose (diarrhée avec sang)',esp:['volailles','lapins'],pl:['amere','aloes','papaye'],
+  s:'Fientes liquides, brunes ou avec du sang, oiseaux en boule, plumes ébouriffées, mortalité chez les jeunes ; lapins : ventre gonflé, diarrhée.',
+  p:'Piler 100 g de feuilles fraîches de feuille amère (ou de feuilles de papayer) par litre d\'eau, laisser tremper 12 heures, filtrer avec un tissu propre. Option : ajouter 50 g de gel d\'aloès par litre.',
+  d:'Donner comme seule eau de boisson pendant 5 jours. Préparer chaque jour.',calc:{k:'eau',q:100,u:'g de feuilles fraîches'},
+  v:'Si la mortalité continue après 2 jours, un anticoccidien vétérinaire est nécessaire. Gardez la litière bien sèche.'},
+ {id:'diar',t:'Diarrhée des jeunes',esp:['ruminants','porcs','lapins','volailles'],pl:['goyave','basilic'],
+  s:'Selles liquides sans sang, animal faible, yeux enfoncés (déshydratation).',
+  p:'Faire bouillir une poignée (≈ 50 g) de jeunes feuilles de goyavier (ou de basilic africain) dans 1 litre d\'eau pendant 10 minutes. Laisser refroidir et filtrer.',
+  d:'Chevreau, agneau, porcelet : 1/2 verre (100 ml) 2 fois par jour. Veau : 1 verre et demi (250 ml) 2 fois par jour. Volailles et lapins : 1 verre de décoction par litre d\'eau de boisson. Pendant 3 jours.',calc:{k:'eau',q:250,u:'ml de décoction'},
+  v:'Donnez aussi à boire de l\'eau sucrée-salée : 1 litre d\'eau bouillie + 6 cuillères à café de sucre + 1/2 cuillère à café de sel. Diarrhée avec sang ou fièvre : vétérinaire.'},
+ {id:'resp',t:'Toux, rhume, éternuements',esp:['volailles'],pl:['ail','gingembre'],
+  s:'Éternuements, écoulement du nez, yeux qui pleurent, bruit en respirant, sans forte mortalité.',
+  p:'Écraser l\'ail et râper le gingembre dans l\'eau, laisser reposer 2 heures, filtrer. Vous pouvez ajouter le jus d\'un citron par litre.',
+  d:'Par litre d\'eau de boisson : 2 gousses d\'ail (≈ 6 g) et 10 g de gingembre, pendant 5 jours.',calc:{k:'eau',q:6,u:'g d\'ail (et 10 g de gingembre par litre)'},
+  v:'Si beaucoup d\'oiseaux meurent, avec tête tordue ou paralysie : pensez à la maladie de Newcastle, appelez le vétérinaire. Aérez le poulailler sans courants d\'air.'},
+ {id:'plaie',t:'Plaies, blessures, abcès ouverts',esp:['ruminants','porcs','lapins','volailles'],pl:['neem','aloes','curcuma'],
+  s:'Coupure, morsure, plaie qui suinte, abcès percé.',
+  p:'Faire bouillir 100 g de feuilles de neem dans 1 litre d\'eau pendant 15 minutes ; laisser tiédir. Laver la plaie, sécher, puis mettre du gel d\'aloès, du miel ou un peu de poudre de curcuma.',
+  d:'2 fois par jour jusqu\'à cicatrisation.',
+  v:'Protégez la plaie des mouches (asticots). Plaie profonde, os visible ou forte fièvre : vétérinaire.'},
+ {id:'ecto',t:'Tiques, poux, puces, gale',esp:['ruminants','porcs','lapins','volailles'],pl:['neem','citronnelle'],
+  s:'Animal qui se gratte, perd ses poils ou ses plumes, croûtes, tiques visibles aux oreilles, sous la queue, entre les pattes.',
+  p:'Piler 200 g de feuilles de neem par litre d\'eau, laisser tremper 24 heures, filtrer, ajouter 1 cuillère à café de savon par litre. Laver ou pulvériser tout l\'animal, en évitant les yeux. Volailles : bac de bain de poussière avec cendre de bois + sable (moitié-moitié) + feuilles de neem séchées.',
+  d:'Tous les 7 jours, 3 fois. Pour un mouton ou une chèvre, comptez 1 à 2 litres ; pour un bœuf, 4 à 5 litres.',
+  v:'Nettoyez et brûlez la vieille litière. Mettez de la citronnelle autour du local contre les mouches.'},
+ {id:'bal',t:'Ballonnement (météorisation)',esp:['ruminants'],pl:['huile'],
+  s:'Flanc gauche gonflé comme un tambour, animal qui souffre, ne rumine plus, souvent après avoir mangé beaucoup d\'herbe jeune ou de légumineuses mouillées.',
+  p:'Huile végétale de cuisine (arachide, soja, coton), donnée lentement à la bouteille.',
+  d:'Mouton, chèvre : 50 à 100 ml. Bœuf : 250 à 500 ml. En une fois, puis faire marcher l\'animal.',
+  v:'URGENCE : si l\'animal tombe ou respire très mal, appelez le vétérinaire tout de suite (il faut parfois percer le rumen).'},
+ {id:'mam',t:'Mammite (pis malade)',esp:['ruminants','porcs'],pl:['aloes'],
+  s:'Pis chaud, dur, douloureux ; lait avec des grumeaux, de l\'eau ou du sang.',
+  p:'Traire le côté malade toutes les 3 à 4 heures (jeter ce lait), mettre des compresses d\'eau chaude, puis masser avec du gel d\'aloès.',
+  d:'Pendant 3 à 5 jours.',
+  v:'Si l\'animal a de la fièvre ou ne mange plus : vétérinaire (antibiotique). Lavez-vous les mains avant chaque traite.'},
+ {id:'vit',t:'Renforcer, croissance, ponte',esp:['volailles','porcs','lapins'],pl:['moringa'],
+  s:'Animaux faibles, croissance lente, baisse de ponte, après une maladie.',
+  p:'Sécher les feuilles de moringa à l\'ombre 3 à 4 jours, les réduire en poudre et mélanger à l\'aliment. Lapins : feuilles fraîches en complément.',
+  d:'30 g de poudre par kg d\'aliment (3 %), sans dépasser 50 g.',calc:{k:'alim',q:30,u:'g de poudre de moringa'},
+  v:'Le moringa ne remplace pas un aliment équilibré.'}
+];
+var ALIM={poussin:{n:'Poussins (0–4 sem.)',k:0.03},poulet:{n:'Poulets, pondeuses',k:0.12},lapin:{n:'Lapins adultes',k:0.12},porcelet:{n:'Porcelets',k:0.8},porc:{n:'Porcs adultes',k:2.5}};
+
+/* ---------- Remèdes cultures ---------- */
+var CUL=[
+ {t:'Oïdium (feutrage blanc sur les feuilles)',c:'Gombo, concombre, courgette, pastèque, tomate, piment, manguier',pl:[],
+  s:'Poudre blanche comme de la farine sur les feuilles, qui jaunissent puis sèchent.',
+  p:'Lait (frais ou en poudre reconstitué) mélangé à l\'eau : 1 volume de lait pour 9 volumes d\'eau.',
+  q:[[1600,'ml de lait']],f:'Tous les 7 jours, en pulvérisant bien le dessus et le dessous des feuilles, de préférence au soleil du matin.'},
+ {t:'Mildiou, taches et pourritures des feuilles',c:'Tomate, piment, aubergine, gombo, chou, haricot',pl:['ail'],
+  s:'Taches brunes ou noires, parfois entourées de jaune ; feuilles qui pourrissent par temps humide.',
+  p:'Piler 100 g d\'ail, laisser tremper 24 heures dans 1 litre d\'eau avec 1 cuillère à soupe d\'huile, filtrer. Verser ce litre dans le pulvérisateur et compléter avec de l\'eau ; ajouter le savon.',
+  q:[[100,'g d\'ail'],[16,'g de savon']],f:'Tous les 7 jours dès les premières taches, et après chaque grosse pluie. Retirer et brûler les feuilles malades.'},
+ {t:'Rouille et taches foliaires',c:'Haricot, niébé, maïs, arachide, bananier',pl:['papaye','neem'],
+  s:'Petites pustules orange ou brunes (rouille) ou taches rondes (cercosporiose) sur les feuilles.',
+  p:'Piler les feuilles de papayer, tremper une nuit dans l\'eau, filtrer, ajouter le savon. Autre possibilité : 5 ml d\'huile de neem par litre d\'eau + savon.',
+  q:[[1600,'g de feuilles de papayer'],[16,'g de savon']],f:'Tous les 7 à 10 jours en prévention. Bananier : couper et sortir les feuilles très atteintes (effeuillage sanitaire).'},
+ {t:'Fonte des semis (pépinière)',c:'Toutes les pépinières : tomate, piment, chou, cacao, arbres',pl:[],
+  s:'Les jeunes plants se couchent, la tige pourrit au ras du sol.',
+  p:'Désinfecter le terreau au soleil : l\'humidifier, le couvrir d\'une bâche plastique transparente bien fermée pendant 4 à 6 semaines en saison sèche. Semer moins serré, arroser sans excès, le matin.',
+  q:null,f:'Une légère couche de cendre de bois en surface et un arrosage à l\'extrait d\'ail (dosage ci-dessus) aident à prévenir.'},
+ {t:'Nématodes (galles sur les racines)',c:'Tomate, aubergine, gombo, piment, bananier, poivre',pl:['tagete','crotalaire','neem'],
+  s:'Plantes qui se fanent aux heures chaudes et poussent mal ; racines couvertes de boules (galles).',
+  p:'Planter des tagètes (œillets d\'Inde) en bordure et entre les lignes, ou une saison de crotalaire avant la culture. Mettre du tourteau de neem au trou de plantation.',
+  q:null,f:'Tourteau de neem : 50 g par trou (légumes), 100 à 200 g par pied de bananier. Rotation avec céréales (maïs, riz).'},
+ {t:'Pourriture brune des cabosses',c:'Cacaoyer',pl:[],none:true,
+  s:'Taches brunes qui s\'étendent sur toute la cabosse, puis duvet blanc.',
+  p:'Aucun extrait de plante n\'est assez efficace au champ. La lutte repose sur la récolte sanitaire : chaque semaine, enlever et enterrer les cabosses malades, tailler pour aérer, réduire l\'ombrage trop épais.',
+  q:null,f:'En cas de forte attaque, un fongicide homologué est nécessaire (voir l\'agent ANADER ou la coopérative).'},
+ {t:'Viroses (mosaïque, enroulement, swollen shoot)',c:'Tomate, piment, gombo, manioc, cacaoyer',pl:['neem'],none:true,
+  s:'Feuilles marbrées de jaune, frisées, enroulées ; plante naine ; gonflement des rameaux du cacaoyer.',
+  p:'Pas de traitement : arracher et brûler les plants malades. Lutter contre les insectes qui transmettent le virus (aleurodes, pucerons, cochenilles) avec l\'extrait de neem (rubrique Biopesticides). Utiliser des boutures et des plants sains.',
+  q:null,f:'Swollen shoot du cacao : signaler au conseiller agricole.'},
+ {t:'Flétrissement bactérien',c:'Tomate, aubergine, piment, pomme de terre',pl:[],none:true,
+  s:'La plante entière fane d\'un coup alors que les feuilles restent vertes ; la tige coupée laisse couler un liquide blanchâtre dans un verre d\'eau.',
+  p:'Pas de traitement. Arracher et brûler les plants, ne pas les mettre au compost. Ne plus planter de tomate, aubergine, piment ni pomme de terre sur cette parcelle pendant 3 ans.',
+  q:null,f:'Préférer les variétés résistantes et les parcelles bien drainées.'}
+];
+
+/* ---------- Illustrations ---------- */
+function leaf(x,y,l,w,a,c){ c=c||'#2C7A3F'; return '<path transform="translate('+x+' '+y+') rotate('+a+')" d="M0 0 C '+(w)+' '+(-l*0.3)+' '+(w*0.8)+' '+(-l*0.8)+' 0 '+(-l)+' C '+(-w*0.8)+' '+(-l*0.8)+' '+(-w)+' '+(-l*0.3)+' 0 0Z" fill="'+c+'"/><path transform="translate('+x+' '+y+') rotate('+a+')" d="M0 0V'+(-l*0.95)+'" stroke="#DCEDE3" stroke-width="1"/>'; }
+function ill(f){
+  var b='', G='#2C7A3F', S='#6B4F2A';
+  if(f==='pinn'||f==='pinn2'){ b+='<path d="M44 80V10" stroke="'+S+'" stroke-width="2"/>'; for(var i=0;i<6;i++){ var y=70-i*11, l=f==='pinn'?20:12, w=f==='pinn'?5:6; b+=leaf(44,y,l,w,-60,G)+leaf(44,y,l,w,60,G);} b+=leaf(44,12,f==='pinn'?18:11,f==='pinn'?5:6,0,G); }
+  else if(f==='palm'){ b+='<path d="M44 82V44" stroke="'+S+'" stroke-width="3"/>'; [-70,-35,0,35,70].forEach(function(a){ b+=leaf(44,46,34,10,a,G); }); }
+  else if(f==='aloe'){ [-35,-15,0,15,35].forEach(function(a,i){ b+='<path transform="translate(44 80) rotate('+a+')" d="M-6 0 Q-4 -40 0 -'+(56-Math.abs(a)/2)+' Q4 -40 6 0Z" fill="#5E9C76" stroke="#3E7A55"/>'; }); }
+  else if(f==='bulb'){ b+='<path d="M44 34V8M40 34L32 10M48 34L56 10" stroke="'+G+'" stroke-width="3" stroke-linecap="round"/><path d="M44 34 C 22 40 24 74 44 76 C 64 74 66 40 44 34Z" fill="#F4EFE6" stroke="#B9A88A" stroke-width="2"/><path d="M44 36 V74 M36 40 Q32 58 38 74 M52 40 Q56 58 50 74" stroke="#CFC2A8" fill="none"/>'; }
+  else if(f==='rhiz'||f==='rhiz2'){ var c=f==='rhiz'?'#D9B26B':'#E08A1E'; b+='<path d="M14 64 C 20 52 34 58 40 54 C 48 48 58 56 66 50 C 74 46 80 56 74 64 C 64 74 50 66 42 72 C 32 78 18 76 14 64Z" fill="'+c+'" stroke="#8D6E4A" stroke-width="1.5"/>'; b+=leaf(30,54,30,6,-10,G)+leaf(52,50,34,6,5,G); }
+  else if(f==='oval'||f==='oval2'||f==='basil'){ b+='<path d="M44 84V20" stroke="'+S+'" stroke-width="2"/>'; var L=f==='oval'?30:(f==='oval2'?26:18), W=f==='oval'?9:(f==='oval2'?10:8); for(var j=0;j<3;j++){ var yy=74-j*20; b+=leaf(44,yy,L-j*3,W,-55,G)+leaf(44,yy,L-j*3,W,55,G);} b+=leaf(44,22,L-6,W,0,G); }
+  else if(f==='grass'){ [-25,-12,0,12,25].forEach(function(a){ b+='<path transform="translate(44 82) rotate('+a+')" d="M-2 0 Q-1 -40 0 -70 Q1 -40 2 0Z" fill="#6FA35A"/>'; }); }
+  else if(f==='flower'){ b+='<path d="M44 84V40" stroke="'+G+'" stroke-width="3"/>'+leaf(44,70,20,6,-50,G)+leaf(44,62,20,6,50,G); for(var k=0;k<10;k++){ var a2=k*36; b+='<ellipse cx="44" cy="22" rx="6" ry="13" transform="rotate('+a2+' 44 32)" fill="#E89B1C"/>'; } b+='<circle cx="44" cy="32" r="7" fill="#B3561A"/>'; }
+  else if(f==='trif'){ b+='<path d="M44 84V18" stroke="'+G+'" stroke-width="2"/>'; for(var m=0;m<3;m++){ var y3=68-m*18; b+=leaf(44,y3,16,6,-70,G)+leaf(44,y3,16,6,0,G)+leaf(44,y3,16,6,70,G);} b+='<path d="M50 20h10M50 26h12M50 32h10" stroke="#E8C21C" stroke-width="5" stroke-linecap="round"/>'; }
+  else if(f==='drop'){ b+='<path d="M44 12 C 30 34 24 46 24 56 C 24 68 33 76 44 76 C 55 76 64 68 64 56 C 64 46 58 34 44 12Z" fill="#E8C21C" stroke="#B97A12" stroke-width="2"/><path d="M34 56 Q34 66 42 68" stroke="#FFF6C8" stroke-width="3" fill="none" stroke-linecap="round"/>'; }
+  return '<svg viewBox="0 0 88 88" width="80" height="80" aria-hidden="true">'+b+'</svg>';
+}
+
+function chipsPl(ids){ return (ids||[]).map(function(k){ return '<span class="chip g">'+esc(PL[k].n)+'</span>'; }).join(''); }
+
+/* ---------- Animaux ---------- */
+var curEsp='tous';
+function renderEsp(){
+  var h='<button type="button" data-e="tous" aria-pressed="'+(curEsp==='tous')+'">Toutes</button>';
+  Object.keys(ESP).forEach(function(k){ h+='<button type="button" data-e="'+k+'" aria-pressed="'+(curEsp===k)+'">'+ESP[k]+'</button>'; });
+  $('#a-esp').innerHTML=h;
+  M.$$('#a-esp button').forEach(function(b){ b.onclick=function(){ curEsp=b.dataset.e; renderEsp(); renderAni(); }; });
+}
+function norm(s){ return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); }
+function calcBox(r){
+  if(!r.calc) return '';
+  var tab=r.calc.k==='eau'?EAU:ALIM, opts=Object.keys(tab).map(function(k){ return '<option value="'+k+'">'+tab[k].n+'</option>'; }).join('');
+  return '<div class="calc noprint" data-r="'+r.id+'"><b>Calculer pour mon lot</b><div class="two"><label class="f">Animaux<select class="ce">'+opts+'</select></label><label class="f">Nombre<input class="cn" type="number" min="1" step="1" value="50" inputmode="decimal"></label></div><output></output></div>';
+}
+function upd(box){
+  var r=REM.filter(function(x){return x.id===box.dataset.r;})[0], k=box.querySelector('.ce').value, n=parseFloat(box.querySelector('.cn').value)||0, o=box.querySelector('output');
+  if(r.calc.k==='eau'){ var L=n*EAU[k].l; o.innerHTML='Eau de boisson par jour : <b>'+M.fmt(L,L<10?1:0)+' L</b> → '+M.fmt(L*r.calc.q,0)+' '+esc(r.calc.u)+' par jour.'; }
+  else { var kg=n*ALIM[k].k; o.innerHTML='Aliment par jour : <b>'+M.kg(kg)+'</b> → '+M.g(kg*r.calc.q)+' '+esc(r.calc.u.replace(/^g /,''))+' par jour.'; }
+}
+function renderAni(){
+  var q=norm($('#a-q').value||''), h='';
+  REM.forEach(function(r){
+    if(curEsp!=='tous' && r.esp.indexOf(curEsp)<0) return;
+    var hay=norm(r.t+' '+r.s+' '+r.p+' '+r.pl.map(function(k){return PL[k].n;}).join(' '));
+    if(q && q.split(/\s+/).some(function(w){return hay.indexOf(w)<0;})) return;
+    h+='<div class="card rem"><h3>'+esc(r.t)+'</h3><div class="chips">'+r.esp.map(function(e){return '<span class="chip">'+ESP[e]+'</span>';}).join('')+chipsPl(r.pl)+'</div>'+
+      '<div class="lbl">Signes</div><p>'+esc(r.s)+'</p><div class="lbl">Préparation</div><p>'+esc(r.p)+'</p><div class="lbl">Quantité et durée</div><p>'+esc(r.d)+'</p>'+
+      calcBox(r)+'<div class="msg warn"><b>Attention :</b> '+esc(r.v)+'</div></div>';
+  });
+  $('#a-list').innerHTML=h||'<p class="note">Aucun remède trouvé. Essayez un autre mot (ex. « vers », « diarrhée »).</p>';
+  M.$$('#a-list .calc').forEach(function(b){ b.querySelector('.ce').onchange=function(){upd(b);}; b.querySelector('.cn').oninput=function(){upd(b);}; upd(b); });
+}
+
+/* ---------- Cultures ---------- */
+function renderCul(){
+  var q=norm($('#c-q').value||''), h='';
+  CUL.forEach(function(r,i){
+    var hay=norm(r.t+' '+r.c+' '+r.s);
+    if(q && q.split(/\s+/).some(function(w){return hay.indexOf(w)<0;})) return;
+    h+='<div class="card rem"><h3>'+esc(r.t)+'</h3><div class="chips"><span class="chip o">'+esc(r.c)+'</span>'+chipsPl(r.pl)+(r.none?'<span class="chip r">Pas de remède végétal</span>':'')+'</div>'+
+      '<div class="lbl">Signes</div><p>'+esc(r.s)+'</p><div class="lbl">'+(r.none?'Que faire':'Préparation')+'</div><p>'+esc(r.p)+'</p>'+
+      (r.q?'<div class="calc noprint" data-i="'+i+'"><b>Quantités pour</b><div class="two"><label class="f">Pulvérisateurs<input class="cp" type="number" min="1" step="1" value="1" inputmode="decimal"></label><label class="f">Contenance (L)<input class="cc" type="number" min="1" step="1" value="16" inputmode="decimal"></label></div><output></output></div>':'')+
+      '<div class="lbl">Fréquence et conseils</div><p>'+esc(r.f)+'</p></div>';
+  });
+  $('#c-list').innerHTML=h||'<p class="note">Aucune fiche trouvée. Essayez un autre mot.</p>';
+  M.$$('#c-list .calc').forEach(function(b){
+    var r=CUL[+b.dataset.i];
+    function u(){ var L=(parseFloat(b.querySelector('.cp').value)||0)*(parseFloat(b.querySelector('.cc').value)||0);
+      b.querySelector('output').innerHTML='Pour '+M.fmt(L,0)+' L de bouillie : '+r.q.map(function(x){ var v=x[0]*L/16, unit=x[1]; if(/^ml/.test(unit)&&v>=1000) return M.fmt(v/1000,1)+' L'+unit.slice(2); if(/^g /.test(unit)) return M.g(v)+unit.slice(1); return M.fmt(v,0)+' '+unit; }).join(' + ')+', le reste en eau.'; }
+    b.querySelector('.cp').oninput=u; b.querySelector('.cc').oninput=u; u();
+  });
+}
+
+/* ---------- Plantes ---------- */
+function renderPl(){
+  $('#p-list').innerHTML=Object.keys(PL).map(function(k){ var p=PL[k];
+    return '<div class="card"><div class="pl-head"><div class="pl-ill">'+ill(p.f)+'</div><div><h3>'+esc(p.n)+'</h3><p class="sci">'+esc(p.sci)+'</p><p class="note" style="margin:4px 0 0">Partie utilisée : '+esc(p.o)+'</p></div></div><ul class="clean">'+p.u.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul><div class="msg info"><b>Précaution :</b> '+esc(p.a)+'</div></div>'; }).join('');
+}
+
+/* ---------- Préparations ---------- */
+var PREP=[
+ ['Infusion','Verser de l\'eau bouillante sur les feuilles, couvrir, laisser 10 à 15 minutes, filtrer. Pour les feuilles tendres (basilic, citronnelle).'],
+ ['Décoction','Faire bouillir les feuilles, écorces ou racines 10 à 20 minutes dans l\'eau, laisser refroidir, filtrer. Pour les parties dures (goyavier, neem pour les plaies).'],
+ ['Macération','Piler la plante et la laisser tremper dans l\'eau froide 12 à 24 heures, à l\'ombre, puis filtrer. Pour les extraits de neem, d\'ail, de feuille amère.'],
+ ['Poudre','Sécher à l\'ombre (feuilles) ou au soleil (graines), piler finement, tamiser, garder dans un bocal sec et fermé. Se conserve 2 à 3 mois.'],
+ ['Gel ou cataplasme','Ouvrir la feuille d\'aloès et racler le gel transparent, ou piler des feuilles fraîches en pâte, et poser directement sur la plaie propre.'],
+ ['Bain ou lavage','Laver tout le corps de l\'animal avec l\'extrait, à rebrousse-poil, sans toucher les yeux. Pour les tiques, poux et gale.']
+];
+
+function renderPrep(){
+  $('#prep-list').innerHTML=PREP.map(function(p,i){ return '<div class="card"><h3>'+(i+1)+'. '+p[0]+'</h3><p style="margin:0">'+esc(p[1])+'</p></div>'; }).join('');
+  $('#w-esp').innerHTML=Object.keys(EAU).map(function(k){ return '<option value="'+k+'">'+EAU[k].n+'</option>'; }).join('');
+  function w(){ var L=M.num('w-n')*EAU[$('#w-esp').value].l; $('#w-out').innerHTML='<div class="kpis"><div class="kpi"><span>Eau bue par jour</span><b>'+M.fmt(L,L<10?1:0)+' L</b></div><div class="kpi"><span>Par temps chaud (+50 %)</span><b>'+M.fmt(L*1.5,L<10?1:0)+' L</b></div></div><p class="note">Préparez le remède pour cette quantité d\'eau et retirez les autres abreuvoirs pendant le traitement.</p>'; }
+  $('#w-esp').onchange=w; $('#w-n').oninput=w; w();
+}
+
+M.tabs(); renderEsp(); renderAni(); renderCul(); renderPl(); renderPrep();
+$('#a-q').oninput=renderAni; $('#c-q').oninput=renderCul;
+M.remember('plantes');
+})();
+</script>
+</body>
+</html>
